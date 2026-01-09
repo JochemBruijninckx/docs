@@ -1,5 +1,109 @@
 ---
-title: "Employees"
-description: "Learn how to define the employees that will be used in the roster."
+title: Employees
+description: Learn how to define the employees that will be used in the roster.
 icon: "users"
 ---
+
+Employees form the foundation for all schedules produced by the solver. The primary objective for all produced schedules is to assign employees to shifts in such a way that they can optimally cover all demand for labour.
+
+The `employees` component of request payloads is used to specify which employees are available for assignment in the schedule. It allows for many configurations that provide more information about each specific employee. This page will give some pointers on how this is done.
+
+## Worktime specification
+
+Employees can have very different contracts with different requirements on the number of hours worked. These can be specified using the `workTime` object.
+
+### Weekly worktimes
+
+The minimum and maximum number of hours worked by an employee can be specified on a weekly level. By default this is assumed to be applied to each calendar week (Monday-Sunday) separately. Alternatively, you can specify that the worktime rules should apply to any consecutive days.
+
+Note that the minimum number of hours per week is a recommendation for the solver. Solutions are not guaranteed to adhere to this. The maximum number of hours can be configured to either be a hard limit or a recommendation (to avoid overtime).
+
+<Tip>
+  The following example shows an employee that may only be assigned 200 hours of work throughout the entire period. For any period of seven consecutive days, he is preferred to work between 20-40 hours. On a scale from 0 to 100, the importance of avoiding overtime for this employee is set to 50.
+
+```json
+{
+  "id": "employee-1",
+  "workTime": {
+    "maxHoursInFTECountPeriod": 200,
+    "weekHoursRules": {
+      "minWeekHours": 20,
+      "maxWeekHours": 40,
+      "maxWeekHoursWeight": 50
+    },
+    "applyMaxWeekHoursToAnySevenConsecutiveDays": true
+  }
+}
+```
+
+</Tip>
+
+## Attributes
+
+Employee attributes provide a flexible way to specify custom characteristics for each employee. These attributes can be used to determine eligibility for shifts, demands, or tasks. In addition, some constraints can be configured to apply to all employees that meet certain attribute requirements. Some good examples of characteristics where it might make sense to use attributes are `departments`, `competences`, or `personnel_groups`.
+
+Each attribute must have its own unique key indicating what kind of attribute it is. An employee can have multiple values for the same attribute.
+
+Here's an example of how to specify attributes for an employee:
+
+<Tip>
+  The following example shows an employee that is part of the departments `finance` and `hr`, and has the competences `manager` and `accountant`. Finally, they are part of the personnel group `group-1`.
+
+```json
+{
+  "id": "employee-1",
+  "attributes": [
+    {
+      "id": "department",
+      "values": ["finance", "hr"]
+    },
+    {
+      "id": "competence",
+      "values": ["manager", "accountant"]
+    },
+    {
+      "id": "personnel-group",
+      "values": ["group-1"]
+    }
+  ]
+}
+```
+
+</Tip>
+
+<Info>
+  In addition to ineligibility through `attributes`, the solver allows for
+  direct specification of ineligibilities for any individual employee. See
+  Prioritization.
+</Info>
+
+## Prescheduled shifts
+
+It is possible to start the solver from a partially filled schedule where employees already have some shifts assigned to them. These are specified in `prescheduledShifts`. If these pre-assignments are set to be `locked`, the solver will never change them. The solver therefore considers unlocked prescheduled shifts as suggestions.
+
+<Info>
+  If there are any employees in the payload who should only work their
+  prescheduled shifts and not be assigned to any new shifts, they can be
+  configured to be a `readOnly` employee. The solver will not assign such
+  employees to any new shifts.
+</Info>
+
+<Tip>
+  The following example shows an employee that is prescheduled to work `shift-1` shifts on each of the first four days of the schedule. These assignments are `locked` and will not be changed by the solver.
+
+```json
+{
+  "id": "employee-1",
+  "scheduledShifts": [
+    {
+      "shiftId": "shift-1",
+      "locked": true,
+      "scheduleDays": {
+        "dayIndexes": [0, 1, 2, 3]
+      }
+    }
+  ]
+}
+```
+
+</Tip>

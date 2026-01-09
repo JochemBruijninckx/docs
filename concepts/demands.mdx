@@ -1,5 +1,121 @@
 ---
-title: "Demands"
-description: "Learn how to define the demands that must be covered in the roster."
+title: Demands
+description: Learn how to define the need for workforce and how many employees you need at work at any given time.
 icon: "chart-column"
 ---
+
+Demand is the need for workforce and defines how many employees you need at work at any given time in the planning period. Specifying demands in the payload is done using the `Demands` property.
+
+The Automatic Rostering API allows you to define demand for workforce in two different ways:
+
+- `ShiftDemand` allows you to specify demand by stating which shifts you need on which days, and how many people you need working those shifts.
+- `TimeDemand` allows you to specify demand by stating how many employees you need at different times of day throughout your schedule. The API will then assign shifts to cover the demand at those times.
+
+<Info>
+  A request to the Automatic Rostering API should either specify all demand as
+  `ShiftDemand`, or all demand as `TimeDemand`. A combination of both is
+  currently not supported.
+</Info>
+
+Choose which type of demand suits your needs, then find below some pointers on how to configure the `Demands` object for your use case.
+
+## ShiftDemand
+
+If you have already configured Shifts in your request, then using these to specify `ShiftDemand` is very simple. Consider the following example.
+
+<Tip>
+  The following shows how to specify that on days 1 and 2 you require 2 people to work Shift A and 2 people to work Shift B, while on day 3 you only require 2 people working Shift B.
+
+```json
+{
+  "demands": [
+    {
+      "days": {
+        "dayIndexes": [0, 1]
+      },
+      "shiftDemands": [
+        {
+          "shiftId": "ShiftA",
+          "ideal": 2
+        },
+        {
+          "shiftId": "ShiftB",
+          "ideal": 2
+        }
+      ]
+    },
+    {
+      "days": {
+        "dayIndexes": [2]
+      },
+      "shiftDemands": [
+        {
+          "shiftId": "ShiftB",
+          "ideal": 2
+        }
+      ]
+    }
+  ]
+}
+```
+
+</Tip>
+
+### Attribute requirements
+
+In principle, all employees assigned to a demand must be compatible with the attribute requirements on that demand.
+However, it is also possible to specify a minimum number of assigned employees that must be compatible.
+
+<Tip>
+  The first demand requires _all_ employees to be able to drive. For the second demand, _at least_ one of the assigned
+  employees should be a nurse.
+
+```json
+{
+  "demands": [
+    {
+      "shiftDemands": [
+        {
+          "shiftId": "shift1",
+          "ideal": 2,
+          "attributeRequirements": [
+            {
+              "id": "competences",
+              "values": ["driving"]
+            }
+          ]
+        },
+        {
+          "shiftId": "shift2",
+          "ideal": 2,
+          "attributeRequirements": [
+            {
+              "id": "personnelGroup",
+              "values": ["nurses"],
+              "min": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+</Tip>
+
+## TimeDemand
+
+When demand is defined as the time periods for when employees are needed. Based on the available shifts, the solver then assigns employees to the shifts that are able to cover this demand.
+
+<Note>
+  A demand always belongs to a day, so in the cases where there are demand
+  intervals spanning midnight, this has to be specified in separate demands.
+</Note>
+
+<Tip>
+  If several demands with the same attributes overlap, they are merged together, as visualized in the below example with three demands that have overlapping time intervals.
+
+![Overlapping demands](/img/merged-demands.png)
+
+</Tip>
