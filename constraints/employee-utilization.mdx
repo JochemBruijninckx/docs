@@ -1,36 +1,38 @@
 ---
 title: Employee Utilization
-description: Constrain the number of hours worked by employees in specific periods, or on specific shifts.
+description: Set targets and limits for the number of hours or shifts worked by employees in specific periods.
 ---
 
-This constraint can be used to specify targets for the amount of work done by employees, either in FTE hours or in number of shifts. Specifically, it can be used to:
+The Employee Utilization constraint allows you to control how much work employees receive, either measured in FTE hours or in number of shifts. You can set minimum targets, ideal targets, and maximum limits for any combination of employees, shifts, and time periods.
 
-1. Set a **lower bound** on the amount of hours worked by employees in some period.
-2. Set an **ideal target** for the amount of hours worked by employees in some period.
-3. Set a **strict upper bound** on the amount of hours/shifts worked by employees in some period.
+## How targets work
+
+The constraint supports three types of targets for both hours and shifts:
+
+- **Minimum targets** (`minHours`, `minShifts`): The solver will try to ensure employees work at least this amount. These are treated as soft targets and may not always be met if other constraints conflict.
+- **Ideal targets** (`idealHours`, `idealShifts`): The solver will try to assign exactly this amount. This is useful when you want employees to work a specific number of hours or shifts.
+- **Maximum limits** (`maxHours`, `maxShifts`): These are hard limits that will never be exceeded. The solver will strictly enforce these bounds.
 
 <Info>
-  `minHours` and `idealHours` are treated as targets - the solver will try to assign exactly `idealHours`, and will try even harder to assign at least `minHours`. `maxHours` is treated as a strict upper bound - the solver will never exceed this value.
-
-The `minShifts`, `idealShifts`, and `maxShifts` targets work in the same way.
-
+  You don't need to specify all targets - only include the ones relevant to your
+  use case. For example, you can set only `maxHours` to cap the total hours, or
+  only `idealShifts` to target a specific number of shifts.
 </Info>
 
-## Setting global utilization targets
+## Global utilization targets
 
-A simple use case for this constraint is to limit the total amount of FTE hours an employee should receive in the entire planning horizon. Note that
-none of the targets are required - you can specify only the ones that are relevant to your use case.
+Set utilization targets for the entire planning horizon. This is useful for ensuring employees receive a fair distribution of work across the entire schedule.
 
 <Tip>
-  The constraint specified below will have the following effects for `employee-1`:
+  The constraint below sets targets for `employee-1` across the entire planning horizon:
 
-- The employee is preferred to work at least 80 hours in the entire planning horizon.
-- The employee should ideally work exactly 120 hours in the entire planning horizon.
-- The employee may work no more than 160 hours in the entire planning horizon.
+- The employee should work at least 80 hours (soft target)
+- The employee should ideally work exactly 120 hours
+- The employee may work no more than 160 hours (hard limit)
 
 ```json
 {
-  "id": "euc-1",
+  "id": "euc-total-hours",
   "targets": {
     "minHours": 80,
     "idealHours": 120,
@@ -46,27 +48,159 @@ none of the targets are required - you can specify only the ones that are releva
 
 </Tip>
 
-## Setting weekly utilization targets
+## Period-based utilization targets
 
-All targets on the Employee Utilization Constraint are applied to each period separately. Using a recurrent period definition is therefore an easy way of creating a weekly utilization constraint.
+All targets are applied to each period separately. By defining periods, you can create constraints that apply to specific time windows, such as weekly or monthly targets.
 
 <Tip>
-  The constraint specified below sets a strict upper bound (2) on the number of night shifts an employee can work per week.
+  The constraint below sets a weekly target for all employees. Each employee should ideally work 40 hours per week, with a minimum of 32 hours and a maximum of 48 hours.
 
 ```json
 {
-  "id": "euc-1",
+  "id": "euc-weekly-hours",
+  "targets": {
+    "minHours": 32,
+    "idealHours": 40,
+    "maxHours": 48
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7
+    }
+  }
+}
+```
+
+</Tip>
+
+## Shift-based limits
+
+You can limit the number of shifts of a specific type that employees can work. This is particularly useful for controlling undesirable shifts like night shifts or weekend work.
+
+<Tip>
+  The constraint below sets a strict upper bound of 2 night shifts per week for all employees. After an employee has worked 2 night shifts in a week, they cannot be assigned any more night shifts that week.
+
+```json
+{
+  "id": "euc-night-shifts-per-week",
+  "targets": {
+    "maxShifts": 2
+  },
   "filters": {
     "shifts": {
       "labels": ["night"]
     }
   },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7
+    }
+  }
+}
+```
+
+</Tip>
+
+## Minimum shift requirements
+
+You can also set minimum shift requirements to ensure employees receive a certain amount of work.
+
+<Tip>
+  The constraint below ensures that each employee works at least 3 shifts per week, with an ideal target of 5 shifts. This helps prevent employees from being underutilized.
+
+```json
+{
+  "id": "euc-min-shifts-per-week",
   "targets": {
-    "maxShifts": 2
+    "minShifts": 3,
+    "idealShifts": 5
   },
   "periods": {
     "recurrentDefinition": {
       "daysPerPeriod": 7
+    }
+  }
+}
+```
+
+</Tip>
+
+## Combining hours and shifts targets
+
+You can combine both hours and shifts targets in a single constraint to create more nuanced requirements.
+
+<Tip>
+  The constraint below ensures employees work between 3-5 shifts per week, with each shift ideally being around 8 hours. This creates a balanced schedule where employees get enough shifts but not too many.
+
+```json
+{
+  "id": "euc-balanced-weekly",
+  "targets": {
+    "minShifts": 3,
+    "idealShifts": 4,
+    "maxShifts": 5,
+    "minHours": 24,
+    "idealHours": 32,
+    "maxHours": 40
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7
+    }
+  }
+}
+```
+
+</Tip>
+
+## Setting limits on specific roles
+
+You can set limits on the number of hours or shifts that employees can be assigned to specific roles.
+
+<Tip>
+  The constraint below limits employees to a maximum of 50 hours per week worked with role `role-1`, while aiming for them to work at least 35 hours.
+
+```json
+{
+  "id": "euc-role-1-max-50-hours",
+  "targets": {
+    "minHours": 35,
+    "idealHours": 40,
+    "maxHours": 50
+  },
+  "filters": {
+    "assignments": {
+      "roleIds": ["role-1"]
+    }
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7
+    }
+  }
+}
+```
+
+</Tip>
+
+<Tip>
+  The constraint below ensures that employees work at least 2 weekend shifts per month, helping to distribute weekend work fairly.
+
+```json
+{
+  "id": "euc-weekend-shifts",
+  "targets": {
+    "minShifts": 2,
+    "idealShifts": 3
+  },
+  "filters": {
+    "shifts": {
+      "labels": ["weekend"]
+    }
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 30
     }
   }
 }
