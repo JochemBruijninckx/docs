@@ -22,7 +22,10 @@ At its core, a shift is built up out of one or more `intervals`. Whenever a shif
 
 - The Shift contains an interval from 20:00-00:00 with `dayIndicator` -1, and an interval from 00:00-02:00 with `dayIndicator` 0. When planning any instances of this Shift, it will be considered to belong to the second day.
 - The Shift contains an interval from 20:00-00:00 with `dayIndicator` 0, and an interval from 00:00-02:00 with `dayIndicator` 1. When planning any instances of this Shift, it will be considered to belong to the first day.
-</Tip>
+
+.
+
+  </Tip>
 
 ### Breaks
 
@@ -40,15 +43,15 @@ In the schedules created by the solver, Shifts are assigned to employees on days
   {
     "id": "shift-1",
     "intervals": [...],
-    "allowedDays": {
-      "weekDays": [1, 2, 3]
+    "availableDays": {
+      "daysOfWeek": ["MON", "TUE", "WED"]
     }
   },
   {
     "id": "shift-2",
     "intervals": [...],
-    "allowedDays": {
-      "dayIndexes": [0, 1, 2, 11, 12, 13]
+    "availableDays": {
+      "dayIndices": [0, 1, 2, 11, 12, 13]
     }
   }
 ]
@@ -56,37 +59,13 @@ In the schedules created by the solver, Shifts are assigned to employees on days
 
 </Tip>
 
-## Connected shifts
-
-If you have different Shifts that are inherently linked, it is possible to ensure they happen after one another using the concept of `connectedShifts`. An example could be a Shift that covers preparation for some event on one day, where it is then required for that employee to also work the Shift for the actual event on the next day. Alternatively, this can be used to indicate that certain Shifts should always be followed by a day off.
-
-<Tip>
-  The following payload example shows a Shift that must be preceded by a day off, and followed by an assignment to a "shift-2" Shift. Note that you may specify multiple potential shiftIds, in which case the solver will choose any of the specified shiftIds.
-
-```json
-{
-  "id": "shift-1",
-  "intervals": [...],
-  "connectedShiftsPreviousDay": {
-    "dayOff": true
-  },
-  "connectedShiftsNextDay": {
-    "shiftIds": ["shift-2"]
-  }
-}
-```
-
-</Tip>
-
-## Prescheduled shifts
+## Preassigned shifts
 
 If there are certain shift assignments for employees that are already fixed, it is recommended to include these in the request. This way, the solver can take into account which hours an employee is already working and ensure the produced schedule is feasible given the already existing assignments.
 
-However, it can occur that this means you have to send in a Shift definition that you do not want to be used by the solver to make new assignments - only to explain what kind of shift the employee is working in the already fixed assignment. For this purpose, it is possible to mark a Shift as `readOnly`. The solver will then not use it to make new assignments.
+However, it can occur that this means you have to send in a Shift definition that you do not want to be used by the solver to make new assignments - only to explain what kind of shift the employee is working in the already fixed assignment. For this purpose, it is possible to mark a Shift as `isReadOnly`. The solver will then not use it to make new assignments.
 
 <Warning>
-  Prescheduled shifts should still adhere to all further rules and constraints
-  active in the request. For example, if you preschedule two Shifts one day
-  apart while also including a constraint that requires two days of rest between
-  any two shifts, the solver cannot produce any schedules.
+  An employee cannot be preassigned to multiple locked shifts on the same day,
+  or to overlapping locked shifts.
 </Warning>

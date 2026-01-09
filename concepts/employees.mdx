@@ -77,29 +77,29 @@ Here's an example of how to specify attributes for an employee:
   Prioritization.
 </Info>
 
-## Prescheduled shifts
+## Preassigned shifts
 
-It is possible to start the solver from a partially filled schedule where employees already have some shifts assigned to them. These are specified in `prescheduledShifts`. If these pre-assignments are set to be `locked`, the solver will never change them. The solver therefore considers unlocked prescheduled shifts as suggestions.
+It is possible to start the solver from a partially filled schedule where employees already have some shifts assigned to them. These are specified in `preassignedShifts`. If these pre-assignments are set to `isLocked`, the solver will never change them. The solver therefore considers unlocked preassigned shifts as suggestions.
 
 <Info>
   If there are any employees in the payload who should only work their
-  prescheduled shifts and not be assigned to any new shifts, they can be
+  preassigned shifts and not be assigned to any new shifts, they can be
   configured to be a `readOnly` employee. The solver will not assign such
   employees to any new shifts.
 </Info>
 
 <Tip>
-  The following example shows an employee that is prescheduled to work `shift-1` shifts on each of the first four days of the schedule. These assignments are `locked` and will not be changed by the solver.
+  The following example shows an employee that is preassigned to work `shift-1` shifts on each of the first four days of the schedule. These assignments are set as `isLocked` and will not be changed by the solver.
 
 ```json
 {
   "id": "employee-1",
-  "scheduledShifts": [
+  "preassignedShifts": [
     {
       "shiftId": "shift-1",
-      "locked": true,
-      "scheduleDays": {
-        "dayIndexes": [0, 1, 2, 3]
+      "isLocked": true,
+      "days": {
+        "dayIndices": [0, 1, 2, 3]
       }
     }
   ]
