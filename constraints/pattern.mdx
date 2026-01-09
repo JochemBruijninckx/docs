@@ -38,7 +38,7 @@ However, if you so desire you can use the `startDays` field on a specific patter
 
 </Tip>
 
-When the importance of a pattern constraint is set to Strict, the solver will _never_ make an employee follow the specified pattern. Since this cannot be guaranteed with respect to days off, it is not allowed to use the keyword `DAY_OFF` within a strict undesired constraint's pattern.
+When the [importance](/constraints/index#constraint-importance) of a pattern constraint is set to `STRICT`, the solver will _never_ make an employee follow the specified pattern. Since this cannot be guaranteed with respect to days off, it is not allowed to use the keyword `DAY_OFF` within a strict undesired constraint's pattern.
 
 ## Desired patterns
 
@@ -114,6 +114,6 @@ The current list of empty day behaviours is as follows:
 
 In order for a day to qualify as a day without demand, there must be no demands defined on that day. In order for a day to qualify as a day off, the employee must be configured to be unavailable for work on that day. This can be done through one of the following constraints:
 
-- **EmployeeAvailability**: The employee is strictly unavailable for work on the entire day.
-- **EmployeeUtilization**: The employee has a strict maximum of 0 hours or shifts on the day.
-- **PeriodDistribution**: The employee may work a maximum of 0 periods (which includes the day).
+- [**EmployeeAvailability**](/constraints/employee-availability): The employee is strictly unavailable for work on the entire day.
+- [**EmployeeUtilization**](/constraints/employee-utilization): The employee has a strict maximum of 0 hours or shifts on the day.
+- [**PeriodDistribution**](/constraints/period-distribution): The employee may work a maximum of 0 periods (which includes the day).

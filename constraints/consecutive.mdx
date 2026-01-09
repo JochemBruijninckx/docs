@@ -7,7 +7,7 @@ This constraint allows you to control how many consecutive shifts or days employ
 
 ## Maximum consecutive shifts
 
-To limit the maximum number of consecutive shifts or days an employee can work, use the `max` property in the `targets` object. This limit can only be enforced with `STRICT` importance, meaning the solver will never violate it.
+To limit the maximum number of consecutive shifts or days an employee can work, use the `max` property in the `targets` object. This limit can only be enforced with [`STRICT` importance](/constraints/index#constraint-importance), meaning the solver will never violate it.
 
 <Tip>
   The below constraint strictly prevents employees from working more than 4 consecutive days. If an employee works on Monday, Tuesday, Wednesday, and Thursday, they must have at least one day off before working again.
@@ -45,7 +45,7 @@ To encourage employees to work a minimum number of consecutive shifts, use the `
 
 ## Combining minimum and maximum
 
-You can combine both `min` and `max` targets in a single constraint to create a preferred range of consecutive work periods. Note that when using `max`, the `importance` must be `STRICT` for the maximum limit to be enforced. The minimum target will be treated as a target that the solver will try to achieve.
+You can combine both `min` and `max` targets in a single constraint to create a preferred range of consecutive work periods. Note that when using `max`, the [importance](/constraints/index#constraint-importance) must be `STRICT` for the maximum limit to be enforced. The minimum target will be treated as a target that the solver will try to achieve.
 
 <Tip>
   The below constraint encourages employees to work between 3 and 5 consecutive days when they do work. The solver will try to achieve at least 3 consecutive days (as a target), and will strictly prevent more than 5 consecutive days.
@@ -65,7 +65,7 @@ You can combine both `min` and `max` targets in a single constraint to create a 
 
 ## Filtering by employees and shifts
 
-You can combine both employee and shift filters to create very specific rules for certain groups of employees working certain types of shifts.
+You can combine both employee and shift [filters](/constraints/index#filters) to create very specific rules for certain groups of employees working certain types of shifts.
 
 <Tip>
   The below constraint strictly limits senior employees to a maximum of 2 consecutive intensive shifts, while other employees are not affected.

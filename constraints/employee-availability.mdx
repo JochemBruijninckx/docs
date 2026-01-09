@@ -36,7 +36,7 @@ To define certain periods as strictly unavailable for an employee, simply specif
 
 ## Undesired availability
 
-To mark that an employee would rather not work during certain periods, set the `isDesired` field to `false` and choose an importance level different than `STRICT`. The solver will try to avoid assigning shifts to the employee during these periods, but it is not strictly forbidden.
+To mark that an employee would rather not work during certain periods, set the `isDesired` field to `false` and choose an [importance level](/constraints/index#constraint-importance) different than `STRICT`. The solver will try to avoid assigning shifts to the employee during these periods, but it is not strictly forbidden.
 
 <Tip>
   The below constraint makes it undesirable for employee with id 'employee-1' to work on Mondays or Thursdays.
@@ -63,7 +63,7 @@ To mark that an employee would rather not work during certain periods, set the `
 
 ## Desired availability
 
-To mark that an employee prefers working on certain periods or shifts, set the `isDesired` field to `true` and choose an importance level different than `STRICT` (`STRICT` is currently not supported on desired constraints).
+To mark that an employee prefers working on certain periods or shifts, set the `isDesired` field to `true` and choose an [importance level](/constraints/index#constraint-importance) different than `STRICT` (`STRICT` is currently not supported on desired constraints).
 
 <Tip>
   The below constraint makes it preferred to assign shifts with shift label `night` to employee with id 'employee-1' on Mondays, Tuesdays or Wednesdays.

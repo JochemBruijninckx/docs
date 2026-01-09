@@ -18,15 +18,16 @@ The constraint can be used in one of two ways: the prioritization of employees c
 
 <Warning>
   It is recommended only to use Prioritization for shifts when working with
-  ShiftDemands. When used with TimeDemand, it can happen that shifts are planned
-  that do not cover demands fully.
+  [ShiftDemands](/concepts/demands#shiftdemand). When used with
+  [TimeDemand](/concepts/demands#timedemand), it can happen that shifts are
+  planned that do not cover demands fully.
 </Warning>
 
 ## Priority scores
 
 A prioritization of employees for a demand/shift is defined using priority scores. The priority scores can be numbers between 0 and 100, where 100 is the highest priority.
 Priority scores should be assigned to employees, such that more preferred employees are given higher scores than less preferred employees.
-In addition, a priority score of -1 can be used to denote that an employee can never be scheduled for a demand/shift. Priority scores of -1 are therefore **hard constraints**.
+In addition, a priority score of -1 can be used to denote that an employee can never be scheduled for a demand/shift. Priority scores of -1 are therefore **hard constraints** (similar to [`STRICT` importance](/constraints/index#constraint-importance)).
 
 ## Priority score matrix
 

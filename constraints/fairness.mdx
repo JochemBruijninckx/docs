@@ -20,18 +20,18 @@ Fairness is a special type of constraint that can be used to improve the fair di
 
 The current list of constraint types that a fairness constraint can apply to is as follows:
 
-| Constraint type                      | Fairness target impact                                           |
-| ------------------------------------ | ---------------------------------------------------------------- |
-| **EmployeeAvailability** (desired)   | Equal amount of desired hours for all employees                  |
-| **EmployeeAvailability** (undesired) | Equal amount of undesired hours for all employees                |
-| **EmployeeUtilization**              | Equal fraction of ideal hours/ideal shifts for all employees     |
-| **PeriodDistribution**               | Equal amount of period distribution violations for all employees |
-| **PeriodicRest**                     | Equal amount of missing periodic rest minutes for all employees  |
-| **RestBetweenShifts**                | Equal amount of missing rest minutes for all employees           |
+| Constraint type                                                            | Fairness target impact                                           |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [**EmployeeAvailability**](/constraints/employee-availability) (desired)   | Equal amount of desired hours for all employees                  |
+| [**EmployeeAvailability**](/constraints/employee-availability) (undesired) | Equal amount of undesired hours for all employees                |
+| [**EmployeeUtilization**](/constraints/employee-utilization)               | Equal fraction of ideal hours/ideal shifts for all employees     |
+| [**PeriodDistribution**](/constraints/period-distribution)                 | Equal amount of period distribution violations for all employees |
+| [**PeriodicRest**](/constraints/periodic-rest)                             | Equal amount of missing periodic rest minutes for all employees  |
+| **RestBetweenShifts**                                                      | Equal amount of missing rest minutes for all employees           |
 
 ## Example - Fairness on Employee Availability
 
-In order to make sure employees receive the same amount of (un)desired work, you can send in a fairness constraint that applies to a group of EmployeeAvailabilityConstraints.
+In order to make sure employees receive the same amount of (un)desired work, you can send in a fairness constraint that applies to a group of [EmployeeAvailabilityConstraints](/constraints/employee-availability).
 
 <Tip>
   In the below example, the solver will try to assign the same amounts of undesired hours to employees 1 and 2. Notice that the undesired hours can come from different shifts - it might be that employee 1 does not want to work weekends, while employee 2 does not want to work on Mondays. The constraint will make sure that the total amount of undesired hours is the same for both employees.
@@ -54,7 +54,7 @@ In addition, notice that the above fairness constraint applies constraint import
 
 ## Example - Fairness on Employee Utilization
 
-In general, when applying a fairness constraint it makes most sense to apply it to constraints that cover similar use cases. For example, on Employee Utilization it could make sense to have separate fairness constraints for employees' total utilization and employee's weekly utilization.
+In general, when applying a fairness constraint it makes most sense to apply it to constraints that cover similar use cases. For example, on [Employee Utilization](/constraints/employee-utilization) it could make sense to have separate fairness constraints for employees' total utilization and employee's weekly utilization.
 
 <Tip>
   In the below example, the solver will try to make sure that employees 1 and 2 receive the same share of their ideal total hours and the same share of their ideal weekly hours.

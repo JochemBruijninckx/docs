@@ -113,7 +113,7 @@ You can create more complex cooldown rules by combining different shift types in
 
 ## Soft cooldown constraints
 
-While cooldown constraints are often used with `STRICT` importance to enforce mandatory rest periods, you can also use them with other importance levels to encourage (but not strictly require) rest periods.
+While cooldown constraints are often used with [`STRICT` importance](/constraints/index#constraint-importance) to enforce mandatory rest periods, you can also use them with other [importance levels](/constraints/index#constraint-importance) to encourage (but not strictly require) rest periods.
 
 <Tip>
   The below constraint encourages (but doesn't strictly require) at least 10 hours of rest after a night shift before an employee can work a morning shift. The solver will try to achieve this, but may violate it if necessary to satisfy other constraints.
