@@ -4,7 +4,7 @@ description: "Learn how to create your first roster"
 icon: "circle-play"
 ---
 
-## Run your first job
+## Create your first roster
 
 <Steps>
     <Step title="Authenticate">
@@ -12,45 +12,47 @@ icon: "circle-play"
     </Step>
 
     <Step title="Specify the roster request">
-    Build your roster request payload. See the [API Reference](/api-reference/roster/start-job) for detailed instructions. For your first job, feel free to use the below example payload as a starting point.
+      Build your roster request payload. See the [API Reference](/api-reference/roster/start-job) for detailed instructions. For your first job, feel free to use the example payload below as a starting point.
 
-    ```json
-    {
-      "jobInfo": {
-        "id": "my-first-job",
-        "organisationId": "my-organisation-id",
-        "scheduleType": "CALENDAR",
-        "demandType": "SHIFT_DEMAND",
-        "planningHorizon": {
-          "startDate": "2026-01-01",
-          "endDate": "2026-01-31"
-        }
-      },
-      "employees": [
+      <Accordion title="Example payload">
+        ```json
         {
-          "id": "employee-1",
-        },
-        {
-          "id": "employee-2",
-        }
-      ],
-      "shifts": [
-        {
-          "id": "shift-1",
-        },
-      ],
-      "demands": [
-        {
-          "shiftDemands": [
+          "jobInfo": {
+            "id": "my-first-job",
+            "organisationId": "my-organisation-id",
+            "scheduleType": "CALENDAR",
+            "demandType": "SHIFT_DEMAND",
+            "planningHorizon": {
+              "startDate": "2026-01-01",
+              "endDate": "2026-01-31"
+            }
+          },
+          "employees": [
             {
-              "shiftId": "shift-1",
-              "ideal": 2
+              "id": "employee-1",
             },
+            {
+              "id": "employee-2",
+            }
+          ],
+          "shifts": [
+            {
+              "id": "shift-1",
+            },
+          ],
+          "demands": [
+            {
+              "shiftDemands": [
+                {
+                  "shiftId": "shift-1",
+                  "ideal": 2
+                },
+              ]
+            }
           ]
         }
-      ]
-    }
-    ```
+        ```
+      </Accordion>
     </Step>
 
     <Step title="Generate your first roster">
@@ -68,7 +70,7 @@ icon: "circle-play"
 
 </Steps>
 
-## Generate code from OpenAPI Specification
+## Generate types from the specification
 
 The Automatic Rostering API is built on the OpenAPI Specification. You can generate code for your preferred programming language using the OpenAPI Specification.
 
