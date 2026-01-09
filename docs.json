@@ -25,8 +25,8 @@
             "group": "Concepts",
             "pages": [
               "concepts/employees",
-              "concepts/demands",
               "concepts/shifts",
+              "concepts/demands",
               {
                 "group": "Constraints",
                 "icon": "shield-check",
