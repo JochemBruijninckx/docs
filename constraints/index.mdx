@@ -1,4 +1,98 @@
 ---
 title: "Constraints"
-description: "Learn about the various constraints you can apply to control shift assignments and roster generation."
+description: "Learn about using constraints to setup rules the solver should follow when generating rosters."
 ---
+
+Constraints are used to specify rules that the solver should follow when generating rosters. They allow you to control shift assignments, employee availability, work patterns, and other aspects of roster generation to ensure the resulting schedule meets your business requirements.
+
+## Constraint importance
+
+Constraints can be configured with different levels of importance:
+
+### Strict constraints
+
+When a constraint is set to `STRICT` importance, the solver will **never** violate it. These constraints act as hard requirements that must be satisfied for the roster to be valid. If the solver cannot satisfy all strict constraints, it will fail to generate a roster.
+
+### Importance levels
+
+Alternatively, constraints can be assigned a regular importance level that indicates how strongly the solver should consider the rule: `VERY_LOW`, `LOW`, `MEDIUM`, `HIGH`, or `VERY_HIGH`.
+
+The solver will attempt to satisfy constraints with higher importance levels more strongly, but may violate them if necessary to satisfy strict constraints or other higher-priority requirements.
+
+## Filters
+
+Every constraint can receive `filters` which allow you to make the constraint apply only to specific employees or shifts. This provides fine-grained control over which parts of your roster are affected by each constraint.
+
+Filters can target entities in two ways:
+
+- **By ID**: Specify exact IDs of employees or shifts that the constraint should apply to
+- **By labels**: Specify labels that employees or shifts must have for the constraint to apply
+
+For example, you might want a constraint that only applies to employees with the label `"senior"` working shifts with the label `"night"`. This allows you to create complex, targeted rules for different groups of employees and shifts.
+
+<Tip>
+  Below is an example of a `HIGH` importance constraint that applies to employees with the id `employee-1` and `employee-2` working shifts with the label `night`.
+
+```json
+{
+  "id": "constraint-123",
+  "labels": ["night-shifts", "senior-staff"],
+  "importance": "HIGH",
+  "filters": {
+    "employees": {
+      "ids": ["employee-1", "employee-2"]
+    },
+    "shifts": {
+      "labels": ["night"]
+    }
+  }
+}
+```
+
+Note that each constraint will have additional fields specific to the constraint type.
+
+</Tip>
+
+## Available constraints
+
+<Columns cols={3}>
+  <Card
+    title="Employee Availability"
+    icon="user-check"
+    href="/constraints/employee-availability"
+  >
+    Block employees from working on specific days or shifts, or make it
+    desired/undesired for them to work.
+  </Card>
+  <Card
+    title="Employee Utilization"
+    icon="user-clock"
+    href="/constraints/employee-utilization"
+  >
+    Control the minimum and maximum utilization of employees over specific
+    periods.
+  </Card>
+  <Card title="Cooldown" icon="clock" href="/constraints/cooldown">
+    Define minimum rest periods between shifts for employees.
+  </Card>
+  <Card
+    title="Consecutive"
+    icon="arrows-left-right"
+    href="/constraints/consecutive"
+  >
+    Control the minimum and maximum number of consecutive working days.
+  </Card>
+  <Card title="Pattern" icon="repeat" href="/constraints/pattern">
+    Define work patterns that employees should follow.
+  </Card>
+  <Card title="Periodic Rest" icon="moon" href="/constraints/periodic-rest">
+    Ensure employees get rest periods at regular intervals.
+  </Card>
+  <Card
+    title="Period Distribution"
+    icon="calendar-days"
+    href="/constraints/period-distribution"
+  >
+    Control how work is distributed across different periods.
+  </Card>
+</Columns>
