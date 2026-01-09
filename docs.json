@@ -15,28 +15,42 @@
         "groups": [
           {
             "group": "Getting started",
-            "pages": ["index", "quickstart", "development"]
-          },
-          {
-            "group": "Customization",
-            "pages": ["essentials/settings", "essentials/navigation"]
-          },
-          {
-            "group": "Writing content",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "index",
+              "getting-started/authentication",
+              "getting-started/quickstart"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Concepts",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "concepts/employees",
+              "concepts/demands",
+              "concepts/shifts",
+              "concepts/attributes",
+              {
+                "group": "Constraints",
+                "icon": "shield-heart",
+                "pages": [
+                  "constraints/employee-availability",
+                  "constraints/employee-utilization",
+                  "constraints/pattern",
+                  "constraints/periodic-rest",
+                  "constraints/period-distribution",
+                  "constraints/cooldown",
+                  "constraints/prioritization",
+                  "constraints/continuity",
+                  "constraints/layout",
+                  "constraints/consecutive",
+                  "constraints/rotation",
+                  "constraints/fairness"
+                ]
+              }
             ]
+          },
+          {
+            "group": "Other",
+            "pages": ["misc/changelog", "misc/migrate"]
           }
         ]
       },
