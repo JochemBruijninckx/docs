@@ -48,6 +48,11 @@
     "global": {
       "anchors": [
         {
+          "anchor": "Documentation",
+          "href": "http://localhost:3000/",
+          "icon": "book-open-cover"
+        },
+        {
           "anchor": "Playground",
           "href": "https://ar-playground-one.vercel.app/",
           "icon": "code"
