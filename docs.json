@@ -30,8 +30,9 @@
               "concepts/attributes",
               {
                 "group": "Constraints",
-                "icon": "shield-heart",
+                "icon": "shield-check",
                 "pages": [
+                  "constraints/index",
                   "constraints/employee-availability",
                   "constraints/employee-utilization",
                   "constraints/cooldown",

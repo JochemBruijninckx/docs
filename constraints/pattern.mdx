@@ -1,4 +1,119 @@
 ---
-title: "Pattern"
-description: "Enforce specific shift patterns or sequences for employees."
+title: Pattern
+description: Define desired or undesired shift patterns.
 ---
+
+Pattern Constraint can be used to allow you to specify patterns that are desired or undesired for the employee to follow in the produced roster. Both possible use cases are discussed separately below.
+
+## Undesired patterns
+
+For undesired patterns, simply define the patterns that you would not want employees to follow. By default, the solver will try to never assign shifts to employees that would make them follow the undesired patterns.
+However, if you so desire you can use the `startDays` field on a specific pattern to specify that the pattern should only be avoided at specific times. For example, some patterns might be fine to follow during the week, but only become undesired during the weekend.
+
+<Tip>
+  The constraint specified below makes it undesirable for employees to work the night shift on both Saturday and Sunday.
+
+```json
+{
+  "id": "spc-weekend-patterns",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "startDays": {
+        "daysOfWeek": ["SAT"]
+      },
+      "patternDays": [
+        {
+          "shiftIds": ["night-shift"]
+        },
+        {
+          "shiftIds": ["night-shift"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+</Tip>
+
+When the importance of a pattern constraint is set to Strict, the solver will _never_ make an employee follow the specified pattern. Since this cannot be guaranteed with respect to days off, it is not allowed to use the keyword `DAY_OFF` within a strict undesired constraint's pattern.
+
+## Desired patterns
+
+The desired version of this constraint works in a similar way. Define the patterns that you would like employees to follow. By default, the solver will try to assign shifts to employees that would make them follow the desired patterns.
+
+However, if there are multiple patterns that you would like the solver to choose from, some further configuration is needed. In this case, it is required to define `periods` on the constraint. Within each defined period, the solver will then try
+to make the employees follow exactly one of the specified patterns. If you do then do not define `startDays` on a pattern, it will default to starting on the first day of each period. If you do choose to define `startDays`, each instance of the pattern
+must fall fully within exactly one period. Desired pattern constraints with only one defined pattern do not need to define `periods`.
+
+<Tip>
+  In the following constraint, the employees may only work shifts if they are in accordance with either of the two patterns. The periods are defined as each weekend (Friday-Sunday). The first pattern is 3 days long and does not define `startDays` - it therefore starts on each Friday.
+  Meanwhile, the second pattern is 2 days long and only starts on Saturdays. When the solver follows the second pattern for some weekend, it is therefore allowed to plan whatever it wants on the Friday of that weekend.
+
+```json
+{
+  "patternConstraints": [
+    {
+      "id": "spc-strict-weekends",
+      "importance": "STRICT",
+      "isDesired": true,
+      "periods": {
+        "recurrentPeriodDefinition": {
+          "daysPerPeriod": 3,
+          "daysBetweenStarts": 7
+        }
+      },
+      "patterns": [
+        {
+          "patternDays": [
+            {
+              "shiftIds": ["shift_1"]
+            },
+            {
+              "shiftIds": ["shift_1"]
+            },
+            {
+              "shiftIds": ["shift_1"]
+            }
+          ]
+        },
+        {
+          "startDays": {
+            "daysOfWeek": ["SAT"]
+          },
+          "patternDays": [
+            {
+              "shiftIds": ["shift_2"]
+            },
+            {
+              "shiftIds": ["shift_2"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+</Tip>
+
+## Empty day behaviour
+
+In some cases, it can be desirable to allow a pattern to 'skip over' days if it will be impossible for an employee to follow the pattern on that day. In particular, days where an employee is not available for work or days where no demand is defined can be configured to be skipped over. These two types of empty day behaviour can be configured separately through the `dayOffBehaviour` and `dayWithoutDemandBehaviour` fields on each pattern itself.
+
+The current list of empty day behaviours is as follows:
+
+| Empty day behaviour | Impact                                                                                                            |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **INCLUDE**         | Days are always included in the pattern (never skipped over), regardless of whether it is an empty day or not.    |
+| **EXCLUDE**         | Days are always excluded from the pattern (always skipped over), regardless of whether it is an empty day or not. |
+| **MATCH**           | Days are included in the pattern as long as the pattern can be matched with a day off on that day.                |
+
+In order for a day to qualify as a day without demand, there must be no demands defined on that day. In order for a day to qualify as a day off, the employee must be configured to be unavailable for work on that day. This can be done through one of the following constraints:
+
+- **EmployeeAvailability**: The employee is strictly unavailable for work on the entire day.
+- **EmployeeUtilization**: The employee has a strict maximum of 0 hours or shifts on the day.
+- **PeriodDistribution**: The employee may work a maximum of 0 periods (which includes the day).

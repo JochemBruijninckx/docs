@@ -1,4 +1,60 @@
 ---
-title: "Periodic Rest"
-description: "Define periodic rest requirements for employees."
+title: Periodic Rest
+description: Set targets for the minimum rest an employee should receive in each period
 ---
+
+The Periodic Rest Constraint can be used to set a minimum duration of continuous rest that an employee gets in a period. Of all the periods of rest the employee gets, the constraint ensures that at least one of them is of the specified minimum duration per period.
+A good example of this constraint is to ensure that employees get at least 48 hours of continuous rest in each week, so that they will always have at least 2 consecutive days off (regardless of which days it is planned on).
+
+<Tip>
+  The following example defines a periodic rest constraint that ensures that all employees get at least one 48-hour long continuous rest in each week.
+
+```json
+{
+  "periodicRestConstraints": [
+    {
+      "id": "48-hours-per-week",
+      "minimumContinuousRestDuration": {
+        "hours": 48
+      },
+      "periods": {
+        "recurrentDefinition": {
+          "daysPerPeriod": 7
+        }
+      }
+    }
+  ]
+}
+```
+
+</Tip>
+
+<Tip>
+  The following example defines a periodic rest constraint that ensures that all employees get at least one 72-hour long continuous rest in each month.
+
+```json
+{
+  "periodicRestConstraints": [
+    {
+      "id": "72-hours-per-month",
+      "minimumContinuousRestDuration": {
+        "hours": 72
+      },
+      "periods": {
+        "customDefinitions": [
+          {
+            "startDate": "2022-01-01",
+            "endDate": "2022-01-31"
+          },
+          {
+            "startDate": "2022-02-01",
+            "endDate": "2022-02-28"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</Tip>

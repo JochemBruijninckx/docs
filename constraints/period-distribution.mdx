@@ -1,4 +1,121 @@
 ---
-title: "Period Distribution"
-description: "Control how shifts are distributed across different time periods."
+title: Period Distribution
+description: Set rules for how many periods (marked by labels) an employee can work.
 ---
+
+Define rules to improve the distribution of inconvenient periods among employees.
+
+## Explanation
+
+Within the context of this constraint, a period is considered 'worked' for an employee if they work any shift during that period, and
+'free' if they do not. The constraint allows you to set rules for how many periods an employee can work, how many they can work in succession,
+and how many free periods they must have surrounding a working period.
+
+Often seen use cases are the distribution of weekends, holidays, or other inconvenient periods among employees.
+
+## Maximum worked periods
+
+An easy use case is to limit how many worked periods an employee can have.
+
+<Tip>
+  The constraint specified below makes it undesirable for employees to work more than 2 weekends. Notice that working a shift is only considered
+  as working a period if it overlaps for at least 6 hours with the period, as configured in the `overlapRules`.
+
+To work with `labels` on periods, make sure you have set a definition for the period label in the `configuration` part of the payload.
+
+```json
+{
+  "id": "pd-max-weekends",
+  "weight": 50,
+  "maxWorkedPeriods": 2,
+  "overlapRules": {
+    "minOverlapHours": 6
+  },
+  "periods": {
+    "labels": ["WEEKENDS"]
+  }
+}
+```
+
+</Tip>
+
+## Minimum worked periods
+
+Alternatively, the constraint can be used to encourage a minimum amount of worked periods for an employee.
+
+<Tip>
+  The constraint specified below sets a target for the minimum number of weekends during which the employee works any shift.
+  `minWorkedPeriods` is never treated as a strict lower bound, but rather as a target that the solver will try to reach.
+
+```json
+{
+  "id": "pd-min-weekends",
+  "minWorkedPeriods": 3,
+  "periods": {
+    "labels": ["WEEKENDS"]
+  }
+}
+```
+
+</Tip>
+
+## Maximum consecutive worked periods
+
+Alternatively, the constraint can be used to limit how many undesirable periods an employee can work in succession.
+
+<Tip>
+  The constraint specified below makes it strictly forbidden for an employee to work 3 holidays in a row. Notice that with the way periods are defined,
+  working both days of Christmas still only counts as working **one** period. If the days of Christmas should count as working separate holidays,
+  you would need to define them as separate periods.
+
+```json
+{
+  "id": "pd-max-consecutive-holidays",
+  "isStrict": true,
+  "maxConsecutiveWorkedPeriods": 2,
+  "periods": {
+    "customDefinitions": [
+      {
+        "startDay": {
+          "date": "2024-12-25"
+        },
+        "endDay": {
+          "date": "2024-12-26"
+        }
+      },
+      {
+        "startDay": {
+          "date": "2024-12-31"
+        },
+        "endDay": {
+          "date": "2024-12-31"
+        }
+      }
+    ]
+  }
+}
+```
+
+</Tip>
+
+## Minimum surrounding free periods
+
+The constraint can also be used to enforce a minimum number of free periods surrounding a worked period.
+
+Note that it is currently not supported to use the `minSurroundingFreePeriods` property in combination with the `maxConsecutiveWorkedPeriods` property.
+
+<Tip>
+  The constraint specified below makes it strictly required for an employee to have at least 1 free weekend surrounding each worked weekend.
+
+```json
+{
+  "id": "pd-min-surrounding-free-weekends",
+  "isStrict": true,
+  "minSurroundingFreePeriods": 1,
+  "periods": {
+    "labels": ["WEEKENDS"]
+  }
+}
+```
+
+</Tip>

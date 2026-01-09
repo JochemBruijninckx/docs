@@ -1,4 +1,71 @@
 ---
-title: "Employee Utilization"
-description: "Control the utilization rate and workload distribution for employees."
+title: Employee Utilization
+description: Constrain the number of hours worked by employees in specific periods, or on specific shifts.
 ---
+
+This constraint can be used to specify targets for the amount of work done by employees, either in FTE hours or in number of shifts. Specifically, it can be used to:
+
+1. Set a **lower bound** on the amount of hours worked by employees in some period.
+2. Set an **ideal target** for the amount of hours worked by employees in some period.
+3. Set a **strict upper bound** on the amount of hours/shifts worked by employees in some period.
+
+<Info>
+  `minHours` and `idealHours` are treated as targets - the solver will try to assign exactly `idealHours`, and will try even harder to assign at least `minHours`. `maxHours` is treated as a strict upper bound - the solver will never exceed this value.
+
+The `minShifts`, `idealShifts`, and `maxShifts` targets work in the same way.
+
+</Info>
+
+## Setting global utilization targets
+
+A simple use case for this constraint is to limit the total amount of FTE hours an employee should receive in the entire planning horizon. Note that
+none of the targets are required - you can specify only the ones that are relevant to your use case.
+
+<Tip>
+  The constraint specified below will have the following effects for `employee-1`:
+
+- The employee is preferred to work at least 80 hours in the entire planning horizon.
+- The employee should ideally work exactly 120 hours in the entire planning horizon.
+- The employee may work no more than 160 hours in the entire planning horizon.
+
+```json
+{
+  "id": "euc-1",
+  "targets": {
+    "minHours": 80,
+    "idealHours": 120,
+    "maxHours": 160
+  },
+  "filters": {
+    "employeeIds": ["employee-1"]
+  }
+}
+```
+
+</Tip>
+
+## Setting weekly utilization targets
+
+All targets on the Employee Utilization Constraint are applied to each period separately. Using a recurrent period definition is therefore an easy way of creating a weekly utilization constraint.
+
+<Tip>
+  The constraint specified below sets a strict upper bound (2) on the number of night shifts an employee can work per week.
+
+```json
+{
+  "id": "euc-1",
+  "filters": {
+    "shiftTypeIds": ["night"]
+  },
+  "targets": {
+    "maxShifts": 2
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7
+    }
+  }
+}
+```
+
+</Tip>

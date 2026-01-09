@@ -1,4 +1,66 @@
 ---
-title: "Continuity"
-description: "Ensure continuity in shift assignments across time periods."
+title: Continuity
+description: Specify shifts for which it is preferred to reuse always use the same employees
 ---
+
+The continuity constraint can be enabled to improve the continuity of selected `employees` for certain shifts. This can be relevant in cases where planners want to make sure that they do not have to onboard new `employees` every day (when employing temp workers), or where it is preferred for `employees` to work multiple shifts in similar groups.
+
+The constraint is configured by specifying `continuityGroups`. A group consist of one or more `shifts`, and can be specified to apply to the entire schedule (default) or to a certain set of days.
+
+The solver will attempt to ensure that all shifts within one `continuityGroup` are worked by the same `employees`. If this is not possible, it will try to minimize the number of deviations.
+
+Each continuity constraint can be assigned a `weight` from 0 to 100 to indicate its importance. Moreover, should a planner require strict continuity for some `continuityGroup`, the `isStrict` property can be used.
+
+## Strict continuity
+
+A group is considered to have strict continuity when all shifts in the group are worked by the first X entries in some ordering of all employees. The number of employees (X) may differ per shift. For instance, this is an example of assignments that would constitute strict continuity. The numbers represent employees.
+
+```json
+Monday    | [8, 3, 2]
+Tuesday   | [8, 3, 2, 5, 7]
+Wednesday | [8, 3, 2, 5]
+Thursday  | [8, 3, 2, 5]
+Friday    | [8]
+```
+
+<Tip>
+  The following example shows two continuity constraint with three continuity groups in total, which have the following effects:
+
+- It is _preferred_ to have a similar group of people working all `shift-1` shifts during the first week.
+- It is _preferred_ to have a similar group of people working all `shift-1` shifts during the second week. This may be a different group than was used in the first week.
+- It is **_required_** for all `shift-2` shifts to be worked by the same group of people. This applies to the entire schedule.
+
+```json
+{
+  "continuityConstraints": [
+    {
+      "id": "cc-123",
+      "continuityGroups": [
+        {
+          "shiftIds": ["shift-1"],
+          "scheduleDays": {
+            "dayIndexes": [0, 1, 2, 3, 4]
+          }
+        },
+        {
+          "shiftIds": ["shift-1"],
+          "scheduleDays": {
+            "dayIndexes": [5, 6, 7, 8, 9]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cc-456",
+      "isStrict": true,
+      "continuityGroups": [
+        {
+          "shiftIds": ["shift-2"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+</Tip>

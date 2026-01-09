@@ -1,4 +1,79 @@
 ---
-title: "Prioritization"
-description: "Set priorities for shift assignments and constraint satisfaction."
+title: Prioritization
+description: Set priority scores for employees
 ---
+
+Takes prioritizations of employees into account during scheduling.
+The constraint can be used in one of two ways: the prioritization of employees can be configured for the **demands** or for the **shifts**.
+
+- Demands:
+  For every demand, it is possible to provide a prioritization of employees. This will have the effect that, given a demand, an employee with a higher priority will be more likely to cover that demand than an employee with a lower priority.
+
+- Shifts:
+  For every shift, it is possible to provide a prioritization of employees. This will have the effect that, given a shift, an employee with a higher priority will be more likely to be scheduled for that shift than an employee with a lower priority.
+
+<Warning>
+  It is recommended only to use Prioritization for shifts when working with
+  ShiftDemands. When used with TimeDemand, it can happen that shifts are planned
+  that do not cover demands fully.
+</Warning>
+
+## Priority scores
+
+A prioritization of employees for a demand/shift is defined using priority scores. The priority scores can be numbers between 0 and 100, where 100 is the highest priority.
+Priority scores should be assigned to employees, such that more preferred employees are given higher scores than less preferred employees.
+In addition, a priority score of -1 can be used to denote that an employee can never be scheduled for a demand/shift. Priority scores of -1 are therefore **hard constraints**.
+
+## Priority score matrix
+
+In the payload, these employee prioritizations for demands/shifts have to be provided in a matrix. This matrix has employees in its rows and demands/shifts in its columns. Priority scores are the elements of the matrix.
+
+In order to allow for more compact matrices, a group of demands/shifts which have the same prioritization of employees can be sent in as one column of the matrix. The columns of the matrix therefore defined as groups of demands/shifts.
+If there are demands/shifts that cannot be grouped, they have to be sent in as a group of one.
+The same goes for employees; employees that are prioritized in the exact same way for all shifts/demands can be sent in as one group in one row of the matrix.
+
+## Payload
+
+See the payload example below to get started and check out the API reference for full configurability of the constraint.
+
+<Tip>
+  The following defines a prioritization based on whether employees have a driver's licence or not.
+  Employees with a driver's licence are prioritized for delivery demands, and employees without a driver's licence are prioritized for sorting demands.
+  The employees without a driver's licence cannot be scheduled for delivery demands.
+
+```json
+{
+  "prioritizationConstraints": [
+    {
+      "id": "pc-123",
+      "weight": 100,
+      "employeeGroups": [
+        {
+          "employeeIds": ["1", "2", "3"],
+          "employeeGroupLabel": "drivers_licence_group"
+        },
+        {
+          "employeeIds": ["4", "5"],
+          "employeeGroupLabel": "not_drivers_licence_group"
+        }
+      ],
+      "demandGroups": [
+        {
+          "demandIds": ["demand_1", "demand_2"],
+          "demandGroupLabel": "delivery"
+        },
+        {
+          "demandIds": ["demand_3"],
+          "demandGroupLabel": "sorting"
+        }
+      ],
+      "scoreMatrix": [
+        [100, 50],
+        [-1, 100]
+      ]
+    }
+  ]
+}
+```
+
+</Tip>

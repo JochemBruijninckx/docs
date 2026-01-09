@@ -1,4 +1,92 @@
 ---
-title: "Fairness"
-description: "Ensure fair distribution of shifts and workload among employees."
+title: Fairness
+description: Improve the fairness among employees of (in)conveniences from other constraints.
 ---
+
+Fairness is a special type of constraint that can be used to improve the fair distribution of (in)conveniences from other constraints among employees. Some examples include the number of night shifts that employees have to work, the number of hours employees receive and the number of times employees receive work during their preferred hours.
+
+## Constraints that support fairness
+
+<Tip>
+  A fairness constraint must always apply to one or more other (non-fairness)
+  constraints. In addition, since fairness constraints will compare the
+  (in)conveniences that come from these constraints, the constraints must be of
+  the same type to ensure that they are comparable.
+</Tip>
+
+The current list of constraint types that a fairness constraint can apply to is as follows:
+
+| Constraint type                      | Fairness target impact                                           |
+| ------------------------------------ | ---------------------------------------------------------------- |
+| **EmployeeAvailability** (desired)   | Equal amount of desired hours for all employees                  |
+| **EmployeeAvailability** (undesired) | Equal amount of undesired hours for all employees                |
+| **EmployeeUtilization**              | Equal fraction of ideal hours/ideal shifts for all employees     |
+| **PeriodDistribution**               | Equal amount of period distribution violations for all employees |
+| **PeriodicRest**                     | Equal amount of missing periodic rest minutes for all employees  |
+| **RestBetweenShifts**                | Equal amount of missing rest minutes for all employees           |
+
+## Example - Fairness on Employee Availability
+
+In order to make sure employees receive the same amount of (un)desired work, you can send in a fairness constraint that applies to a group of EmployeeAvailabilityConstraints.
+
+<Tip>
+  In the below example, the solver will try to assign the same amounts of undesired hours to employees 1 and 2. Notice that the undesired hours can come from different shifts - it might be that employee 1 does not want to work weekends, while employee 2 does not want to work on Mondays. The constraint will make sure that the total amount of undesired hours is the same for both employees.
+
+```json
+{
+  "id": "fairness-undesired-availability",
+  "importance": "HIGH",
+  "constraintIds": [
+    "undesired-availability-employee-1",
+    "undesired-availability-employee-2"
+  ],
+  "applyConstraintImportanceScaling": true
+}
+```
+
+In addition, notice that the above fairness constraint applies constraint importance scaling. This means that if the `undesired-availability-employee-1` constraint has a higher importance than the `undesired-availability-employee-2` constraint, the solver will take this into account when comparing the (in)conveniences of the two constraints.
+
+</Tip>
+
+## Example - Fairness on Employee Utilization
+
+In general, when applying a fairness constraint it makes most sense to apply it to constraints that cover similar use cases. For example, on Employee Utilization it could make sense to have separate fairness constraints for employees' total utilization and employee's weekly utilization.
+
+<Tip>
+  In the below example, the solver will try to make sure that employees 1 and 2 receive the same share of their ideal total hours and the same share of their ideal weekly hours.
+
+```json
+[
+  {
+    "id": "fairness-total-hours",
+    "importance": "VERY_HIGH",
+    "constraintIds": [
+      "total-utilization-employee-1",
+      "total-utilization-employee-2"
+    ]
+  },
+  {
+    "id": "fairness-weekly-hours",
+    "importance": "HIGH",
+    "constraintIds": [
+      "weekly-utilization-employee-1",
+      "weekly-utilization-employee-2"
+    ]
+  }
+]
+```
+
+</Tip>
+
+<Tip>
+  It is also possible to apply a fairness constraint to just one constraint, but that will only have an effect if the constraint applies to multiple employees. The below example shows a constraint which will try to give all employees the same share of their weekly 40 hours.
+
+```json
+{
+  "id": "fairness-weekly-hours",
+  "importance": "VERY_HIGH",
+  "constraintIds": ["utilization-40-hours-for-all-employees"]
+}
+```
+
+</Tip>
