@@ -2,3 +2,90 @@
 title: "Consecutive"
 description: "Control the number of consecutive shifts or days that employees can work."
 ---
+
+This constraint allows you to control how many consecutive shifts or days employees can work. It can be used to set both minimum and maximum limits on consecutive work periods, helping you balance employee workload and prevent burnout.
+
+## Maximum consecutive shifts
+
+To limit the maximum number of consecutive shifts or days an employee can work, use the `max` property in the `targets` object. This limit can only be enforced with `STRICT` importance, meaning the solver will never violate it.
+
+<Tip>
+  The below constraint strictly prevents employees from working more than 4 consecutive days. If an employee works on Monday, Tuesday, Wednesday, and Thursday, they must have at least one day off before working again.
+
+```json
+{
+  "id": "cc-max-4-days",
+  "importance": "STRICT",
+  "targets": {
+    "max": 4
+  }
+}
+```
+
+</Tip>
+
+## Minimum consecutive shifts
+
+To encourage employees to work a minimum number of consecutive shifts, use the `min` property in the `targets` object. This is treated as a target rather than a strict requirement, so the solver will try to achieve it but may not always succeed.
+
+<Tip>
+  The below constraint encourages employees to work at least 3 consecutive shifts when they do work. This helps create more predictable work patterns and reduces fragmentation.
+
+```json
+{
+  "id": "cc-min-3-shifts",
+  "importance": "MEDIUM",
+  "targets": {
+    "min": 3
+  }
+}
+```
+
+</Tip>
+
+## Combining minimum and maximum
+
+You can combine both `min` and `max` targets in a single constraint to create a preferred range of consecutive work periods. Note that when using `max`, the `importance` must be `STRICT` for the maximum limit to be enforced. The minimum target will be treated as a target that the solver will try to achieve.
+
+<Tip>
+  The below constraint encourages employees to work between 3 and 5 consecutive days when they do work. The solver will try to achieve at least 3 consecutive days (as a target), and will strictly prevent more than 5 consecutive days.
+
+```json
+{
+  "id": "cc-3-to-5-days",
+  "importance": "STRICT",
+  "targets": {
+    "min": 3,
+    "max": 5
+  }
+}
+```
+
+</Tip>
+
+## Filtering by employees and shifts
+
+You can combine both employee and shift filters to create very specific rules for certain groups of employees working certain types of shifts.
+
+<Tip>
+  The below constraint strictly limits senior employees to a maximum of 2 consecutive intensive shifts, while other employees are not affected.
+
+```json
+{
+  "id": "cc-senior-intensive-max-2",
+  "importance": "STRICT",
+  "scope": {
+    "employees": {
+      "labels": ["senior"]
+    },
+    "shifts": {
+      "labels": ["intensive"]
+    }
+  },
+  "targets": {
+    "max": 2
+  }
+}
+```
+
+</Tip>
