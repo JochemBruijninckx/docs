@@ -22,7 +22,9 @@ To define certain periods as strictly unavailable for an employee, simply specif
   "importance": "STRICT",
   "isDesired": false,
   "filters": {
-    "employeeIds": ["employee-1"]
+    "employees": {
+      "ids": ["employee-1"]
+    }
   },
   "periods": {
     "labels": ["WEEKENDS"]
@@ -45,7 +47,9 @@ To mark that an employee would rather not work during certain periods, set the `
   "importance": "HIGH",
   "isDesired": false,
   "filters": {
-    "employeeIds": ["employee-1"]
+    "employees": {
+      "ids": ["employee-1"]
+    }
   },
   "periods": {
     "days": {
@@ -62,7 +66,7 @@ To mark that an employee would rather not work during certain periods, set the `
 To mark that an employee prefers working on certain periods or shifts, set the `isDesired` field to `true` and choose an importance level different than `STRICT` (`STRICT` is currently not supported on desired constraints).
 
 <Tip>
-  The below constraint makes it preferred to assign shifts with shift type `night` to employee with id 'employee-1' on Mondays, Tuesdays or Wednesdays.
+  The below constraint makes it preferred to assign shifts with shift label `night` to employee with id 'employee-1' on Mondays, Tuesdays or Wednesdays.
 
 ```json
 {
@@ -70,8 +74,12 @@ To mark that an employee prefers working on certain periods or shifts, set the `
   "importance": "MEDIUM",
   "isDesired": true,
   "filters": {
-    "employeeIds": ["employee-1"],
-    "shiftTypeIds": ["night"]
+    "employees": {
+      "ids": ["employee-1"]
+    },
+    "shifts": {
+      "labels": ["night"]
+    }
   },
   "periods": {
     "days": {

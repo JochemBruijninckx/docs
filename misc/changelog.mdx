@@ -1,0 +1,105 @@
+---
+title: Changelog
+---
+
+# Changelog
+
+## March 2025
+
+- Introduced `periods` on employee attributes. This can be used to define attributes that are only valid during certain periods.
+- Improved `shiftLabelRules` to allow for automatic assignment of shift labels based on the shift's properties.
+- Introduced `applyWorkloadScaling` on **FairnessConstraint**, which allows the fairness criterion to take an employee's workload into account when comparing the (in)conveniences of the constraints.
+
+## February 2025
+
+- Made significant improvements to the impact of **PatternConstraint** on the created rosters.
+
+## December 2024
+
+- Introduced **FairnessConstraint** as a replacement of the old `fairness` property on constraints. This new constraint allows for the application of fairness across multiple constraints, for example to balance the amount of undesired hours that employees work.
+
+## November 2024
+
+- Introduced **PatternConstraint** which is an improved version of the **ShiftPatternConstraint**. Switching to this new constraint should improve many previously existing challenges with configuring the **ShiftPatternConstraint**.
+- Introduced `maxConsecutivePeriods` on the **PeriodDistributionConstraint**. This allows you to set a maximum number of consecutive periods that an employee can work.
+- Introduced `minWorkedPeriods` on the **PeriodDistributionConstraint**. This allows you to set a target minimum number of periods that an employee must work.
+
+## October 2024
+
+- Added `days` on periods to allow for more flexible period definitions.
+- Added `idealShifts` and `idealHours` on **EmployeeUtilizationConstraint** to allow for more flexible utilization targets.
+- Introduced `overlapRules` on **EmployeeUtilizationConstraint** and **PeriodDistributionConstraint** which allow you to configure under which conditions a shift is considered to have enough overlap for the constraint to take it into account.
+- Introduced **EmployeeAvailabilityConstraint** as a replacement for **BlockedTimeConstraint** and **WorkingTimePreferenceConstraint**.
+- Grouped filter options into `filters` on all non-deprecated constraints. This has improved consistency between constraints in terms of the available configuration options, and made it easier to find which filters a constraint supports.
+
+## September 2024
+
+- Marked many constraints as deprecated. These constraints will be supported via new or previously existing constraints in an effort to simplify the constraint configuration. This update comes with signifcant improvements to our internal handling of the constraints, improving solver performance. Below shows the mapping of the deprecated constraints to their replacements:
+
+| Deprecated Constraint                  | Replacement Constraint             | Detailed Description                                                                                                                                                                      |
+| -------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **BlockedTimeConstraint**              | **EmployeeAvailabilityConstraint** | Strict and undesired instances of the EmployeeAvailabilityConstraint will completely block an employee from working the specified times.                                                  |
+| **WorkingTimePreferenceConstraint**    | **EmployeeAvailabilityConstraint** | Non-strict instances of the EmployeeAvailabilityConstraint can prioritize or avoid (based on whether the constraint is desired) certain time periods or shifts for employees.             |
+| **ShiftPatternConstraint**             | **PatternConstraint**              | The PatternConstraint is a more robust version of the ShiftPatternConstraint, with a uniform way of handling desired/undesired versions of the constraint.                                |
+| **WeekendDistributionConstraint**      | **PeriodDistributionConstraint**   | The PeriodDistributionConstraint is a more generalized version of the WeekendDistributionConstraint, allowing for more flexible period definitions.                                       |
+| **WeekRestConstraint**                 | **PeriodicRestConstraint**         | The PeriodicRestConstraint is a more generalized version of the WeekRestConstraint, allowing for more flexible period definitions.                                                        |
+| **ShiftUtilizationConstraint**         | **EmployeeUtilizationConstraint**  | The EmployeeUtilizationConstraint is a more generalized version of the ShiftUtilizationConstraint, with more filter options and with the option to set targets in either shifts or hours. |
+| **ShiftLayoutConstraint**              | **RestBetweenShiftsConstraint**    | Because they serve similar functionality, our goal is to make RestBetweenShiftsConstraint be able to handle all functionality within the same constraint.                                 |
+| **ConsecutiveTimeOffConstraint**       | **PeriodicRestConstraint**         | Because they serve similar functionality, our goal is to make PeriodicRestConstraint be able to handle all functionality within the same constraint.                                      |
+| **NewWorkingDayConstraint**            | **TBD**                            | No name has been decided yet, but our goal is to group this constraint together with ExistingWorkingDayChangeConstraint because of the high similarity between the two.                   |
+| **ExistingWorkingDayChangeConstraint** | **TBD**                            | No name has been decided yet, but our goal is to group this constraint together with NewWorkingDayConstraint because of the high similarity between the two.                              |
+
+- Introduced priorities on demands, allowing you to prioritize certain demands over others.
+- Introduced `periodLabels` in configuration. These allow you to easily reuse period definitions in other places in the payload. For example, it could be useful to create a generic 'weekend' periodLabel, or a 'public-holiday' label.
+
+## August 2024
+
+- Introduced **PeriodDistributionConstraint**, a generalized version of the **WeekendDistributionConstraint**.
+- Improved the configuration options on **EmployeeUtilizationConstraint**. It now also supports periods.
+- Introduced the option to track bonus FTE hours during inconvenient times. Configured in the **EmployeeUtilizationConstraint** and `configuration`.
+
+## July 2024
+
+- Improvements to the request payload format for better readability and structure
+- `id`, `organisationId` and `scheduleType` are now grouped in the new `jobInfo` object
+- `demandDefinitions` have been renamed to `timeSlots`
+- `shifts` and `shiftTemplates` are now top-level objects in the request payload
+- `dayDemands` has been renamed to `demands`
+- It is now possible to set `min/ideal/max` demand levels on ShiftDemands.
+
+## June 2024
+
+### New
+
+- Released [solution visualization tool](https://ar-playground.resolve.visma.com/roster)
+
+### Fixed
+
+- Refactor json schema to improve readability and structure
+- Several fixes for handling locked shifts
+- ConnectedShifts with DAYOFF in a shift pattern did not work well for shift templates
+- Fixed handling shift templates that are not spanning midnight with DayIndicatorRule END_DAY
+
+## May 2024
+
+- Released functionality for handling [minimum / maximum task durations and cooldown periods](https://docs.resolve.visma.com/automatic-rostering/rostering/tasks#min--max-task-duration-and-cooldown-periods)
+- Introduced [PeriodicRestConstraint](https://docs.resolve.visma.com/automatic-rostering/constraints/periodic-rest) to set targets for the minimum rest an employee should receive in each period
+- Introduced [EmployeeAttributes](https://docs.resolve.visma.com/automatic-rostering/rostering/employees#attributes) and removed PersonnelGroups and Competences
+
+## April 2024
+
+### New
+
+- Allow partial demand coverage for
+  [pre-assigned and locked shifts](https://docs.resolve.visma.com/automatic-rostering/rostering/shifts/#prescheduled-shifts)
+- Throw a validation error in the
+  [feasibility checker](https://docs.resolve.visma.com/automatic-rostering/feasibility-check/)
+  if the request contains too many employees or shifts
+- Validate min/max/cooldown durations per Task(Group) in an xml request
+- Changelog implemented
+
+### Fixed
+
+- Exceeding demand when using the
+  [continuity constraint](https://docs.resolve.visma.com/automatic-rostering/constraints/continuity)
+- Significantly reduced setup time for solver runs

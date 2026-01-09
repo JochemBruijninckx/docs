@@ -37,7 +37,9 @@ none of the targets are required - you can specify only the ones that are releva
     "maxHours": 160
   },
   "filters": {
-    "employeeIds": ["employee-1"]
+    "employees": {
+      "ids": ["employee-1"]
+    }
   }
 }
 ```
@@ -55,7 +57,9 @@ All targets on the Employee Utilization Constraint are applied to each period se
 {
   "id": "euc-1",
   "filters": {
-    "shiftTypeIds": ["night"]
+    "shifts": {
+      "labels": ["night"]
+    }
   },
   "targets": {
     "maxShifts": 2
