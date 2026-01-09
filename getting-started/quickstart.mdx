@@ -1,56 +1,85 @@
 ---
 title: "Quickstart"
-description: "Create your first request"
+description: "Learn how to create your first roster"
 icon: "circle-play"
 ---
 
 ## Run your first job
 
 <Steps>
-  <Step title="Authenticate">
-    Create a POST request to the Visma Connect API to authenticate. See the API Reference for detailed instructions.
-  </Step>
+    <Step title="Authenticate">
+      Create a `POST` request to the Visma Connect API to retrieve an access token. See [Authentication](/getting-started/authentication) for detailed instructions.
+    </Step>
 
-<Step title="Specify the problem">
-  Before running your first job, you need to specify the problem to be solved.
-  Feel free to use the example payload as a starting point and check out the API
-  reference for configurations. Use the `/feasibility` endpoint to evaluate the
-  configuration.
-</Step>
+    <Step title="Specify the roster request">
+    Build your roster request payload. See the [API Reference](/api-reference/roster/start-job) for detailed instructions. For your first job, feel free to use the below example payload as a starting point.
 
-<Step title="Generate your first roster">
-  Use the `/jobs` endpoint to start a job. The response will contain a
-  `statusCode` and a `jobId` for your job.
-</Step>
+    ```json
+    {
+      "jobInfo": {
+        "id": "my-first-job",
+        "organisationId": "my-organisation-id",
+        "scheduleType": "CALENDAR",
+        "demandType": "SHIFT_DEMAND",
+        "planningHorizon": {
+          "startDate": "2026-01-01",
+          "endDate": "2026-01-31"
+        }
+      },
+      "employees": [
+        {
+          "id": "employee-1",
+        },
+        {
+          "id": "employee-2",
+        }
+      ],
+      "shifts": [
+        {
+          "id": "shift-1",
+        },
+      ],
+      "demands": [
+        {
+          "shiftDemands": [
+            {
+              "shiftId": "shift-1",
+              "ideal": 2
+            },
+          ]
+        }
+      ]
+    }
+    ```
+    </Step>
 
-<Step title="Check job status">
-  Use the `/jobs/{jobId}` endpoint to get the status of the job.
-</Step>
+    <Step title="Generate your first roster">
+      Use the [/jobs](/api-reference/roster/start-job) endpoint to start a job. The response will contain a
+      `statusCode` and a `jobId` for your job.
+    </Step>
 
-  <Step title="Retrieve results">
-    Use the `/jobs/{jobId}/result` endpoint to get the current best result of the job. This will always be updated with the best result as long as the job is running.
-  </Step>
+    <Step title="Check job status">
+      The job is now running. You can poll the [/jobs/\{jobId\}](/api-reference/roster/get-job-status) endpoint to retrieve the status of the job. This will let you know whether the job is still running or has stopped.
+    </Step>
+
+    <Step title="Retrieve results">
+        At any point in time, you can retrieve the current best result of the job by calling the [/jobs/\{jobId\}/result](/api-reference/roster/get-result) endpoint. This will always be updated with the best result. Once the job has stopped, the result will be the final best result.
+    </Step>
+
 </Steps>
 
 ## Generate code from OpenAPI Specification
 
 The Automatic Rostering API is built on the OpenAPI Specification. You can generate code for your preferred programming language using the OpenAPI Specification.
 
-<Tip>
-  The easiest way to get some hands-on experience with running the API is to
-  follow our [getting-started
-  guides](/automatic-rostering/quickstart/tutorial_1), so if you haven't checked
-  those out yet, we highly recommend starting there.
-</Tip>
-
 Once you have some experience with designing the payloads, we highly recommend using code-generation tools to help you get started with the API through the OpenAPI specification.
 
-<Steps>
-  <Step title="Get the OpenAPI specification">
+<AccordionGroup>
+  <Accordion icon="copy" title="Get the OpenAPI specification">
     The OpenAPI specification for the Automatic Rostering service can be found [here](https://docs.optimization-rostering.prod.visma.net/openapi.yml).
-  </Step>
+  </Accordion>
 
-  <Step title="Generate code">
+  <Accordion icon="gears" title="Generate code">
     Use the [OpenAPI Generator](https://openapi-generator.tech/) or [Swagger Codegen](https://swagger.io/tools/swagger-codegen/) to generate code for your preferred programming language.
     
     For example, to generate a C# client with the OpenAPI Generator, you can use the following command:
@@ -62,5 +91,5 @@ Once you have some experience with designing the payloads, we highly recommend u
     <Warning>
       There seems to be some conflicts if attempting to use the hosted resource directly (i.e., calling with the input: `-i https://docs.optimization-rostering.prod.visma.net/openapi.yml`), so it is recommended to download the file and use it locally.
     </Warning>
-  </Step>
-</Steps>
+  </Accordion>
+</AccordionGroup>
