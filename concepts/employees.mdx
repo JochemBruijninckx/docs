@@ -46,7 +46,7 @@ It is possible to start the solver from a partially filled schedule where employ
 <Tip>
   The following example shows an employee that is preassigned to work `shift-1` shifts on each of the first four days of the schedule. These assignments are set as `isLocked` and will not be changed by the solver.
 
-```json
+```json highlight={6}
 {
   "id": "employee-1",
   "preassignedShifts": [
@@ -75,14 +75,13 @@ When an employee is marked as `isReadOnly`, the solver will:
 <Tip>
   The following example shows an employee that is set to read-only. The solver will only use their preassigned shifts and will not assign them to any new shifts.
 
-```json
+```json highlight={3}
 {
   "id": "employee-1",
   "isReadOnly": true,
   "preassignedShifts": [
     {
       "shiftId": "shift-1",
-      "isLocked": true,
       "days": {
         "dayIndices": [0, 1, 2, 3]
       }
