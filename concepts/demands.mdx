@@ -107,15 +107,3 @@ However, it is also possible to specify a minimum number of assigned employees t
 ## TimeDemand
 
 When demand is defined as the time periods for when employees are needed. Based on the available shifts, the solver then assigns employees to the shifts that are able to cover this demand.
-
-<Note>
-  A demand always belongs to a day, so in the cases where there are demand
-  intervals spanning midnight, this has to be specified in separate demands.
-</Note>
-
-<Tip>
-  If several demands with the same attributes overlap, they are merged together, as visualized in the below example with three demands that have overlapping time intervals.
-
-![Overlapping demands](/img/merged-demands.png)
-
-</Tip>
