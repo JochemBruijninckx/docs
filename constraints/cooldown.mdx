@@ -2,3 +2,169 @@
 title: "Cooldown"
 description: "Define minimum rest periods between shifts for employees."
 ---
+
+This constraint allows you to enforce minimum rest periods between different types of work. It works by defining what triggers a cooldown (`starts`) and what should be avoided during that cooldown period (`ends`). This is useful for ensuring employees have adequate rest between demanding shifts, preventing burnout, and complying with labor regulations.
+
+## Basic cooldown between shifts
+
+The simplest use case is to require a minimum rest period between any two shifts. This ensures employees have adequate time to recover between work periods. When you omit the `starts` and `ends` sections, the constraint applies to all shifts.
+
+<Tip>
+  The below constraint requires a minimum of 12 hours of rest between any two shifts. After an employee finishes any shift, they cannot start another shift until at least 12 hours have passed.
+
+```json
+{
+  "id": "cd-min-12h-rest",
+  "importance": "STRICT",
+  "targets": {
+    "minHours": 12
+  }
+}
+```
+
+</Tip>
+
+## Cooldown between specific shift types
+
+You can define cooldowns that only apply between specific types of shifts. For example, you might want a longer cooldown after night shifts before morning shifts.
+
+<Tip>
+  The below constraint requires at least 16 hours of rest after a night shift before an employee can work a morning shift. This helps ensure employees have adequate time to adjust their sleep schedule.
+
+```json
+{
+  "id": "cd-night-to-morning",
+  "importance": "STRICT",
+  "starts": {
+    "shifts": {
+      "labels": ["night"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["morning"]
+    }
+  },
+  "targets": {
+    "minHours": 16
+  }
+}
+```
+
+</Tip>
+
+## Cooldown measured in days
+
+Instead of specifying the cooldown in hours, you can specify it in days. This is useful for ensuring employees have full days off between certain types of work.
+
+<Tip>
+  The below constraint requires at least 2 days without a shift after working a weekend shift before an employee can work another weekend shift. This helps distribute weekend work more evenly among employees.
+
+```json
+{
+  "id": "cd-weekend-2-days",
+  "importance": "STRICT",
+  "starts": {
+    "shifts": {
+      "labels": ["weekend"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["weekend"]
+    }
+  },
+  "targets": {
+    "minDays": 2
+  }
+}
+```
+
+</Tip>
+
+## Complex cooldown scenarios
+
+You can create more complex cooldown rules by combining different shift types in the `starts` and `ends` sections. This allows you to model sophisticated rest requirements.
+
+<Tip>
+  The below constraint requires at least 48 hours of rest after working any intensive shift (like emergency shifts or long shifts) before an employee can work another intensive shift. This helps prevent employee burnout from demanding work.
+
+```json
+{
+  "id": "cd-intensive-48h",
+  "importance": "STRICT",
+  "starts": {
+    "shifts": {
+      "labels": ["intensive"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["intensive"]
+    }
+  },
+  "targets": {
+    "minHours": 48
+  }
+}
+```
+
+</Tip>
+
+## Soft cooldown constraints
+
+While cooldown constraints are often used with `STRICT` importance to enforce mandatory rest periods, you can also use them with other importance levels to encourage (but not strictly require) rest periods.
+
+<Tip>
+  The below constraint encourages (but doesn't strictly require) at least 10 hours of rest after a night shift before an employee can work a morning shift. The solver will try to achieve this, but may violate it if necessary to satisfy other constraints.
+
+```json
+{
+  "id": "cd-soft-night-to-morning",
+  "importance": "MEDIUM",
+  "starts": {
+    "shifts": {
+      "labels": ["night"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["morning"]
+    }
+  },
+  "targets": {
+    "minHours": 10
+  }
+}
+```
+
+</Tip>
+
+## Cooldown with specific shift IDs
+
+You can also target specific shifts by their IDs, giving you fine-grained control over which shifts trigger cooldowns and which shifts are restricted during cooldown periods.
+
+<Tip>
+  The below constraint requires at least 8 hours of rest after a specific early morning shift (shift-1) before an employee can work a specific evening shift (shift-2). This is useful when you have specific shift pairs that should not be scheduled too close together.
+
+```json
+{
+  "id": "cd-specific-shifts",
+  "importance": "STRICT",
+  "starts": {
+    "shifts": {
+      "ids": ["shift-1"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "ids": ["shift-2"]
+    }
+  },
+  "targets": {
+    "minHours": 8
+  }
+}
+```
+
+</Tip>
