@@ -3,6 +3,10 @@ title: Continuity
 description: Specify shifts for which it is preferred to reuse always use the same employees
 ---
 
+import UnstableConstraintWarning from "/snippets/unstable-constraint-warning.mdx";
+
+<UnstableConstraintWarning />
+
 The continuity constraint can be enabled to improve the continuity of selected `employees` for certain shifts. This can be relevant in cases where planners want to make sure that they do not have to onboard new `employees` every day (when employing temp workers), or where it is preferred for `employees` to work multiple shifts in similar groups.
 
 The constraint is configured by specifying `continuityGroups`. A group consist of one or more `shifts`, and can be specified to apply to the entire schedule (default) or to a certain set of days.
