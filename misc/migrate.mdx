@@ -8,14 +8,14 @@ This page serves as a guide for how to migrate from XML to JSON in cases where t
 
 ## Vacant Employees
 
-Before the transition to JSON, [employees](../10_rostering/12_employees.md) had a `vacant` field.
+Before the transition to JSON, [employees](/concepts/employees) had a `vacant` field.
 This field indicated that employees were not tied to any specific individual, but were collecting non-overlapping shifts
 that were not assigned to actual employees.
 The mechanism governing the `vacant` field functioned as a black box due to its complexity, leading to its removal
 during the shift to JSON.
 
 In the JSON framework, an alternative approach has been adopted.
-Now, vacant employees are managed through the [prioritization constraint](../20_constraints/28_prioritization.md).
+Now, vacant employees are managed through the [prioritization constraint](/constraints/prioritization).
 By assigning a priority score of 0 to these employees, the system is configured to prioritize regular employees.
 
 This change leads to increased customizability and transparency when dealing with vacant employees.
@@ -26,7 +26,7 @@ field.
 ## Employee Max Hours Default
 
 This is not a significant change, but it might lead to very different schedules if not handled correctly.
-The `maxHoursInFTECountPeriod` field in the `workTime` object of [employees](../10_rostering/12_employees.md) now
+The `maxHoursInFTECountPeriod` field in the `workTime` object of [employees](/concepts/employees) now
 defaults to the maximum number of hours possible.
 This means that the default value will be 168 (total hours in a week) times the number of weeks in the planning period.
 In XML, the default value for the field `MaxHoursInPlanningPeriod` was 0 for normal employees and unlimited for vacant
@@ -34,7 +34,7 @@ employees.
 
 ## Employee week hours replaced with Max And Min hours
 
-With XML, the `weekHours` field in the `workTime` object of [employees](../10_rostering/12_employees.md) was
+With XML, the `weekHours` field in the `workTime` object of [employees](/concepts/employees) was
 used to specify the number of hours an employee should work in a week.
 With JSON, this field no longer exists, and uses only minWeekHours/maxWeekHours. If the value is not
 specified, there is no upper limit to amount of hours for an employee.
@@ -44,7 +44,7 @@ the solver will try to minimize the number of hours exceeded, but it can happen.
 
 ## Personnel Groups and Competences replaced with Employee Attributes
 
-In JSON, the `personnelGroups` and `competences` fields in the [employees](../10_rostering/12_employees.md) object have been replaced with the `attributes` field.
+In JSON, the `personnelGroups` and `competences` fields in the [employees](/concepts/employees) object have been replaced with the `attributes` field.
 This allows the integrator to define exactly which custom attributes an employee should have. Shifts, Demands, Tasks and Constraints can then be configured with requirements for these attributes.
 
 ## WeeklyRestRules replaced with Periodic Rest Constraints
