@@ -6,53 +6,44 @@ icon: "key"
 
 ## Getting API Access
 
-Follow the steps below in order to receive the credentials you need when making API calls.
+Follow the steps below to receive the credentials you need when making API calls.
 
 <Steps>
-    <Step title="Log in to Visma Developer Portal">
-        Access the appropriate environment:
-        
-        - **Stage environment** (for testing): [https://oauth.developers.stagaws.visma.com](https://oauth.developers.stagaws.visma.com)
-        - **Production environment** (when making it available for end-users): [https://oauth.developers.visma.com](https://oauth.developers.visma.com)
+    <Step title="Access the Visma Developer Portal">
+      Log in to the appropriate environment:
+      
+      - **Stage environment** (for testing): [https://oauth.developers.stagaws.visma.com](https://oauth.developers.stagaws.visma.com)
+      - **Production environment** (for end-users): [https://oauth.developers.visma.com](https://oauth.developers.visma.com)
     </Step>
 
     <Step title="Create a new application">
-    Go to "My Applications" and click "Add Application" > "Service
-    (Machine-to-Machine)."
+      Go to "My Applications" and click "Add Application" > "Service
+      (Machine-to-Machine)".
     </Step>
 
-    <Step title="Configure your application">
-    Fill in the required details and save your application. Make sure to note your
-    `client_id`.
-    </Step>
-
-    <Step title="Publish the application">
-    Publish the application to make it available for integration.
+    <Step title="Configure and publish your application">
+      Fill in the required details and save your application. Make sure to note your
+      `client_id`, then publish the application to make it available for
+      integration.
     </Step>
 
     <Step title="Add a new integration">
-    Open the application and add a new integration.
+      Open your application and add a new integration.
     </Step>
 
-    <Step title="Select the API">
-    Select the API you want to integrate with: - For the stage environment, select
-    `automatic-rostering-stage`. - For the production environment, select
-    `automatic-rostering-prod`.
-    </Step>
-
-    <Step title="Select the appropriate scope">
-    Choose the scope for your integration: - For the stage environment, select
-    `automatic-rostering-stage`. - For the production environment, select
-    `automatic-rostering-prod`.
+    <Step title="Configure the integration">
+      Select the API and scope for your integration:
+      - **Stage environment**: Select `automatic-rostering-stage` for both API and scope.
+      - **Production environment**: Select `automatic-rostering-prod` for both API and scope.
     </Step>
 
     <Step title="Wait for approval">
-    Wait for the integration to be accepted. Feel free to contact the Automatic
-    Rostering team to expedite the process.
+      Wait for the integration to be accepted. Feel free to contact the Automatic
+      Rostering team to expedite the process.
     </Step>
 
-    <Step title="Generate credentials">
-        Open the application, generate credentials, and securely store the `client_secret`.
+    <Step title="Generate and store credentials">
+      Open your application, generate credentials, and securely store the `client_secret`.
     </Step>
 
 </Steps>
