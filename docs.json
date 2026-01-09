@@ -34,14 +34,14 @@
                 "pages": [
                   "constraints/employee-availability",
                   "constraints/employee-utilization",
+                  "constraints/cooldown",
+                  "constraints/consecutive",
                   "constraints/pattern",
                   "constraints/periodic-rest",
                   "constraints/period-distribution",
-                  "constraints/cooldown",
                   "constraints/prioritization",
                   "constraints/continuity",
                   "constraints/layout",
-                  "constraints/consecutive",
                   "constraints/rotation",
                   "constraints/fairness"
                 ]
