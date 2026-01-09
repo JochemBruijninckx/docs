@@ -10,7 +10,7 @@ Employees form the foundation for all schedules produced by the solver. The prim
 
 Employee attributes provide a flexible way to specify custom characteristics for each employee. These attributes can be used to determine eligibility for shifts, demands, or tasks. In addition, some constraints can be configured to apply to all employees that meet certain attribute requirements. Some good examples of characteristics where it might make sense to use attributes are `departments`, `competences`, or `personnel-groups`.
 
-Each attribute must have its own unique key indicating what kind of attribute it is. An employee can have multiple values for the same attribute.
+Each attribute must have its own unique category indicating what kind of attribute it is. An employee can have multiple values for the same attribute.
 
 Here's an example of how to specify attributes for an employee:
 
@@ -22,15 +22,15 @@ Here's an example of how to specify attributes for an employee:
   "id": "employee-1",
   "attributes": [
     {
-      "id": "department",
+      "category": "department",
       "values": ["finance", "hr"]
     },
     {
-      "id": "competence",
+      "category": "competence",
       "values": ["manager", "accountant"]
     },
     {
-      "id": "personnel-group",
+      "category": "personnel-group",
       "values": ["group-1"]
     }
   ]
@@ -38,12 +38,6 @@ Here's an example of how to specify attributes for an employee:
 ```
 
 </Tip>
-
-<Info>
-  In addition to ineligibility through `attributes`, the solver allows for
-  direct specification of ineligibilities for any individual employee. See
-  Prioritization.
-</Info>
 
 ## Preassigned shifts
 
