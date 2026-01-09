@@ -63,7 +63,7 @@
       "anchors": [
         {
           "anchor": "Documentation",
-          "href": "http://localhost:3000/",
+          "href": "/",
           "icon": "book-open-cover"
         },
         {
