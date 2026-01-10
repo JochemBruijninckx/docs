@@ -2,6 +2,27 @@
 title: Changelog
 ---
 
+## January 2026
+
+- Added labels on shifts and employees, allowing you to easily target groups of shifts or employees in constraints. Labels on shifts serve as a replacement for shiftTypeIds.
+- Made WorkTypes no longer required - not having a workType on a shift will make it default to an FTE factor of 1.
+- Improved the filtering options on constraints. Advanced filters can now be applied (which allows for NOT and AND filtering).
+- Renamed readOnly and locked to isReadOnly and isLocked, respectively, for consistency.
+- Replaced remaning usages of the scheduleDays schema with the new days schema. This now also allows for the use of weekdays when specifying preassigned shifts or demands.
+
+## December 2025
+
+- Introduce roles on preassigned shifts, allowing you to predefine the role the employee will have when working the shift.
+
+## Sep 2025
+
+- Introduced [**ConsecutiveConstraint**](/constraints/consecutive). This can be used to set targets on the minimum and maximum number of consecutive shifts that an employee can work.
+
+## May 2025
+
+- Introduced [**CooldownConstraint**](/constraints/cooldown) as a replacement for RestBetweenShiftsConstraint. This new constraint can handle cooldowns between different kinds of shifts.
+- Introduced labels on constraints. Currently only used for legibility of payloads.
+
 ## March 2025
 
 - Introduced `periods` on employee attributes. This can be used to define attributes that are only valid during certain periods.
