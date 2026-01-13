@@ -344,20 +344,12 @@ components:
         - 'null'
       format: date
       description: Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
-      examples:
-        - example_1:
-            value: '2023-12-24'
-            summary: The 24th of December 2023.
     dayIndex:
       type:
         - integer
         - 'null'
       description: Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
       minimum: 0
-      examples:
-        - example_1:
-            value: 9
-            summary: The 10th day of the planning horizon.
     dayOfWeek:
       type: string
       enum:
@@ -475,10 +467,7 @@ components:
       type: object
       minProperties: 1
       maxProperties: 1
-      description: |-
-        List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through
-        a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods
-        (such as weeks, months, etc.).
+      description: List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods (such as weeks, months, etc.).
       properties:
         days:
           $ref: '#/components/schemas/daysWithTime'
@@ -562,26 +551,12 @@ components:
       items:
         $ref: '#/components/schemas/dayIndex'
       uniqueItems: true
-      examples:
-        - example_1:
-            value:
-              - 0
-              - 1
-              - 2
-              - 3
-            summary: First four days of the planning horizon.
     dates:
       type: array
       description: List of dates, specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
       items:
         $ref: '#/components/schemas/date'
       uniqueItems: true
-      examples:
-        - example_1:
-            value:
-              - '2023-12-24'
-              - '2023-12-25'
-            summary: The 24th and 25th of December 2023.
     scheduleDaysWithoutWeekDays:
       type: object
       description: |-
@@ -610,22 +585,6 @@ components:
           default: false
         scheduleDays:
           $ref: '#/components/schemas/scheduleDaysWithoutWeekDays'
-          examples:
-            - example_1:
-                value:
-                  dayIndexes:
-                    - 0
-                    - 1
-                    - 2
-                    - 3
-                summary: Shift is pre-scheduled the first four days of the schedule period.
-            - example_2:
-                value:
-                  dates:
-                    - '2022-12-19'
-                    - '2022-12-20'
-                    - '2022-12-21'
-                summary: Shift is pre-scheduled on the specified dates.
     dayIndicator:
       type: integer
       minimum: -1
@@ -712,27 +671,12 @@ components:
         Sunday is index 7.
       minimum: 1
       maximum: 7
-      examples:
-        - example_1:
-            value: 1
-            summary: All days in scheduling period that is Monday.
     weekDays:
       type: array
       description: List of week days.
       items:
         $ref: '#/components/schemas/weekDay'
       uniqueItems: true
-      examples:
-        - example_1:
-            value:
-              - 1
-            summary: All Mondays in the planning horizon.
-        - example_2:
-            value:
-              - 5
-              - 6
-              - 7
-            summary: All Fridays, Saturdays and Sundays in the planning horizon.
     scheduleDays:
       type: object
       description: Defines the days in the planning horizon. If the schedule type is RECURRING, then dayIndexes can be specified, and if the schedule type is CALENDAR, then dates can be specified. weekDays can be specified regardless of the schedule type.
@@ -911,10 +855,7 @@ components:
       type: object
       minProperties: 1
       maxProperties: 1
-      description: |-
-        List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through
-        a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods
-        (such as weeks, months, etc.).
+      description: List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods (such as weeks, months, etc.).
       properties:
         days:
           $ref: '#/components/schemas/daysWithTime'
@@ -945,7 +886,7 @@ components:
         name:
           deprecated: true
           type: string
-          description: DEPRECATED - Use category instead. Type of work. (for example, WORK, ON_DUTY, ON_CALL etc.)
+          description: DEPRECATED - Use category instead.
     solverParameters:
       type: array
       description: List of solver parameters used to tweak solver behaviour. Contact dev team for possible parameters. If not defined, default parameters will be used.
@@ -962,60 +903,24 @@ components:
         type: string
       description: List of shift ids for which the constraint applies. The shift ids must be present in the shift section. If not specified, the constraint will be applied to all shifts.
       uniqueItems: true
-      example:
-        example_1:
-          value:
-            - shift_1
-            - shift_2
-          summary: The constraint will be applied only to shifts with id "shift_1" or "shift_2".
-        example_2:
-          value: []
-          summary: The constraint will be applied to all defined shifts.
     constraintTemplateIds:
       type: array
       items:
         type: string
       description: List of shift template ids for which the constraint applies. The shift template ids must be present in the shift template section. If not specified, the constraint will be applied to all shifts.
       uniqueItems: true
-      example:
-        example_1:
-          value:
-            - shift_1
-            - shift_2
-          summary: The constraint will be applied only to shifts with id "shift_1" or "shift_2".
-        example_2:
-          value: []
-          summary: The constraint will be applied to all defined shifts.
     constraintShiftTypeIds:
       type: array
       items:
         type: string
       description: List of shift type ids for which the constraint applies. The shift type ids must be present in the shift type section. If not specified, the constraint will be applied to all shift types.
       uniqueItems: true
-      example:
-        example_ids:
-          value:
-            - shift_type_1
-            - shift_type_2
-          summary: The constraint will be applied only to shift types with id "shift_type_1" and "shift_type_2".
-        example_all_shift_types:
-          value: []
-          summary: The constraint will be applied to all defined shift types.
     constraintWorkTypeIds:
       type: array
       items:
         type: string
       description: List of workType IDs for which the constraint applies. The workTypeIds should be present in workType section. If work type ids are not specified, the constraint will be applied to all work types.
       uniqueItems: true
-      example:
-        example_1:
-          value:
-            - 0
-            - 3
-          summary: The constraint will be applied only to work type with id 0 and 3.
-        example_2:
-          value: []
-          summary: The constraint will be applied to all defined work types.
     patternDay:
       type: object
       minProperties: 1
@@ -1192,21 +1097,6 @@ components:
         type: string
       description: List of employee ids for which the constraint applies. The employee ids must be present in the employee section. If not specified, the constraint will be applied to all employees.
       uniqueItems: true
-      example:
-        example_ints:
-          value:
-            - 1
-            - 5
-            - 3
-          summary: The constraint will be applied only to employees with id 1, 5 and 3.
-        example_all_employees:
-          value: []
-          summary: The constraint will be applied to all defined employees.
-        example_string:
-          value:
-            - Lars Petersen
-            - 123qwerty
-          summary: The constraint will be applied to listed employees.
     taskMinMinutes:
       type: integer
       default: 0
@@ -1375,13 +1265,6 @@ components:
       minimum: 0
       maximum: 100
       default: 0
-      example:
-        example_1:
-          value: 0
-          summary: The constraint is not taken into account when solving the schedule as it has weight 0.
-        example_2:
-          value: 100
-          summary: Solver will try its best to satisfy the constraint as it has weight 100.
     constraintFairness:
       deprecated: true
       type: object
@@ -1393,13 +1276,6 @@ components:
           minimum: 0
           maximum: 100
           default: 0
-          example:
-            example_1:
-              value: 0
-              summary: The fairness is not taken into account when solving the schedule.
-            example_2:
-              value: 100
-              summary: Solver will try its best to make the constraint as fair as possible.
         fteAdjustedFairness:
           type: boolean
           description: |-
@@ -1530,16 +1406,6 @@ components:
       minimum: -100
       maximum: 100
       default: 0
-      example:
-        example_0:
-          value: -100
-          summary: Solver will try to violate the constraint as much as possible.
-        example_1:
-          value: 0
-          summary: The constraint is not taken into account when solving the schedule as it has weight 0.
-        example_2:
-          value: 100
-          summary: Solver will try its best to satisfy the constraint as it has weight 100.
     workingTimePreferenceInterval:
       type: object
       description: |-
@@ -1564,7 +1430,7 @@ components:
       type: string
       description: Identifier for the organisation/user that has requested this roster.
     demandType:
-      description: Type of demand that will be used in this job. Can be either "SHIFT_DEMAND" or "TIME_DEMAND". See [documentation](https://docs.resolve.visma.com/automatic-rostering/rostering/demands) for more information.
+      description: Type of demand that will be used in this job.
       type: string
       enum:
         - SHIFT_DEMAND
@@ -1581,7 +1447,7 @@ components:
           $ref: '#/components/schemas/date'
     planningHorizon:
       type: object
-      description: Specifies the planning horizon for which a roster will be created. The required properties depend on the scheduleType, which can be either "RECURRING" or "CALENDAR". See [documentation](https://docs.resolve.visma.com/automatic-rostering/rostering/) for more information.
+      description: Specifies the planning horizon for which a roster will be created. The required properties depend on the chosen scheduleType.
       required:
         - startDate
       properties:
@@ -1616,7 +1482,7 @@ components:
         organisationId:
           $ref: '#/components/schemas/organisationId'
         scheduleType:
-          description: Type of schedule that the solver should create. Can be either "RECURRING" or "CALENDAR". See [documentation](https://docs.resolve.visma.com/automatic-rostering/rostering/) for more information.
+          description: Type of schedule that the solver should create.
           type: string
           enum:
             - CALENDAR
@@ -1728,7 +1594,7 @@ components:
             - START_DAY
             - END_DAY
             - NEXT_DAY
-          description: Rule used to determine to which day this shift officially belongs. See [documentation](https://docs.resolve.visma.com/automatic-rostering/shift-generation/) for more details on the different rules.
+          description: Rule used to determine to which day this shift officially belongs.
         assignmentId:
           type: string
           description: |-
@@ -1859,7 +1725,7 @@ components:
         workTime:
           deprecated: true
           type: object
-          description: DEPRECATED - Should be done using EmployeeUtilizationConstraints instead. Information about the employee's desired and allowed work time.
+          description: DEPRECATED - Use EmployeeUtilizationConstraints instead. New shorthands are under development.
           properties:
             maxHoursInFTECountPeriod:
               type: number
@@ -1891,7 +1757,7 @@ components:
         dayRestRuleId:
           type: string
           deprecated: true
-          description: DEPRECATED - Use PeriodicRestConstraint instead. A reference to a day rest rule to apply to this employee specifically. If not specified, the default day rest rule will be used. If no default is specified a random day rest rule will be used, from the list of available day rest rules in the *Configuration* part of the payload.
+          description: DEPRECATED - Use PeriodicRestConstraint instead.
     taskGroup:
       type: object
       required:
@@ -2572,12 +2438,7 @@ components:
         isStrict:
           deprecated: true
           type: boolean
-          description: |-
-            DEPRECATED - Use importance instead. If set to true, continuity groups in this constraint must have strict continuity. A group is considered to have
-            strict continuity when all shifts in the group are worked by the first X entries in some ordering of all employees.
-            The number of employees (X) may differ per shift. For more information, see the Continuity Constraint documentation.
-
-            If a shift impacted by this constraint cannot be filled without breaking strict continuity, it will remain unassigned.
+          description: DEPRECATED - Use importance instead.
           default: false
     layoutConstraint:
       type: object
@@ -2845,63 +2706,16 @@ components:
         periods:
           deprecated: true
           $ref: '#/components/schemas/periods'
-          description: |-
-            DEPRECATED - Use startDays instead. Only works for desired shift patterns. Defines the period(s) in which the pattern is applied.
-            If not defined, the pattern is applied to the whole scheduling period. If several periods are defined,
-            the pattern is applied separately to all of them, which might lead to conflicts if the periods overlap.
+          description: DEPRECATED - Use startDays instead.
         startWeekday:
           type: integer
           description: |-
-            DEPRECATED - Use startDays instead. Defines the day of the week on which the pattern starts. Monday = 1, Tuesday = 2, ..., Sunday = 7.
-            If skipNonWorkingDays is set to ALWAYS, the real start day can also be any day after the startWeekday as long
-            as there are only non-working days (days off) before. If defined, isStrictStart will be 
+            DEPRECATED - Use startDays instead. 
             forced True.
           minimum: 1
           maximum: 7
         fairness:
           $ref: '#/components/schemas/constraintFairness'
-      examples:
-        - example_1:
-            value:
-              id: 1
-              configuration:
-                weight: -10
-              startWeekday: 5
-              skipNonWorkingDays: NEVER
-              employeeIds:
-                - 1
-              pattern:
-                patternDay1:
-                  shiftIds:
-                    - X
-                patternDay2:
-                  shiftIds:
-                    - Z
-            summary: In this example, employee with id 1 should not work shift X on Friday, and shift Z on Saturday.
-        - example_2:
-            value:
-              id: 1
-              configuration:
-                weight: 10
-              skipNonWorkingDays: ALWAYS
-              employeeIds: []
-              pattern:
-                patternDay1:
-                  shiftTypeIds:
-                    - type1
-                  shiftTemplateIds:
-                    - template1
-                patternDay2:
-                  shiftTypeIds:
-                    - type2
-                  shiftTemplateIds:
-                    - template1
-                patternDay3:
-                  shiftTypeIds:
-                    - type3
-                  shiftTemplateIds:
-                    - template1
-            summary: In this example, employees should work shift types type1, type2 and type3 in that order. Alternatively, shift template template 1 can substitute for any of the days. Days off are allowed in-between these shifts.
     shiftUtilizationConstraint:
       type: object
       description: |-
@@ -2964,33 +2778,6 @@ components:
           $ref: '#/components/schemas/scheduleDaysWithoutWeekDays'
         fairness:
           $ref: '#/components/schemas/constraintFairness'
-      examples:
-        - example_1:
-            value:
-              id: 1
-              occurrenceMin: 1
-              occurrenceMax: 3
-              shiftIds:
-                - X
-              employeeIds:
-                - 1
-            summary: In this example the shift with id X can be used between 1 and 3 times. This constraint only applies to employee with id 1.
-        - example_2:
-            value:
-              id: 2
-              occurrenceMin: 2
-              occurrenceMax: 6
-              durationMin:
-                hours: 4
-              durationMax:
-                hours: 8
-              shiftTypeIds:
-                - type1
-                - type2
-              shiftIds:
-                - X
-                - 'Y'
-            summary: In this example the shifts with id X and Y can be used between 2 and 6 times. The type1 and type2 shift types can also be used between 2 and 6 times, but only if the shift is between 4 and 8 hours long. The constraint applies to all employees.
     shiftLayoutConstraint:
       type: object
       description: |-
@@ -3277,28 +3064,11 @@ components:
           type: integer
           description: Defines the number of weekends in the scheduling period that employee can work. The constraint is triggered if the number of working weekends exceeds this value. 0 means that employee can't work any weekend in scheduling period. Will default to the total number of weekends in the scheduling period if not specified.
           minimum: 0
-          example:
-            - example_1:
-                value: 2
-                summary: Employee can work on 2 weekends in scheduling period.
-            - example_2:
-                value: 0
-                summary: Employee can't work any weekend in scheduling period.
         minSurroundingFreeWeekends:
           type: integer
           description: Defines the smallest number of free weekends employee should have before and after working on a weekend. 0 means that employee(s) can work on a weekend even when the previous and/or the next weekend is not free.
           minimum: 0
           default: 0
-          example:
-            - example_1:
-                value: 1
-                summary: Employee can work on the weekend only if he has at least one free weekend before and after the working weekend.
-            - example_2:
-                value: 0
-                summary: Employee can work on the weekend even when the previous or next weekend is not free.
-            - example_3:
-                value: 2
-                summary: Employee can work on the weekend only if he has at least two free weekends before and after the working weekend.
         workTypeIds:
           $ref: '#/components/schemas/constraintWorkTypeIds'
         employeeIds:
@@ -3479,13 +3249,13 @@ components:
         dayRestRules:
           type: array
           deprecated: true
-          description: DEPRECATED - Use PeriodicRestConstraint instead. List of possible day rest rules. If employee doesn't have day rest rule defined in employee level then solver will give it default day rest rule. If default day rest rule is not defined then solver will give employee one of the rules from this list.
+          description: DEPRECATED - Use PeriodicRestConstraint instead.
           items:
             $ref: '#/components/schemas/dayRestRule'
         dayRestRuleDefault:
           type: string
           deprecated: true
-          description: DEPRECATED - Use PeriodicRestConstraint instead. Default day rest rule that will be applied to employees if they don't have day rest rule defined on employee level. Default day rest rule doesn't have to be specified but if it is, it has to be one of the rules from the list of all day rest rules.
+          description: DEPRECATED - Use PeriodicRestConstraint instead.
         shiftTypeRules:
           type: array
           deprecated: true
@@ -3686,19 +3456,19 @@ components:
                 $ref: '#/components/schemas/shiftUtilizationConstraint'
             shiftLayoutConstraints:
               deprecated: true
-              description: DEPRECATED - Still functional, but a new improved version of this constraint is under development. It is recommended not to integrate with this constraint and instead wait for the new version.
+              description: DEPRECATED - Use EmployeeUtilizationConstraint instead.
               type: array
               items:
                 $ref: '#/components/schemas/shiftLayoutConstraint'
             newWorkingDayConstraints:
               deprecated: true
-              description: DEPRECATED - Still functional, but a new improved version of this constraint is under development. It is recommended not to integrate with this constraint and instead wait for the new version.
+              description: DEPRECATED - Use CooldownConstraint instead.
               type: array
               items:
                 $ref: '#/components/schemas/newWorkingDayConstraint'
             existingWorkingDayChangeConstraints:
               deprecated: true
-              description: DEPRECATED - Still functional, but a new improved version of this constraint is under development. It is recommended not to integrate with this constraint and instead wait for the new version.
+              description: DEPRECATED - Replacement under development.
               type: array
               items:
                 $ref: '#/components/schemas/existingWorkingDayChangeConstraint'
@@ -3730,8 +3500,8 @@ components:
           $ref: '#/components/schemas/configuration'
       example:
         jobInfo:
-          id: '123'
-          organisationId: '456'
+          id: job-id
+          organisationId: my-organisation-id
           scheduleType: CALENDAR
           demandType: TIME_DEMAND
           planningHorizon:
@@ -3747,14 +3517,12 @@ components:
               - startTime: '08:00'
                 endTime: '16:00'
                 dayIndicator: 1
-                workTypeId: '1'
         employees:
           - id: '1'
         timeSlots:
           - id: timeSlot1
           - startTime: '00:00'
           - endTime: '00:00'
-          - workTypeId: '1'
         demands:
           - days: null
             dates:
@@ -3770,17 +3538,6 @@ components:
                 min: 1
                 ideal: 2
                 max: 3
-        constraints: {}
-        configuration:
-          workTypes:
-            - id: '1'
-              name: WORK
-              factor: 1
-          weekend:
-            startWeekDay: 5
-            startTime: '00:00'
-            endWeekDay: 1
-            endTime: '00:00'
       $defs:
         durationInterval:
           type: object
@@ -3884,7 +3641,7 @@ components:
             workTime:
               deprecated: true
               type: object
-              description: DEPRECATED - Should be done using EmployeeUtilizationConstraints instead. Information about the employee's desired and allowed work time.
+              description: DEPRECATED - Use EmployeeUtilizationConstraints instead. New shorthands are under development.
               properties:
                 maxHoursInFTECountPeriod:
                   type: number
@@ -3916,7 +3673,7 @@ components:
             dayRestRuleId:
               type: string
               deprecated: true
-              description: DEPRECATED - Use PeriodicRestConstraint instead. A reference to a day rest rule to apply to this employee specifically. If not specified, the default day rest rule will be used. If no default is specified a random day rest rule will be used, from the list of available day rest rules in the *Configuration* part of the payload.
+              description: DEPRECATED - Use PeriodicRestConstraint instead.
         shift:
           type: object
           required:
@@ -4052,7 +3809,7 @@ components:
                 - START_DAY
                 - END_DAY
                 - NEXT_DAY
-              description: Rule used to determine to which day this shift officially belongs. See [documentation](https://docs.resolve.visma.com/automatic-rostering/shift-generation/) for more details on the different rules.
+              description: Rule used to determine to which day this shift officially belongs.
             assignmentId:
               type: string
               description: |-
@@ -4356,13 +4113,13 @@ components:
             dayRestRules:
               type: array
               deprecated: true
-              description: DEPRECATED - Use PeriodicRestConstraint instead. List of possible day rest rules. If employee doesn't have day rest rule defined in employee level then solver will give it default day rest rule. If default day rest rule is not defined then solver will give employee one of the rules from this list.
+              description: DEPRECATED - Use PeriodicRestConstraint instead.
               items:
                 $ref: '#/components/schemas/dayRestRule'
             dayRestRuleDefault:
               type: string
               deprecated: true
-              description: DEPRECATED - Use PeriodicRestConstraint instead. Default day rest rule that will be applied to employees if they don't have day rest rule defined on employee level. Default day rest rule doesn't have to be specified but if it is, it has to be one of the rules from the list of all day rest rules.
+              description: DEPRECATED - Use PeriodicRestConstraint instead.
             shiftTypeRules:
               type: array
               deprecated: true
@@ -4505,81 +4262,30 @@ components:
             type: string
           description: List of employee ids for which the constraint applies. The employee ids must be present in the employee section. If not specified, the constraint will be applied to all employees.
           uniqueItems: true
-          example:
-            example_ints:
-              value:
-                - 1
-                - 5
-                - 3
-              summary: The constraint will be applied only to employees with id 1, 5 and 3.
-            example_all_employees:
-              value: []
-              summary: The constraint will be applied to all defined employees.
-            example_string:
-              value:
-                - Lars Petersen
-                - 123qwerty
-              summary: The constraint will be applied to listed employees.
         constraintShiftIds:
           type: array
           items:
             type: string
           description: List of shift ids for which the constraint applies. The shift ids must be present in the shift section. If not specified, the constraint will be applied to all shifts.
           uniqueItems: true
-          example:
-            example_1:
-              value:
-                - shift_1
-                - shift_2
-              summary: The constraint will be applied only to shifts with id "shift_1" or "shift_2".
-            example_2:
-              value: []
-              summary: The constraint will be applied to all defined shifts.
         constraintTemplateIds:
           type: array
           items:
             type: string
           description: List of shift template ids for which the constraint applies. The shift template ids must be present in the shift template section. If not specified, the constraint will be applied to all shifts.
           uniqueItems: true
-          example:
-            example_1:
-              value:
-                - shift_1
-                - shift_2
-              summary: The constraint will be applied only to shifts with id "shift_1" or "shift_2".
-            example_2:
-              value: []
-              summary: The constraint will be applied to all defined shifts.
         constraintShiftTypeIds:
           type: array
           items:
             type: string
           description: List of shift type ids for which the constraint applies. The shift type ids must be present in the shift type section. If not specified, the constraint will be applied to all shift types.
           uniqueItems: true
-          example:
-            example_ids:
-              value:
-                - shift_type_1
-                - shift_type_2
-              summary: The constraint will be applied only to shift types with id "shift_type_1" and "shift_type_2".
-            example_all_shift_types:
-              value: []
-              summary: The constraint will be applied to all defined shift types.
         constraintWorkTypeIds:
           type: array
           items:
             type: string
           description: List of workType IDs for which the constraint applies. The workTypeIds should be present in workType section. If work type ids are not specified, the constraint will be applied to all work types.
           uniqueItems: true
-          example:
-            example_1:
-              value:
-                - 0
-                - 3
-              summary: The constraint will be applied only to work type with id 0 and 3.
-            example_2:
-              value: []
-              summary: The constraint will be applied to all defined work types.
         constraintId:
           type: string
           description: Unique identifier for the constraint.
@@ -4701,13 +4407,6 @@ components:
           minimum: 0
           maximum: 100
           default: 0
-          example:
-            example_1:
-              value: 0
-              summary: The constraint is not taken into account when solving the schedule as it has weight 0.
-            example_2:
-              value: 100
-              summary: Solver will try its best to satisfy the constraint as it has weight 100.
         constraintWeightFullRange:
           type: integer
           deprecated: true
@@ -4715,16 +4414,6 @@ components:
           minimum: -100
           maximum: 100
           default: 0
-          example:
-            example_0:
-              value: -100
-              summary: Solver will try to violate the constraint as much as possible.
-            example_1:
-              value: 0
-              summary: The constraint is not taken into account when solving the schedule as it has weight 0.
-            example_2:
-              value: 100
-              summary: Solver will try its best to satisfy the constraint as it has weight 100.
         constraintFairness:
           deprecated: true
           type: object
@@ -4736,13 +4425,6 @@ components:
               minimum: 0
               maximum: 100
               default: 0
-              example:
-                example_1:
-                  value: 0
-                  summary: The fairness is not taken into account when solving the schedule.
-                example_2:
-                  value: 100
-                  summary: Solver will try its best to make the constraint as fair as possible.
             fteAdjustedFairness:
               type: boolean
               description: |-
@@ -4830,7 +4512,7 @@ components:
             name:
               deprecated: true
               type: string
-              description: DEPRECATED - Use category instead. Type of work. (for example, WORK, ON_DUTY, ON_CALL etc.)
+              description: DEPRECATED - Use category instead.
         preassignedShift:
           type: object
           required:
@@ -4864,22 +4546,6 @@ components:
               default: false
             scheduleDays:
               $ref: '#/components/schemas/scheduleDaysWithoutWeekDays'
-              examples:
-                - example_1:
-                    value:
-                      dayIndexes:
-                        - 0
-                        - 1
-                        - 2
-                        - 3
-                    summary: Shift is pre-scheduled the first four days of the schedule period.
-                - example_2:
-                    value:
-                      dates:
-                        - '2022-12-19'
-                        - '2022-12-20'
-                        - '2022-12-21'
-                    summary: Shift is pre-scheduled on the specified dates.
         dayRestRule:
           type: object
           deprecated: true
@@ -5794,12 +5460,7 @@ components:
             isStrict:
               deprecated: true
               type: boolean
-              description: |-
-                DEPRECATED - Use importance instead. If set to true, continuity groups in this constraint must have strict continuity. A group is considered to have
-                strict continuity when all shifts in the group are worked by the first X entries in some ordering of all employees.
-                The number of employees (X) may differ per shift. For more information, see the Continuity Constraint documentation.
-
-                If a shift impacted by this constraint cannot be filled without breaking strict continuity, it will remain unassigned.
+              description: DEPRECATED - Use importance instead.
               default: false
         blockedTimeConstraint:
           type: object
@@ -5939,28 +5600,11 @@ components:
               type: integer
               description: Defines the number of weekends in the scheduling period that employee can work. The constraint is triggered if the number of working weekends exceeds this value. 0 means that employee can't work any weekend in scheduling period. Will default to the total number of weekends in the scheduling period if not specified.
               minimum: 0
-              example:
-                - example_1:
-                    value: 2
-                    summary: Employee can work on 2 weekends in scheduling period.
-                - example_2:
-                    value: 0
-                    summary: Employee can't work any weekend in scheduling period.
             minSurroundingFreeWeekends:
               type: integer
               description: Defines the smallest number of free weekends employee should have before and after working on a weekend. 0 means that employee(s) can work on a weekend even when the previous and/or the next weekend is not free.
               minimum: 0
               default: 0
-              example:
-                - example_1:
-                    value: 1
-                    summary: Employee can work on the weekend only if he has at least one free weekend before and after the working weekend.
-                - example_2:
-                    value: 0
-                    summary: Employee can work on the weekend even when the previous or next weekend is not free.
-                - example_3:
-                    value: 2
-                    summary: Employee can work on the weekend only if he has at least two free weekends before and after the working weekend.
             workTypeIds:
               $ref: '#/components/schemas/constraintWorkTypeIds'
             employeeIds:
@@ -6153,63 +5797,16 @@ components:
             periods:
               deprecated: true
               $ref: '#/components/schemas/periods'
-              description: |-
-                DEPRECATED - Use startDays instead. Only works for desired shift patterns. Defines the period(s) in which the pattern is applied.
-                If not defined, the pattern is applied to the whole scheduling period. If several periods are defined,
-                the pattern is applied separately to all of them, which might lead to conflicts if the periods overlap.
+              description: DEPRECATED - Use startDays instead.
             startWeekday:
               type: integer
               description: |-
-                DEPRECATED - Use startDays instead. Defines the day of the week on which the pattern starts. Monday = 1, Tuesday = 2, ..., Sunday = 7.
-                If skipNonWorkingDays is set to ALWAYS, the real start day can also be any day after the startWeekday as long
-                as there are only non-working days (days off) before. If defined, isStrictStart will be 
+                DEPRECATED - Use startDays instead. 
                 forced True.
               minimum: 1
               maximum: 7
             fairness:
               $ref: '#/components/schemas/constraintFairness'
-          examples:
-            - example_1:
-                value:
-                  id: 1
-                  configuration:
-                    weight: -10
-                  startWeekday: 5
-                  skipNonWorkingDays: NEVER
-                  employeeIds:
-                    - 1
-                  pattern:
-                    patternDay1:
-                      shiftIds:
-                        - X
-                    patternDay2:
-                      shiftIds:
-                        - Z
-                summary: In this example, employee with id 1 should not work shift X on Friday, and shift Z on Saturday.
-            - example_2:
-                value:
-                  id: 1
-                  configuration:
-                    weight: 10
-                  skipNonWorkingDays: ALWAYS
-                  employeeIds: []
-                  pattern:
-                    patternDay1:
-                      shiftTypeIds:
-                        - type1
-                      shiftTemplateIds:
-                        - template1
-                    patternDay2:
-                      shiftTypeIds:
-                        - type2
-                      shiftTemplateIds:
-                        - template1
-                    patternDay3:
-                      shiftTypeIds:
-                        - type3
-                      shiftTemplateIds:
-                        - template1
-                summary: In this example, employees should work shift types type1, type2 and type3 in that order. Alternatively, shift template template 1 can substitute for any of the days. Days off are allowed in-between these shifts.
         patternDay:
           type: object
           minProperties: 1
@@ -6296,33 +5893,6 @@ components:
               $ref: '#/components/schemas/scheduleDaysWithoutWeekDays'
             fairness:
               $ref: '#/components/schemas/constraintFairness'
-          examples:
-            - example_1:
-                value:
-                  id: 1
-                  occurrenceMin: 1
-                  occurrenceMax: 3
-                  shiftIds:
-                    - X
-                  employeeIds:
-                    - 1
-                summary: In this example the shift with id X can be used between 1 and 3 times. This constraint only applies to employee with id 1.
-            - example_2:
-                value:
-                  id: 2
-                  occurrenceMin: 2
-                  occurrenceMax: 6
-                  durationMin:
-                    hours: 4
-                  durationMax:
-                    hours: 8
-                  shiftTypeIds:
-                    - type1
-                    - type2
-                  shiftIds:
-                    - X
-                    - 'Y'
-                summary: In this example the shifts with id X and Y can be used between 2 and 6 times. The type1 and type2 shift types can also be used between 2 and 6 times, but only if the shift is between 4 and 8 hours long. The constraint applies to all employees.
         shiftLayoutConstraint:
           type: object
           description: |-
