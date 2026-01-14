@@ -419,7 +419,6 @@ components:
           default: false
         type:
           type: string
-          description: DEPRECATED. The type of custom period.
           enum:
             - BASIC
           deprecated: true
@@ -502,7 +501,6 @@ components:
         id:
           deprecated: true
           type: string
-          description: The id of the attribute.
     days:
       description: List of days in the schedule. Days can be defined as an array of dates (in CALENDAR payloads), as an array of day indices (in RECURRING payloads), or as an array of weekdays (allowed in all payloads).
       type: object
@@ -558,11 +556,8 @@ components:
         $ref: '#/components/schemas/date'
       uniqueItems: true
     scheduleDaysWithoutWeekDays:
+      deprecated: true
       type: object
-      description: |-
-        Defines the days in the planning horizon. Either dayIndexes or dates must be specified. If the schedule type is
-        RECURRING, then dayIndexes must be specified, and if the schedule type is CALENDAR, then dates must be
-        specified.
       minProperties: 1
       maxProperties: 1
       properties:
@@ -604,22 +599,26 @@ components:
         dayIndicator:
           $ref: '#/components/schemas/dayIndicator'
           description: |-
-            Indicates which day this interval belongs to, relative to the day that the shift belongs to.
-            Use -1 for intervals belonging to the previous day, 0 for intervals belonging to the same day,
-            and 1 for intervals belonging to the next day.
-        workTypeId:
-          type: string
-          description: Work type id for this interval. Needs to match a work type id from the **configuration** part of the payload. This shift interval can only be used to cover demand with a similar work type.
+            Indicates which day this interval belongs to, relative to the day that the shift belongs to. -1 indicates the
+            interval starts on the previous day, 0 on the same day, and 1 on the next day.
+        factor:
+          type: number
+          description: Factor by which the hours of this interval will be multiplied to calculate the FTE hours of the employee. For example, if the interval is two hours and the factor is 0.5, then the interval counts as 1 FTE.
+          default: 1
+          minimum: 0
         breakMinutes:
           type: integer
           description: Minutes of break in this interval. The solver does not plan the break at any specific time, but the break minutes are subtracted from the total FTE for the shift.
           default: 0
-        assignmentId:
-          type: string
-          description: Assignment id of the assignment that must be worked on during this interval.
         taskId:
           type: string
           description: Task id of the task that must be worked on during this interval. The task needs to be defined in the configuration part of the payload.
+        assignmentId:
+          deprecated: true
+          type: string
+        workTypeId:
+          type: string
+          deprecated: true
     connectedShifts:
       type: object
       minProperties: 1
@@ -678,8 +677,8 @@ components:
         $ref: '#/components/schemas/weekDay'
       uniqueItems: true
     scheduleDays:
+      deprecated: true
       type: object
-      description: Defines the days in the planning horizon. If the schedule type is RECURRING, then dayIndexes can be specified, and if the schedule type is CALENDAR, then dates can be specified. weekDays can be specified regardless of the schedule type.
       not:
         required:
           - dates
@@ -692,9 +691,6 @@ components:
           $ref: '#/components/schemas/dayIndexes'
         dates:
           $ref: '#/components/schemas/dates'
-    assignmentId:
-      type: string
-      description: A unique id for an assignment to do during this demand interval. If specified, only shifts that also have this assignmentId specified will be able to cover this demand.
     timeWindow:
       type: object
       description: A time window. From a start timeStamp to an end timeStamp. The end is not included. A timeWindow can wrap around midnight, in which case the end timeStamp is before the start timeStamp.
@@ -882,7 +878,7 @@ components:
         excludeDayRest:
           type: boolean
           deprecated: true
-          description: DEPRECATED. Indicate whether shifts of this work type should be excluded from day rest calculation.
+          description: DEPRECATED.
         name:
           deprecated: true
           type: string
@@ -897,53 +893,102 @@ components:
             type: string
           value:
             type: string
-    constraintShiftIds:
-      type: array
-      items:
-        type: string
-      description: List of shift ids for which the constraint applies. The shift ids must be present in the shift section. If not specified, the constraint will be applied to all shifts.
-      uniqueItems: true
-    constraintTemplateIds:
-      type: array
-      items:
-        type: string
-      description: List of shift template ids for which the constraint applies. The shift template ids must be present in the shift template section. If not specified, the constraint will be applied to all shifts.
-      uniqueItems: true
-    constraintShiftTypeIds:
-      type: array
-      items:
-        type: string
-      description: List of shift type ids for which the constraint applies. The shift type ids must be present in the shift type section. If not specified, the constraint will be applied to all shift types.
-      uniqueItems: true
-    constraintWorkTypeIds:
-      type: array
-      items:
-        type: string
-      description: List of workType IDs for which the constraint applies. The workTypeIds should be present in workType section. If work type ids are not specified, the constraint will be applied to all work types.
-      uniqueItems: true
+    matchType:
+      type: string
+      enum:
+        - NONE
+        - ANY
+        - ALL
+      default: ANY
+    advancedFilter:
+      type: object
+      required:
+        - field
+        - values
+      properties:
+        field:
+          type: string
+          description: The field to filter on.
+        values:
+          type: array
+          description: The values to filter on.
+          items:
+            type: string
+          uniqueItems: true
+        matchType:
+          $ref: '#/components/schemas/matchType'
+    advancedFilters:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/advancedFilter'
+        matchType:
+          $ref: '#/components/schemas/matchType'
+    constraintFiltersShifts:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          description: |-
+            List of shift ids that the constraint should be applied to. If not specified, no filtering is applied 
+            based on shift ids.
+          uniqueItems: true
+        labels:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        advanced:
+          $ref: '#/components/schemas/advancedFilters'
+    patternDayKeyword:
+      type: string
+      description: A keyword to represent that a day must be a day off (DAY_OFF), must be a worked day (ANY_SHIFT), or that there are no requirements on this day (ANY).
+      enum:
+        - DAY_OFF
+        - ANY_SHIFT
+        - ANY
     patternDay:
       type: object
       minProperties: 1
       properties:
-        shiftIds:
-          $ref: '#/components/schemas/constraintShiftIds'
-        shiftTemplateIds:
-          $ref: '#/components/schemas/constraintTemplateIds'
-        shiftTypeIds:
-          $ref: '#/components/schemas/constraintShiftTypeIds'
-        workTypeIds:
-          $ref: '#/components/schemas/constraintWorkTypeIds'
+        shifts:
+          $ref: '#/components/schemas/constraintFiltersShifts'
+        keyword:
+          $ref: '#/components/schemas/patternDayKeyword'
         keywords:
+          deprecated: true
           type: array
-          description: |-
-            The keywords can be used to define allowed shifts in the pattern as an addition to the ids. If set
-            to ANY_SHIFT, any shift is allowed in the pattern, meaning that any ids in the pattern are ignored.
+          description: DEPRECATED - Use 'keyword' instead.
+          items:
+            $ref: '#/components/schemas/patternDayKeyword'
+          uniqueItems: true
+        shiftIds:
+          deprecated: true
+          type: array
           items:
             type: string
-            enum:
-              - DAY_OFF
-              - ANY_SHIFT
-              - ANY
+          uniqueItems: true
+        shiftTemplateIds:
+          deprecated: true
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        shiftTypeIds:
+          deprecated: true
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        workTypeIds:
+          deprecated: true
+          type: array
+          items:
+            type: string
           uniqueItems: true
     shiftPattern:
       type: object
@@ -983,7 +1028,6 @@ components:
     dayRestRule:
       type: object
       deprecated: true
-      description: Defines how much rest an employee should get in a 24 hour period. Rest means that an employee is not assigned any shift.
       required:
         - id
         - type
@@ -1024,39 +1068,6 @@ components:
             average connected = (10 + 16) / 2 = 13
             average unconnected = (13 + 16) / 2 = 14.5
           default: true
-    matchType:
-      type: string
-      enum:
-        - NONE
-        - ANY
-        - ALL
-      default: ANY
-    advancedFilter:
-      type: object
-      required:
-        - field
-        - values
-      properties:
-        field:
-          type: string
-          description: The field to filter on.
-        values:
-          type: array
-          description: The values to filter on.
-          items:
-            type: string
-          uniqueItems: true
-        matchType:
-          $ref: '#/components/schemas/matchType'
-    advancedFilters:
-      type: object
-      properties:
-        filters:
-          type: array
-          items:
-            $ref: '#/components/schemas/advancedFilter'
-        matchType:
-          $ref: '#/components/schemas/matchType'
     constraintFiltersEmployees:
       type: object
       properties:
@@ -1073,29 +1084,29 @@ components:
           items:
             type: string
           uniqueItems: true
-    constraintFiltersShifts:
-      type: object
-      properties:
-        ids:
-          type: array
-          items:
-            type: string
-          description: |-
-            List of shift ids that the constraint should be applied to. If not specified, no filtering is applied 
-            based on shift ids.
-          uniqueItems: true
-        labels:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        advanced:
-          $ref: '#/components/schemas/advancedFilters'
     constraintEmployeeIds:
       type: array
       items:
         type: string
       description: List of employee ids for which the constraint applies. The employee ids must be present in the employee section. If not specified, the constraint will be applied to all employees.
+      uniqueItems: true
+    constraintShiftIds:
+      type: array
+      items:
+        type: string
+      description: List of shift ids for which the constraint applies. The shift ids must be present in the shift section. If not specified, the constraint will be applied to all shifts.
+      uniqueItems: true
+    constraintShiftTypeIds:
+      type: array
+      items:
+        type: string
+      description: List of shift type ids for which the constraint applies. The shift type ids must be present in the shift type section. If not specified, the constraint will be applied to all shift types.
+      uniqueItems: true
+    constraintWorkTypeIds:
+      type: array
+      items:
+        type: string
+      description: List of workType IDs for which the constraint applies. The workTypeIds should be present in workType section. If work type ids are not specified, the constraint will be applied to all work types.
       uniqueItems: true
     taskMinMinutes:
       type: integer
@@ -1158,28 +1169,16 @@ components:
           $ref: '#/components/schemas/constraintFiltersShifts'
         employeeIds:
           deprecated: true
-          description: |-
-            List of employee ids that the constraint should be applied to. If not specified, the constraint applies
-            to all employees.
           $ref: '#/components/schemas/constraintEmployeeIds'
         shiftIds:
           deprecated: true
-          description: |-
-            List of shift ids that the constraint should be applied to. If not specified, no filtering is applied 
-            based on shift ids.
           $ref: '#/components/schemas/constraintShiftIds'
         shiftTypeIds:
           deprecated: true
-          description: |-
-            List of shift type ids that the constraint should be applied to. If not specified, no filtering is applied 
-            based on shift types.
           $ref: '#/components/schemas/constraintShiftTypeIds'
         workTypeIds:
           deprecated: true
           $ref: '#/components/schemas/constraintWorkTypeIds'
-          description: |-
-            List of work type ids that the constraint should be applied to. If not specified, no filtering is applied 
-            based on work types.
     constraintFiltersWork:
       type: object
       description: Defines filtering for specific work that the constraint should be applied to. For example, it can be used to apply the constraint only to work carried out in specific roles.
@@ -1236,9 +1235,6 @@ components:
         workTypeIds:
           deprecated: true
           $ref: '#/components/schemas/constraintWorkTypeIds'
-          description: |-
-            List of work type ids that the constraint should be applied to. If not specified, no filtering is applied 
-            based on work types.
     overlapRules:
       description: |-
         Specifies overlap thresholds that a shift must meet with the constraint's periods in order for it to be
@@ -1571,12 +1567,6 @@ components:
         availableDays:
           $ref: '#/components/schemas/days'
           description: Days on which this shift is available to be assigned. If not set, the shift is always available.
-        workTypeId:
-          type: string
-          description: Work type id for this shift template. Needs to match a work type id from the configuration part of the payload. This shift template can only be used to cover demand with a similar work type.
-        onDutyWorkTypeId:
-          type: string
-          description: Input if it is possible to cover any other kind of work, during this shift.
         noWorkTimeWindows:
           type: array
           description: Time windows within the shift in which no work will be done. The Solver will disregard these time windows when considering demand fulfilment as well as employee FTE working time. This means that no demand will be fulfilled in this time window if an employee is assigned to this shift. The duration of these noWorkTimeWindows will also not count towards the assigned employees FTE.
@@ -1595,13 +1585,6 @@ components:
             - END_DAY
             - NEXT_DAY
           description: Rule used to determine to which day this shift officially belongs.
-        assignmentId:
-          type: string
-          description: |-
-            An assignment to be done in this shift. Will match the assignment in the demand(s).
-            Default is that all assignments can be done. If an assignment is specified then it's only this
-            assignment that can be done during demand fulfilment, in addition to demand that doesn't have any
-            assignments specified.
         possibleTaskIds:
           type: array
           uniqueItems: true
@@ -1669,6 +1652,15 @@ components:
           $ref: '#/components/schemas/scheduleDays'
           deprecated: true
           description: DEPRECATED - Use availableDays instead.
+        assignmentId:
+          type: string
+          deprecated: true
+        workTypeId:
+          type: string
+          deprecated: true
+        onDutyWorkTypeId:
+          type: string
+          deprecated: true
     employee:
       type: object
       required:
@@ -1841,15 +1833,10 @@ components:
         endTime:
           description: End time of this time slot.
           $ref: '#/components/schemas/timeStamp'
-        workTypeId:
-          type: string
-          description: Work type id for this time slot. Needs to match a work type id from the **configuration** part of the payload. Covering this time slot is only possible with a shift that has the same work type.
         canBeShared:
           type: boolean
           description: Determines if the time slot can be "split" and covered by more than one employee. If set to false, the same employee has to cover the entire time slot from start to end.
           default: true
-        assignmentId:
-          $ref: '#/components/schemas/assignmentId'
         taskId:
           type: string
           description: Task id of the task to do during this time slot. The task needs to be defined in the configuration part of the payload. If an employee does not meet the requirements for the task, they can not cover this time slot.
@@ -1858,6 +1845,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/attributeRequirement'
+        workTypeId:
+          deprecated: true
+          type: string
+        assignmentId:
+          deprecated: true
+          type: string
     demand:
       type: object
       properties:
@@ -2235,7 +2228,6 @@ components:
         isStrict:
           deprecated: true
           type: boolean
-          description: If true, the constraint must be strictly followed and the solver will never consider solutions that would violate the constraint.
     cooldownConstraint:
       type: object
       required:
@@ -2438,7 +2430,6 @@ components:
         isStrict:
           deprecated: true
           type: boolean
-          description: DEPRECATED - Use importance instead.
           default: false
     layoutConstraint:
       type: object
@@ -2706,12 +2697,8 @@ components:
         periods:
           deprecated: true
           $ref: '#/components/schemas/periods'
-          description: DEPRECATED - Use startDays instead.
         startWeekday:
           type: integer
-          description: |-
-            DEPRECATED - Use startDays instead. 
-            forced True.
           minimum: 1
           maximum: 7
         fairness:
@@ -3748,15 +3735,10 @@ components:
             endTime:
               description: End time of this time slot.
               $ref: '#/components/schemas/timeStamp'
-            workTypeId:
-              type: string
-              description: Work type id for this time slot. Needs to match a work type id from the **configuration** part of the payload. Covering this time slot is only possible with a shift that has the same work type.
             canBeShared:
               type: boolean
               description: Determines if the time slot can be "split" and covered by more than one employee. If set to false, the same employee has to cover the entire time slot from start to end.
               default: true
-            assignmentId:
-              $ref: '#/components/schemas/assignmentId'
             taskId:
               type: string
               description: Task id of the task to do during this time slot. The task needs to be defined in the configuration part of the payload. If an employee does not meet the requirements for the task, they can not cover this time slot.
@@ -3765,6 +3747,12 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/attributeRequirement'
+            workTypeId:
+              deprecated: true
+              type: string
+            assignmentId:
+              deprecated: true
+              type: string
         shiftTemplate:
           type: object
           description: Shift template that will be used to generate shifts.
@@ -3786,12 +3774,6 @@ components:
             availableDays:
               $ref: '#/components/schemas/days'
               description: Days on which this shift is available to be assigned. If not set, the shift is always available.
-            workTypeId:
-              type: string
-              description: Work type id for this shift template. Needs to match a work type id from the configuration part of the payload. This shift template can only be used to cover demand with a similar work type.
-            onDutyWorkTypeId:
-              type: string
-              description: Input if it is possible to cover any other kind of work, during this shift.
             noWorkTimeWindows:
               type: array
               description: Time windows within the shift in which no work will be done. The Solver will disregard these time windows when considering demand fulfilment as well as employee FTE working time. This means that no demand will be fulfilled in this time window if an employee is assigned to this shift. The duration of these noWorkTimeWindows will also not count towards the assigned employees FTE.
@@ -3810,13 +3792,6 @@ components:
                 - END_DAY
                 - NEXT_DAY
               description: Rule used to determine to which day this shift officially belongs.
-            assignmentId:
-              type: string
-              description: |-
-                An assignment to be done in this shift. Will match the assignment in the demand(s).
-                Default is that all assignments can be done. If an assignment is specified then it's only this
-                assignment that can be done during demand fulfilment, in addition to demand that doesn't have any
-                assignments specified.
             possibleTaskIds:
               type: array
               uniqueItems: true
@@ -3884,6 +3859,15 @@ components:
               $ref: '#/components/schemas/scheduleDays'
               deprecated: true
               description: DEPRECATED - Use availableDays instead.
+            assignmentId:
+              type: string
+              deprecated: true
+            workTypeId:
+              type: string
+              deprecated: true
+            onDutyWorkTypeId:
+              type: string
+              deprecated: true
         demand:
           type: object
           properties:
@@ -4308,28 +4292,16 @@ components:
               $ref: '#/components/schemas/constraintFiltersShifts'
             employeeIds:
               deprecated: true
-              description: |-
-                List of employee ids that the constraint should be applied to. If not specified, the constraint applies
-                to all employees.
               $ref: '#/components/schemas/constraintEmployeeIds'
             shiftIds:
               deprecated: true
-              description: |-
-                List of shift ids that the constraint should be applied to. If not specified, no filtering is applied 
-                based on shift ids.
               $ref: '#/components/schemas/constraintShiftIds'
             shiftTypeIds:
               deprecated: true
-              description: |-
-                List of shift type ids that the constraint should be applied to. If not specified, no filtering is applied 
-                based on shift types.
               $ref: '#/components/schemas/constraintShiftTypeIds'
             workTypeIds:
               deprecated: true
               $ref: '#/components/schemas/constraintWorkTypeIds'
-              description: |-
-                List of work type ids that the constraint should be applied to. If not specified, no filtering is applied 
-                based on work types.
         constraintFiltersEmployees:
           type: object
           properties:
@@ -4476,22 +4448,26 @@ components:
             dayIndicator:
               $ref: '#/components/schemas/dayIndicator'
               description: |-
-                Indicates which day this interval belongs to, relative to the day that the shift belongs to.
-                Use -1 for intervals belonging to the previous day, 0 for intervals belonging to the same day,
-                and 1 for intervals belonging to the next day.
-            workTypeId:
-              type: string
-              description: Work type id for this interval. Needs to match a work type id from the **configuration** part of the payload. This shift interval can only be used to cover demand with a similar work type.
+                Indicates which day this interval belongs to, relative to the day that the shift belongs to. -1 indicates the
+                interval starts on the previous day, 0 on the same day, and 1 on the next day.
+            factor:
+              type: number
+              description: Factor by which the hours of this interval will be multiplied to calculate the FTE hours of the employee. For example, if the interval is two hours and the factor is 0.5, then the interval counts as 1 FTE.
+              default: 1
+              minimum: 0
             breakMinutes:
               type: integer
               description: Minutes of break in this interval. The solver does not plan the break at any specific time, but the break minutes are subtracted from the total FTE for the shift.
               default: 0
-            assignmentId:
-              type: string
-              description: Assignment id of the assignment that must be worked on during this interval.
             taskId:
               type: string
               description: Task id of the task that must be worked on during this interval. The task needs to be defined in the configuration part of the payload.
+            assignmentId:
+              deprecated: true
+              type: string
+            workTypeId:
+              type: string
+              deprecated: true
         workType:
           type: object
           required:
@@ -4508,7 +4484,7 @@ components:
             excludeDayRest:
               type: boolean
               deprecated: true
-              description: DEPRECATED. Indicate whether shifts of this work type should be excluded from day rest calculation.
+              description: DEPRECATED.
             name:
               deprecated: true
               type: string
@@ -4549,7 +4525,6 @@ components:
         dayRestRule:
           type: object
           deprecated: true
-          description: Defines how much rest an employee should get in a 24 hour period. Rest means that an employee is not assigned any shift.
           required:
             - id
             - type
@@ -4738,9 +4713,6 @@ components:
             workTypeIds:
               deprecated: true
               $ref: '#/components/schemas/constraintWorkTypeIds'
-              description: |-
-                List of work type ids that the constraint should be applied to. If not specified, no filtering is applied 
-                based on work types.
         employeeUtilizationConstraint:
           type: object
           description: |-
@@ -5294,7 +5266,6 @@ components:
             isStrict:
               deprecated: true
               type: boolean
-              description: If true, the constraint must be strictly followed and the solver will never consider solutions that would violate the constraint.
         prioritizationConstraint:
           type: object
           description: |-
@@ -5460,7 +5431,6 @@ components:
             isStrict:
               deprecated: true
               type: boolean
-              description: DEPRECATED - Use importance instead.
               default: false
         blockedTimeConstraint:
           type: object
@@ -5493,7 +5463,6 @@ components:
         weeklyRestConstraint:
           type: object
           deprecated: true
-          description: DEPRECATED. This constraint defines a wanted length of consecutive rest during a week. When an employee's length consecutive rest exceeds this constraint's threshold, the score will increase. The more it exceeds, the higher the score will be. This prioritizes grouping the rest in a single period rather than spreading them out over the week. A constraint can be applied to all employees or specific employees, meaning that an employee can have both personal weekly rest constraints and be a part of group weekly rest constraints. These constraints will affect the final score independently of each other. If the wanted rest length for a constraint cannot be achieved in that week, the solver will only try to satisfy the strict minimum rest defined in weekly rest rules.
           required:
             - id
             - restDuration
@@ -5797,39 +5766,57 @@ components:
             periods:
               deprecated: true
               $ref: '#/components/schemas/periods'
-              description: DEPRECATED - Use startDays instead.
             startWeekday:
               type: integer
-              description: |-
-                DEPRECATED - Use startDays instead. 
-                forced True.
               minimum: 1
               maximum: 7
             fairness:
               $ref: '#/components/schemas/constraintFairness'
+        patternDayKeyword:
+          type: string
+          description: A keyword to represent that a day must be a day off (DAY_OFF), must be a worked day (ANY_SHIFT), or that there are no requirements on this day (ANY).
+          enum:
+            - DAY_OFF
+            - ANY_SHIFT
+            - ANY
         patternDay:
           type: object
           minProperties: 1
           properties:
-            shiftIds:
-              $ref: '#/components/schemas/constraintShiftIds'
-            shiftTemplateIds:
-              $ref: '#/components/schemas/constraintTemplateIds'
-            shiftTypeIds:
-              $ref: '#/components/schemas/constraintShiftTypeIds'
-            workTypeIds:
-              $ref: '#/components/schemas/constraintWorkTypeIds'
+            shifts:
+              $ref: '#/components/schemas/constraintFiltersShifts'
+            keyword:
+              $ref: '#/components/schemas/patternDayKeyword'
             keywords:
+              deprecated: true
               type: array
-              description: |-
-                The keywords can be used to define allowed shifts in the pattern as an addition to the ids. If set
-                to ANY_SHIFT, any shift is allowed in the pattern, meaning that any ids in the pattern are ignored.
+              description: DEPRECATED - Use 'keyword' instead.
+              items:
+                $ref: '#/components/schemas/patternDayKeyword'
+              uniqueItems: true
+            shiftIds:
+              deprecated: true
+              type: array
               items:
                 type: string
-                enum:
-                  - DAY_OFF
-                  - ANY_SHIFT
-                  - ANY
+              uniqueItems: true
+            shiftTemplateIds:
+              deprecated: true
+              type: array
+              items:
+                type: string
+              uniqueItems: true
+            shiftTypeIds:
+              deprecated: true
+              type: array
+              items:
+                type: string
+              uniqueItems: true
+            workTypeIds:
+              deprecated: true
+              type: array
+              items:
+                type: string
               uniqueItems: true
         shiftUtilizationConstraint:
           type: object
@@ -6304,7 +6291,7 @@ components:
     scheduleType:
       deprecated: true
       type: object
-      description: DEPRECATED. Use JobInfo instead. Can be either value WEEK_RECURRING or CALENDAR.
+      description: DEPRECATED. Use JobInfo instead.
       maxProperties: 1
       minProperties: 1
       properties:
@@ -6433,7 +6420,8 @@ components:
                           type: integer
                           description: Number of missing employees to fulfill the minimum demand.
                         assignmentId:
-                          $ref: '#/components/schemas/assignmentId'
+                          deprecated: true
+                          type: string
                         taskId:
                           type: string
                         attributeRequirements:
