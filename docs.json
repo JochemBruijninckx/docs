@@ -56,7 +56,6 @@
       },
       {
         "tab": "API reference",
-        "openapi": "openapi.yml",
         "groups": [
           {
             "group": "Create",
