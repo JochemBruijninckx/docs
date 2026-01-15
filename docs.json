@@ -89,5 +89,10 @@
   "contextual": {
     "options": ["copy", "chatgpt"]
   },
-  "footer": {}
+  "footer": {},
+  "api": {
+    "examples": {
+      "languages": []
+    }
+  }
 }
