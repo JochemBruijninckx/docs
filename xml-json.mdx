@@ -96,8 +96,12 @@
     "id": "rbs-min-15-hours",
     "importance": "STRICT",
     "filters": {
-      "employeeIds": ["1", "2"],
-      "workTypeIds": ["WORK"]
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "labels": ["type:work"]
+      }
     },
     "minRestDuration": {
       "hours": 15,
@@ -143,8 +147,12 @@
     "maxWorkedPeriods": 6,
     "minSurroundingFreePeriods": 1,
     "filters": {
-      "employeeIds": ["1", "2"],
-      "workTypeIds": ["WORK", "ON_DUTY"]
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "labels": ["type:work", "type:on-duty"]
+      }
     },
     "periods": {
       "labels": ["weekends"]
@@ -182,8 +190,12 @@
     "importance": "STRICT",
     "minWorkedPeriods": 1,
     "filters": {
-      "employeeIds": ["1", "2"],
-      "workTypeIds": ["WORK", "ON_DUTY"]
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "labels": ["type:work", "type:on-duty"]
+      }
     },
     "periods": {
       "labels": ["weekends"]
@@ -234,8 +246,12 @@
     "importance": "HIGH",
     "isDesired": false,
     "filters": {
-      "employeeIds": ["1", "2"],
-      "workTypeIds": ["WORK"]
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "labels": ["type:work"]
+      }
     },
     "periods": {
       "days": {
@@ -288,7 +304,9 @@
     "id": "euc-max-3-consecutive-days-off",
     "importance": "VERY_HIGH",
     "filters": {
-      "employeeIds": ["1", "2"]
+      "employees": {
+        "ids": ["1", "2"]
+      }
     },
     "targets": {
       "minShifts": 1
@@ -348,8 +366,12 @@
     "id": "euc-days",
     "importance": "VERY_HIGH",
     "filters": {
-      "employeeIds": ["1", "2"],
-      "workTypeIds": ["WORK", "ON_DUTY"]
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "labels": ["type:work", "type:on-duty"]
+      }
     },
     "targets": {
       "minShifts": 20,
@@ -398,8 +420,12 @@
     "id": "euc-nights",
     "importance": "VERY_HIGH",
     "filters": {
-      "employeeIds": ["1", "2"],
-      "shiftTypeIds": ["NIGHT"]       // see comment
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "labels": ["night"]
+      }
     },
     "targets": {
       "minShifts": 1,
@@ -430,7 +456,9 @@
     "id": "euc-hours-per-week",
     "importance": "MEDIUM",
     "filters": {
-      "employeeIds": ["X"]
+      "employees": {
+        "ids": ["X"]
+      }
     },
     "targets": {
       "minHours": Y,
@@ -484,8 +512,12 @@
     "id": "rbs-days",
     "importance": "STRICT",
     "filters": {
-      "employeeIds": ["1", "2"],
-      "shiftIds": ["Dag2", "Kvzaezli"]
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "ids": ["Dag2", "Kvzaezli"]
+      }
     },
     "minRestDays": 3
   }
@@ -534,7 +566,11 @@
     "minNumberOfDays": 3,
     "minNumberOfWeeks": 1,
     "requiredWeekDaysOff": [6, 7],
-    "employeeIds": ["1", "2"]
+    "filters": {
+      "employees": {
+        "ids": ["1", "2"]
+      }
+    }
   }
 ]
 ```
@@ -648,8 +684,12 @@
           "idealShifts": 0
         },
         "filters": {
-          "employeeIds": ["1", "2"],
-          "shiftTypeIds": ["EVENING"]
+          "employees": {
+            "ids": ["1", "2"]
+          },
+          "shifts": {
+            "labels": ["evening"]
+          }
         }
       }
     ],
@@ -698,8 +738,12 @@
         "id": "AVOID_WEEKENDS",
         "importance": "NONE",
         "filters": {
-          "employeeIds": ["1", "2"],
-          "workTypeIds": ["WORK", "ON_DUTY"]
+          "employees": {
+            "ids": ["1", "2"]
+          },
+          "shifts": {
+            "labels": ["type:work", "type:on-duty"]
+          }
         },
         "maxWorkedPeriods": 0,
         "periods": {
