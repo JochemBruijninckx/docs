@@ -56,7 +56,26 @@
       },
       {
         "tab": "API reference",
-        "openapi": "api-reference/openapi.yml"
+        "groups": [
+          {
+            "group": "Create",
+            "pages": [
+              "api-reference/start",
+              "api-reference/get-job-status",
+              "api-reference/stop-job",
+              "api-reference/get-result",
+              "api-reference/get-request"
+            ]
+          },
+          {
+            "group": "Analyze",
+            "pages": ["api-reference/analyze"]
+          },
+          {
+            "group": "Feasibility",
+            "pages": ["api-reference/feasibility"]
+          }
+        ]
       }
     ],
     "global": {
