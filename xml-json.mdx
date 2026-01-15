@@ -297,6 +297,15 @@
 - `max_continous_shifts`
 - `max_continous_dayoff = 3`
 
+**Other parameters:**
+
+- `min_continous_nights`
+- `max_continous_nights`
+- `min_continous_evenings`
+- `max_continous_evenings`
+- `max_continous_dutycall_shifts`
+- `max_continous_onduty_shifts`
+
 **XML:**
 
 ```xml
@@ -341,14 +350,28 @@
 ]
 ```
 
-**Other parameters:**
+_Note_: The 'day off' case is not supported on ConsecutiveConstraint, and the above example is a workaround for that.
+The other examples (min/max consecutive night/evening/etc) are supported on ConsecutiveConstraint, like such:
 
-- `min_continous_nights`
-- `max_continous_nights`
-- `min_continous_evenings`
-- `max_continous_evenings`
-- `max_continous_dutycall_shifts`
-- `max_continous_onduty_shifts`
+```json
+"consecutiveConstraints": [
+  {
+    "id": "cc-max-3-consecutive-nights",
+    "importance": "STRICT",
+    "filters": {
+      "employees": {
+        "ids": ["1", "2"]
+      },
+      "shifts": {
+        "labels": ["night"]
+      }
+    },
+    "targets": {
+      "max": 3
+    }
+  }
+]
+```
 
 ## ShiftUtilizationConstraint
 
