@@ -197,8 +197,6 @@
   </div>
 </Columns>
 
-### Min_weekends = 1
-
 <Columns cols={2}>
   <div>
     <h4>XML</h4>
@@ -313,20 +311,6 @@
 
 ## ShiftPatternConstraint
 
-**Parameters:**
-
-- `max_continous_shifts`
-- `max_continous_dayoff = 3`
-
-**Other parameters:**
-
-- `min_continous_nights`
-- `max_continous_nights`
-- `min_continous_evenings`
-- `max_continous_evenings`
-- `max_continous_dutycall_shifts`
-- `max_continous_onduty_shifts`
-
 **XML:**
 
 ```xml
@@ -347,6 +331,9 @@
 ```
 
 **JSON:**
+
+_Note_: The 'day off' case is not supported on ConsecutiveConstraint, and the below example is a workaround for that.
+We will support this case on ConsecutiveConstraint as well in the future.
 
 ```json
 "employeeUtilizationConstraints": [ // alternative
@@ -371,7 +358,6 @@
 ]
 ```
 
-_Note_: The 'day off' case is not supported on ConsecutiveConstraint, and the above example is a workaround for that.
 The other examples (min/max consecutive night/evening/etc) are supported on ConsecutiveConstraint, like such:
 
 ```json
@@ -443,13 +429,6 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
   </div>
 </Columns>
 
-**Other parameters:**
-
-- `max_evenings`
-- `min_evenings`
-- `max_nights = 10`
-- `min_nights = 1`
-
 ### max_nights / min_nights
 
 <Columns cols={2}>
@@ -499,15 +478,6 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
 </Columns>
-
-**Other parameters:**
-
-- `max_undesirable_shifts`
-- `min_undesirable_shifts`
-- `max_dutycall_shifts`
-- `min_dutycall_shifts`
-- `max_onduty_shifts`
-- `min_onduty_shifts`
 
 ### min_hours_week
 
@@ -600,10 +570,6 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
 </Columns>
-
-**Other parameters:**
-
-- `days_between_onduty_shifts`
 
 ## ConsecutiveTimeOffConstraint
 
