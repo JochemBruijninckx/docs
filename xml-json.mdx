@@ -1,14 +1,14 @@
-# Autoschedule row setting constraints
-
 ## BlockedHoursConstraint
 
 **JSON:** `employeeAvailabilityConstraints`
 
 **Rule ID:** `blockinghours_rule_id`
 
+**Blocking hours on day 12**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <BlockedHoursConstraint>
       <Block>
@@ -20,7 +20,7 @@
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "employeeAvailabilityConstraints": [
       {
@@ -44,10 +44,11 @@
 
 **Source:** `ScheduleRow.DayRestRule`
 
+**11 hours rest starting at 0:00**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
-    ```xml
+    **XML** ```xml
     <DayRestRule>
       <Id>013N0068H001</Id>
       <Type>TIME</Type>
@@ -57,7 +58,7 @@
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     <p>
       <em>See PeriodicRestConstraint documentation</em>
     </p>
@@ -72,10 +73,11 @@
 
 **Source:** `ScheduleRow.WeeklyRestRule`
 
+**36 hours rest over 7 days starting on day 6 at 14:00**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
-    ```xml
+    **XML** ```xml
     <WeeklyRestRule>
       <Id>013N0003100N</Id>
       <NbrOfDays>7</NbrOfDays>
@@ -86,7 +88,7 @@
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     <p>
       <em>See PeriodicRestConstraint documentation</em>
     </p>
@@ -99,9 +101,11 @@
 
 **JSON:** `cooldownConstraints`
 
+**Minimum 15 hours rest between shifts**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <RestBetweenShiftsConstraint>
       <Id>min_hours_between_shifts#15</Id>
@@ -117,7 +121,7 @@
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "cooldownConstraints": [
       {
@@ -151,9 +155,11 @@
 
 **JSON:** `periodDistributionConstraints`
 
+**Maximum 6 weekends with 1 free neighbor**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <WeekendDistributionConstraint>
       <Id>max_weekends#6#1</Id>
@@ -172,7 +178,7 @@
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "periodDistributionConstraints": [
       {
@@ -197,9 +203,11 @@
   </div>
 </Columns>
 
+**Minimum 1 weekend**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <WeekendDistributionConstraint>
       <Id>min_weekends#1#</Id>
@@ -217,7 +225,7 @@
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "periodDistributionConstraints": [
       {
@@ -245,9 +253,11 @@
 
 **JSON:** `employeeAvailabilityConstraints`
 
+**Unwanted hours on Monday and Tuesday nights**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <PointConstraint>
       <Id>PREFERABLE_HOURS</Id>
@@ -276,7 +286,7 @@
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "employeeAvailabilityConstraints": [
       {
@@ -311,9 +321,12 @@
 
 ## ShiftPatternConstraint
 
-**XML:**
+**Maximum 3 consecutive days off**
 
-```xml
+<Columns cols={2}>
+  <div>
+    **XML**
+    ```xml
 <ShiftPatternConstraint>
   <Id>max_continous_dayoff#3</Id>
   <Weight>-90</Weight>
@@ -328,14 +341,11 @@
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
-```
-
-**JSON:**
-
-_Note_: The 'day off' case is not supported on ConsecutiveConstraint, and the below example is a workaround for that.
-We will support this case on ConsecutiveConstraint as well in the future.
-
-```json
+    ```
+  </div>
+  <div>
+    **JSON**
+    ```json
 "employeeUtilizationConstraints": [ // alternative
   {
     "id": "euc-max-3-consecutive-days-off",
@@ -356,7 +366,12 @@ We will support this case on ConsecutiveConstraint as well in the future.
     }
   }
 ]
-```
+    ```
+  </div>
+</Columns>
+
+_Note_: The 'day off' case is not supported on ConsecutiveConstraint, and the below example is a workaround for that.
+We will support this case on ConsecutiveConstraint as well in the future.
 
 The other examples (min/max consecutive night/evening/etc) are supported on ConsecutiveConstraint, like such:
 
@@ -384,9 +399,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **JSON:** `employeeUtilizationConstraints`
 
+**20-57 workdays**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <ShiftUtilizationConstraint>
       <Id>max_workdays#57#20</Id>
@@ -405,7 +422,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "employeeUtilizationConstraints": [
       {
@@ -431,9 +448,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 ### max_nights / min_nights
 
+**1-10 night shifts**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <ShiftUtilizationConstraint>
       <Id>max_nights#10#1</Id>
@@ -455,7 +474,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "employeeUtilizationConstraints": [
       {
@@ -483,7 +502,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **Source:** `Row.MinWeekHours`
 
-**JSON:**
+**Minimum hours per week**
 
 ```json
 "employeeUtilizationConstraints": [
@@ -521,9 +540,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **JSON:** `cooldownConstraints`
 
+**3 days between specific shifts**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <ShiftLayoutConstraint>
       <Id>days_between_undesirable#3</Id>
@@ -541,7 +562,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "cooldownConstraints": [
       {
@@ -575,9 +596,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **JSON:** `consecutiveTimeOffConstraints`
 
+**Minimum 1 long weekend of 3 days**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <ConsecutiveTimeOffConstraint>
       <Id>min_longweekends#1#3</Id>
@@ -597,7 +620,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "consecutiveTimeOffConstraints": [
       {
@@ -626,21 +649,29 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **ID:** `RESCHEDULE_FAIR_HOURS`
 
-**XML:**
+**Fair rescheduling of hours**
 
-```xml
-<AdjustedTimeConstraint>
-  <Id>RESCHEDULE_FAIR_HOURS</Id>
-  <Weight>90</Weight>
-  <RateAdjustFairness>false</RateAdjustFairness>
-  <Types>
-    <Type>WORK</Type>
-    <Type>ON_DUTY</Type>
-  </Types>
-</AdjustedTimeConstraint>
-```
-
-**JSON:** Yet to be supported
+<Columns cols={2}>
+  <div>
+    **XML** ```xml
+    <AdjustedTimeConstraint>
+      <Id>RESCHEDULE_FAIR_HOURS</Id>
+      <Weight>90</Weight>
+      <RateAdjustFairness>false</RateAdjustFairness>
+      <Types>
+        <Type>WORK</Type>
+        <Type>ON_DUTY</Type>
+      </Types>
+    </AdjustedTimeConstraint>
+    ```
+  </div>
+  <div>
+    **JSON**
+    <p>
+      <em>Yet to be supported</em>
+    </p>
+  </div>
+</Columns>
 
 ### NewWorkingDayConstraints
 
@@ -649,21 +680,29 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 - `RESCHEDULE_FAIR_DAYS`
 - `RESCHEDULE_FAIR_DAYS_WEEKEND`
 
-**XML:**
+**Fair rescheduling of weekend days**
 
-```xml
-<NewWorkingDayConstraint>
-  <Id>RESCHEDULE_FAIR_DAYS_WEEKEND</Id>
-  <Weight>99</Weight>
-  <WeekDays>6#7</WeekDays>
-  <Types>
-    <Type>WORK</Type>
-    <Type>ON_DUTY</Type>
-  </Types>
-</NewWorkingDayConstraint>
-```
-
-**JSON:** Yet to be supported
+<Columns cols={2}>
+  <div>
+    **XML** ```xml
+    <NewWorkingDayConstraint>
+      <Id>RESCHEDULE_FAIR_DAYS_WEEKEND</Id>
+      <Weight>99</Weight>
+      <WeekDays>6#7</WeekDays>
+      <Types>
+        <Type>WORK</Type>
+        <Type>ON_DUTY</Type>
+      </Types>
+    </NewWorkingDayConstraint>
+    ```
+  </div>
+  <div>
+    **JSON**
+    <p>
+      <em>Yet to be supported</em>
+    </p>
+  </div>
+</Columns>
 
 ### ShiftPatternConstraint
 
@@ -671,9 +710,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **ID:** `FRI_OFF_IF_SAT_SUN_MON`
 
+**Friday off if Saturday-Sunday-Monday worked**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <ShiftPatternConstraint>
       <Id>FRI_OFF_IF_SAT_SUN_MON</Id>
@@ -693,7 +734,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "patternConstraints": [
       {
@@ -744,9 +785,12 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **ID:** `FAIR_EVENINGS`
 
-**XML:**
+**Fair distribution of evening shifts**
 
-```xml
+<Columns cols={2}>
+  <div>
+    **XML**
+    ```xml
 <ShiftUtilizationConstraint>
   <Id>FAIR_EVENINGS</Id>
   <Weight>0</Weight>
@@ -763,11 +807,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftUtilizationConstraint>
-```
-
-**JSON:**
-
-```json
+    ```
+  </div>
+  <div>
+    **JSON**
+    ```json
 {
   "constraints": {
     "employeeUtilizationConstraints": [
@@ -797,7 +841,9 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ]
   }
 }
-```
+    ```
+  </div>
+</Columns>
 
 ### WeekendDistributionConstraint
 
@@ -805,9 +851,12 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **ID:** `FAIR_WEEKENDS`
 
-**XML:**
+**Fair distribution of weekends**
 
-```xml
+<Columns cols={2}>
+  <div>
+    **XML**
+    ```xml
 <WeekendDistributionConstraint>
   <Id>FAIR_WEEKENDS</Id>
   <Weight>0</Weight>
@@ -822,11 +871,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </WeekendDistributionConstraint>
-```
-
-**JSON:**
-
-```json
+    ```
+  </div>
+  <div>
+    **JSON**
+    ```json
 {
   "constraints": {
     "periodDistributionConstraints": [
@@ -872,7 +921,9 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ]
   }
 }
-```
+    ```
+  </div>
+</Columns>
 
 ## WeeklyRestConstraint
 
@@ -880,9 +931,11 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 **ID:** `WEEKLYRESTHOUR_45`
 
+**45 hours rest per week**
+
 <Columns cols={2}>
   <div>
-    <h4>XML</h4>
+    **XML**
     ```xml
     <WeeklyRestConstraint>
       <Id>WEEKLYRESTHOUR_45</Id>
@@ -896,7 +949,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     ```
   </div>
   <div>
-    <h4>JSON</h4>
+    **JSON**
     ```json
     "periodicRestConstraints": [
       {
