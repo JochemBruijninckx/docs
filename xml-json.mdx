@@ -1,6 +1,8 @@
 # Autoschedule row setting constraints
 
-## BlockedHoursConstraint ⇒ EmployeeAvailabilityConstraint
+## BlockedHoursConstraint
+
+**JSON:** `employeeAvailabilityConstraints`
 
 **Rule ID:** `blockinghours_rule_id`
 
@@ -33,7 +35,9 @@
 ]
 ```
 
-## DayRestRule ⇒ periodicRestConstraints
+## DayRestRule
+
+**JSON:** `periodicRestConstraints`
 
 **Source:** `ScheduleRow.DayRestRule`
 
@@ -50,7 +54,9 @@
 
 **Note:** Start with ONE period rest
 
-## WeeklyRestRule ⇒ periodicRestConstraints
+## WeeklyRestRule
+
+**JSON:** `periodicRestConstraints`
 
 **Source:** `ScheduleRow.WeeklyRestRule`
 
@@ -69,6 +75,8 @@
 **Note:** Start with ONE period rest
 
 ## RestBetweenShifts
+
+**JSON:** `cooldownConstraints`
 
 **Parameter:** `min_hours_between_shifts = 15`
 
@@ -91,27 +99,35 @@
 **JSON:**
 
 ```json
-"restBetweenShiftsConstraints": [
+"cooldownConstraints": [
   {
-    "id": "rbs-min-15-hours",
+    "id": "cd-min-15-hours",
     "importance": "STRICT",
     "filters": {
       "employees": {
         "ids": ["1", "2"]
-      },
+      }
+    },
+    "starts": {
       "shifts": {
         "labels": ["type:work"]
       }
     },
-    "minRestDuration": {
-      "hours": 15,
-      "minutes": 0
+    "ends": {
+      "shifts": {
+        "labels": ["type:work"]
+      }
+    },
+    "targets": {
+      "minHours": 15
     }
   }
 ]
 ```
 
-## WeekendDistributionConstraint ⇒ PeriodDistributionConstraint
+## WeekendDistributionConstraint
+
+**JSON:** `periodDistributionConstraints`
 
 **Parameters:**
 
@@ -204,7 +220,9 @@
 ]
 ```
 
-## PointConstraint ⇒ employeeAvailabilityConstraint
+## PointConstraint
+
+**JSON:** `employeeAvailabilityConstraints`
 
 **Parameter:** `unwanted_hours`
 
@@ -270,7 +288,9 @@
 ]
 ```
 
-## ShiftPatternConstraint ⇒ Pattern
+## ShiftPatternConstraint
+
+**JSON:** `employeeUtilizationConstraints`
 
 **Parameters:**
 
@@ -330,7 +350,9 @@
 - `max_continous_dutycall_shifts`
 - `max_continous_onduty_shifts`
 
-## ShiftUtilizationConstraint ⇒ EmployeeUtilizationConstraint
+## ShiftUtilizationConstraint
+
+**JSON:** `employeeUtilizationConstraints`
 
 **Parameters:**
 
@@ -482,7 +504,9 @@
 
 **Note:** See above
 
-## ShiftLayoutConstraint ⇒ RestBetweenShifts
+## ShiftLayoutConstraint
+
+**JSON:** `cooldownConstraints`
 
 **Parameter:** `days_between_undesirable = 3`
 
@@ -507,19 +531,28 @@
 **JSON:**
 
 ```json
-"restBetweenShiftsConstraints": [
+"cooldownConstraints": [
   {
-    "id": "rbs-days",
+    "id": "cd-days-between-shifts",
     "importance": "STRICT",
     "filters": {
       "employees": {
         "ids": ["1", "2"]
-      },
+      }
+    },
+    "starts": {
       "shifts": {
         "ids": ["Dag2", "Kvzaezli"]
       }
     },
-    "minRestDays": 3
+    "ends": {
+      "shifts": {
+        "ids": ["Dag2", "Kvzaezli"]
+      }
+    },
+    "targets": {
+      "minDays": 3
+    }
   }
 ]
 ```
@@ -528,7 +561,9 @@
 
 - `days_between_onduty_shifts`
 
-## ConsecutiveTimeOffConstraint ⇒ PeriodicRestConstraint
+## ConsecutiveTimeOffConstraint
+
+**JSON:** `consecutiveTimeOffConstraints`
 
 **Parameters:**
 
@@ -579,7 +614,7 @@
 
 ## XML-file based constraints with dynamic weight settings
 
-### AdjustedTimeConstraints ⇒ ???
+### AdjustedTimeConstraints
 
 **ID:** `RESCHEDULE_FAIR_HOURS`
 
@@ -599,7 +634,7 @@
 
 **JSON:** Yet to be supported
 
-### NewWorkingDayConstraints ⇒ ???
+### NewWorkingDayConstraints
 
 **IDs:**
 
@@ -622,7 +657,9 @@
 
 **JSON:** Yet to be supported
 
-### ShiftPatternConstraint ⇒ Pattern
+### ShiftPatternConstraint
+
+**JSON:** `employeeUtilizationConstraints`
 
 **ID:** `FRI_OFF_IF_SAT_SUN_MON`
 
@@ -646,7 +683,9 @@
 </ShiftPatternConstraint>
 ```
 
-### ShiftUtilizationConstraint ⇒ EmployeeUtilizationConstraint
+### ShiftUtilizationConstraint
+
+**JSON:** `employeeUtilizationConstraints`
 
 **ID:** `FAIR_EVENINGS`
 
@@ -705,7 +744,9 @@
 }
 ```
 
-### WeekendDistributionConstraint ⇒ PeriodDistributionConstraint
+### WeekendDistributionConstraint
+
+**JSON:** `periodDistributionConstraints`
 
 **ID:** `FAIR_WEEKENDS`
 
@@ -778,7 +819,9 @@
 }
 ```
 
-## WeeklyRestConstraint ⇒ periodicRestConstraints
+## WeeklyRestConstraint
+
+**JSON:** `periodicRestConstraints`
 
 **ID:** `WEEKLYRESTHOUR_45`
 
