@@ -290,8 +290,6 @@
 
 ## ShiftPatternConstraint
 
-**JSON:** `employeeUtilizationConstraints`
-
 **Parameters:**
 
 - `max_continous_shifts`
@@ -682,7 +680,7 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
 
 ### ShiftPatternConstraint
 
-**JSON:** `employeeUtilizationConstraints`
+**JSON:** `patternConstraints`
 
 **ID:** `FRI_OFF_IF_SAT_SUN_MON`
 
@@ -704,6 +702,50 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON:**
+
+```json
+"patternConstraints": [
+  {
+    "id": "pc-fri-off-if-sat-sun-mon",
+    "importance": "MEDIUM",
+    "isDesired": false,
+    "filters": {
+      "employees": {
+        "ids": ["1", "2"]
+      }
+    },
+    "patterns": [
+      {
+        "startDays": {
+          "daysOfWeek": ["FRI"]
+        },
+        "patternDays": [
+          {
+            "keyword": "ANY_SHIFT"
+          },
+          {
+            "shifts": {
+              "labels": ["type:work", "type:on-duty"]
+            }
+          },
+          {
+            "shifts": {
+              "labels": ["type:work", "type:on-duty"]
+            }
+          },
+          {
+            "shifts": {
+              "labels": ["type:work", "type:on-duty"]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
 ```
 
 ### ShiftUtilizationConstraint
@@ -759,8 +801,8 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
       {
         "id": "FAIR_EVENINGS",
         "importance": "HIGH",
-        "constraintIds": ["FAIR_EVENINGS_UTILIZATION"]
-        // FTE adjustment not yet merged
+        "constraintIds": ["FAIR_EVENINGS_UTILIZATION"],
+        "applyWorkloadScaling": true
       }
     ]
   }
@@ -860,4 +902,28 @@ The other examples (min/max consecutive night/evening/etc) are supported on Cons
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </WeeklyRestConstraint>
+```
+
+**JSON:**
+
+```json
+"periodicRestConstraints": [
+  {
+    "id": "prc-weekly-45-hours",
+    "importance": "MEDIUM",
+    "filters": {
+      "employees": {
+        "ids": ["1", "2"]
+      }
+    },
+    "minimumContinuousRestDuration": {
+      "hours": 45
+    },
+    "periods": {
+      "recurrentDefinition": {
+        "daysPerPeriod": 7
+      }
+    }
+  }
+]
 ```
