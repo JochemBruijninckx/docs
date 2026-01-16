@@ -929,7 +929,7 @@ components:
       properties:
         field:
           type: string
-          description: The field to filter on.
+          description: The field to filter on. Can be "id" or "label".
         values:
           type: array
           description: The values to filter on.
@@ -937,29 +937,33 @@ components:
             type: string
           uniqueItems: true
         matchType:
+          description: Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter.
           $ref: "#/components/schemas/matchType"
     advancedFilters:
       type: object
+      description: Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
       properties:
         filters:
           type: array
+          description: List of advanced filters to apply.
           items:
             $ref: "#/components/schemas/advancedFilter"
         matchType:
+          description: Defines how the filters should be combined. For example, if set to NONE, an entity needs to not match any of the filters to be included.
           $ref: "#/components/schemas/matchType"
     constraintFiltersShifts:
       type: object
+      description: Used to filter which shifts the constraint should be applied to. If not specified, the constraint applies to all shifts.
       properties:
         ids:
           type: array
           items:
             type: string
-          description: |-
-            List of shift ids that the constraint should be applied to. If not specified, no filtering is applied 
-            based on shift ids.
+          description: List of shift ids that the constraint should be applied to.
           uniqueItems: true
         labels:
           type: array
+          description: List of shift labels that the constraint should be applied to.
           items:
             type: string
           uniqueItems: true
@@ -1091,17 +1095,17 @@ components:
           default: true
     constraintFiltersEmployees:
       type: object
+      description: Used to filter which employees the constraint should be applied to. If not specified, the constraint applies to all employees.
       properties:
         ids:
           type: array
           items:
             type: string
-          description: |-
-            List of employee ids that the constraint should be applied to. If not specified, the constraint applies
-            to all employees.
+          description: List of employee ids that the constraint should be applied to.
           uniqueItems: true
         labels:
           type: array
+          description: List of employee labels that the constraint should be applied to.
           items:
             type: string
           uniqueItems: true
@@ -1179,10 +1183,7 @@ components:
       description: The importance of the constraint. The higher the importance, the more the solver will take the constraint into account. Under strict importance, the constraint may never be violated.
     constraintFilters:
       type: object
-      description: |-
-        Filters to determine the scope of the constraint. Used to decide which employees and which shifts the constraint
-        should be applied to. Filters use logical OR filtering - an employee or shift is included as long as it is targeted
-        by any of the filters.
+      description: Filters to determine the scope of the constraint. Used to indicate what the constraint should be applied to (which employees, which shifts, etc). Leaving this empty means that the constraint always applies.
       properties:
         employees:
           $ref: "#/components/schemas/constraintFiltersEmployees"
@@ -1205,6 +1206,7 @@ components:
       description: Defines filtering for specific work that the constraint should be applied to. For example, it can be used to apply the constraint only to work carried out in specific roles.
       properties:
         roles:
+          description: Used to apply the constraint only to work carried out in specific roles.
           type: object
           properties:
             ids:
@@ -3317,7 +3319,6 @@ components:
         - jobInfo
         - demands
         - employees
-        - configuration
       properties:
         jobInfo:
           $ref: "#/components/schemas/jobInfo"
@@ -4230,12 +4231,15 @@ components:
               $ref: "#/components/schemas/advancedFilters"
         advancedFilters:
           type: object
+          description: Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
           properties:
             filters:
               type: array
+              description: List of advanced filters to apply.
               items:
                 $ref: "#/components/schemas/advancedFilter"
             matchType:
+              description: Defines how the filters should be combined. For example, if set to NONE, an entity needs to not match any of the filters to be included.
               $ref: "#/components/schemas/matchType"
         advancedFilter:
           type: object
@@ -4245,7 +4249,7 @@ components:
           properties:
             field:
               type: string
-              description: The field to filter on.
+              description: The field to filter on. Can be "id" or "label".
             values:
               type: array
               description: The values to filter on.
@@ -4253,6 +4257,7 @@ components:
                 type: string
               uniqueItems: true
             matchType:
+              description: Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter.
               $ref: "#/components/schemas/matchType"
         objective:
           type: string
@@ -4302,10 +4307,7 @@ components:
             type: string
         constraintFilters:
           type: object
-          description: |-
-            Filters to determine the scope of the constraint. Used to decide which employees and which shifts the constraint
-            should be applied to. Filters use logical OR filtering - an employee or shift is included as long as it is targeted
-            by any of the filters.
+          description: Filters to determine the scope of the constraint. Used to indicate what the constraint should be applied to (which employees, which shifts, etc). Leaving this empty means that the constraint always applies.
           properties:
             employees:
               $ref: "#/components/schemas/constraintFiltersEmployees"
@@ -4325,33 +4327,33 @@ components:
               $ref: "#/components/schemas/constraintWorkTypeIds"
         constraintFiltersEmployees:
           type: object
+          description: Used to filter which employees the constraint should be applied to. If not specified, the constraint applies to all employees.
           properties:
             ids:
               type: array
               items:
                 type: string
-              description: |-
-                List of employee ids that the constraint should be applied to. If not specified, the constraint applies
-                to all employees.
+              description: List of employee ids that the constraint should be applied to.
               uniqueItems: true
             labels:
               type: array
+              description: List of employee labels that the constraint should be applied to.
               items:
                 type: string
               uniqueItems: true
         constraintFiltersShifts:
           type: object
+          description: Used to filter which shifts the constraint should be applied to. If not specified, the constraint applies to all shifts.
           properties:
             ids:
               type: array
               items:
                 type: string
-              description: |-
-                List of shift ids that the constraint should be applied to. If not specified, no filtering is applied 
-                based on shift ids.
+              description: List of shift ids that the constraint should be applied to.
               uniqueItems: true
             labels:
               type: array
+              description: List of shift labels that the constraint should be applied to.
               items:
                 type: string
               uniqueItems: true
@@ -4362,6 +4364,7 @@ components:
           description: Defines filtering for specific work that the constraint should be applied to. For example, it can be used to apply the constraint only to work carried out in specific roles.
           properties:
             roles:
+              description: Used to apply the constraint only to work carried out in specific roles.
               type: object
               properties:
                 ids:
