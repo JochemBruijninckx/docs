@@ -39,10 +39,6 @@
                   "constraints/pattern",
                   "constraints/periodic-rest",
                   "constraints/period-distribution",
-                  "constraints/prioritization",
-                  "constraints/continuity",
-                  "constraints/layout",
-                  "constraints/rotation",
                   "constraints/fairness"
                 ]
               }
