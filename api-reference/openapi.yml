@@ -49,6 +49,9 @@ paths:
       tags:
         - roster
       summary: Start job
+      x-mint:
+        metadata:
+          mode: wide
       description: Creates and immediately starts a new job for the solver.
       security:
         - vismaConnectBearer: []
@@ -103,6 +106,9 @@ paths:
       tags:
         - roster
       summary: Get job status
+      x-mint:
+        metadata:
+          mode: wide
       description: Returns the current state of the specified solver job, including whether it is still running or has stopped.
       security:
         - vismaConnectBearer: []
@@ -133,6 +139,9 @@ paths:
       tags:
         - roster
       summary: Stop job
+      x-mint:
+        metadata:
+          mode: wide
       description: Stops a running solver job.
       security:
         - vismaConnectBearer: []
@@ -153,6 +162,9 @@ paths:
       tags:
         - roster
       summary: Get result
+      x-mint:
+        metadata:
+          mode: wide
       description: Returns the current best solution produced by the solver for the specified job.
       security:
         - vismaConnectBearer: []
@@ -177,6 +189,9 @@ paths:
       tags:
         - roster
       summary: Get request
+      x-mint:
+        metadata:
+          mode: wide
       description: Returns the payload that was sent to the API when starting the job.
       security:
         - vismaConnectBearer: []
@@ -201,6 +216,9 @@ paths:
       tags:
         - analyze
       summary: Analyze
+      x-mint:
+        metadata:
+          mode: wide
       description: WIP - Analyze a job request. Currently returns a dummy response.
       security:
         - vismaConnectBearer: []
@@ -263,6 +281,9 @@ paths:
       tags:
         - feasibility
       summary: Feasibility Check
+      x-mint:
+        metadata:
+          mode: wide
       description: Check jobs feasibility.
       security:
         - vismaConnectBearer: []
