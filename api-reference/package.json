@@ -1,0 +1,10 @@
+{
+  "name": "api-reference",
+  "private": true,
+  "scripts": {
+    "strip-deprecated": "node strip-deprecated.js"
+  },
+  "dependencies": {
+    "yaml": "^2.6.0"
+  }
+}
