@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Strips all deprecated fields from an OpenAPI YAML file.
+ * Strips all deprecated fields from an OpenAPI YAML file and sets wide mode on every path.
  * - Removes any property whose value is an object with deprecated: true
  * - Removes the deprecated key from remaining objects
+ * - Adds x-mint.metadata.mode: wide to each path operation so pages render in wide mode
  *
  * Usage:
  *   node strip-deprecated.js                    # in/out: openapi.yml → openapi.no-deprecated.yml
@@ -50,6 +51,23 @@ function stripDeprecated(value) {
   return result;
 }
 
+const OPERATION_METHODS = new Set(['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']);
+
+function ensureWideMode(spec) {
+  if (!spec.paths || typeof spec.paths !== 'object') return;
+  for (const pathItem of Object.values(spec.paths)) {
+    if (!pathItem || typeof pathItem !== 'object') continue;
+    for (const key of Object.keys(pathItem)) {
+      if (!OPERATION_METHODS.has(key)) continue;
+      const op = pathItem[key];
+      if (!op || typeof op !== 'object') continue;
+      if (!op['x-mint']) op['x-mint'] = {};
+      if (!op['x-mint'].metadata) op['x-mint'].metadata = {};
+      op['x-mint'].metadata.mode = 'wide';
+    }
+  }
+}
+
 function main() {
   if (!fs.existsSync(inputFile)) {
     console.error(`Input file not found: ${inputFile}`);
@@ -59,9 +77,10 @@ function main() {
   const content = fs.readFileSync(inputFile, 'utf8');
   const spec = yaml.parse(content);
   const stripped = stripDeprecated(spec);
+  ensureWideMode(stripped);
 
   fs.writeFileSync(outputFile, yaml.stringify(stripped), 'utf8');
-  console.log(`Wrote ${path.basename(outputFile)} (deprecated fields removed)`);
+  console.log(`Wrote ${path.basename(outputFile)} (deprecated removed, wide mode set)`);
 }
 
 main();

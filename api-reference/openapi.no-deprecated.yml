@@ -49,9 +49,6 @@ paths:
       tags:
         - roster
       summary: Start job
-      x-mint:
-        metadata:
-          mode: wide
       description: Creates and immediately starts a new job for the solver.
       security:
         - vismaConnectBearer: []
@@ -103,14 +100,14 @@ paths:
                 type: string
               example: Unsupported content type. Supported Content-Types are application/xml,
                 application/json
+      x-mint:
+        metadata:
+          mode: wide
   /jobs/{id}:
     get:
       tags:
         - roster
       summary: Get job status
-      x-mint:
-        metadata:
-          mode: wide
       description: Returns the current state of the specified solver job, including
         whether it is still running or has stopped.
       security:
@@ -138,13 +135,13 @@ paths:
               schema:
                 type: string
               example: "Supported Accept header values: application/json, application/xml"
+      x-mint:
+        metadata:
+          mode: wide
     put:
       tags:
         - roster
       summary: Stop job
-      x-mint:
-        metadata:
-          mode: wide
       description: Stops a running solver job.
       security:
         - vismaConnectBearer: []
@@ -160,14 +157,14 @@ paths:
           description: The job was stopped successfully.
         "404":
           description: Job with given ID not found
+      x-mint:
+        metadata:
+          mode: wide
   /jobs/{id}/result:
     get:
       tags:
         - roster
       summary: Get result
-      x-mint:
-        metadata:
-          mode: wide
       description: Returns the current best solution produced by the solver for the
         specified job.
       security:
@@ -188,14 +185,14 @@ paths:
                 $ref: "#/components/schemas/response"
         "404":
           description: Job with given ID not found
+      x-mint:
+        metadata:
+          mode: wide
   /jobs/{id}/request:
     get:
       tags:
         - roster
       summary: Get request
-      x-mint:
-        metadata:
-          mode: wide
       description: Returns the payload that was sent to the API when starting the job.
       security:
         - vismaConnectBearer: []
@@ -215,14 +212,14 @@ paths:
                 $ref: "#/components/schemas/request"
         "404":
           description: Job with given ID not found
+      x-mint:
+        metadata:
+          mode: wide
   /analyze:
     post:
       tags:
         - analyze
       summary: Analyze
-      x-mint:
-        metadata:
-          mode: wide
       description: WIP - Analyze a job request. Currently returns a dummy response.
       security:
         - vismaConnectBearer: []
@@ -281,14 +278,14 @@ paths:
                 type: string
               example: Unsupported content type. The only supported content type is
                 application/json.
+      x-mint:
+        metadata:
+          mode: wide
   /feasibility:
     post:
       tags:
         - feasibility
       summary: Feasibility Check
-      x-mint:
-        metadata:
-          mode: wide
       description: Check jobs feasibility.
       security:
         - vismaConnectBearer: []
@@ -341,6 +338,9 @@ paths:
                 type: string
               example: Unsupported content type. Supported Content-Types are application/xml,
                 application/json
+      x-mint:
+        metadata:
+          mode: wide
 components:
   securitySchemes:
     vismaConnectBearer:
@@ -1243,6 +1243,14 @@ components:
             for this constraint.
           minimum: 1
           maximum: 100
+    periodicRestTargets:
+      type: object
+      properties:
+        continuousRest:
+          type: object
+          properties:
+            minHours:
+              type: number
     cooldownStartsOrEnds:
       type: object
       properties:
@@ -1829,6 +1837,66 @@ components:
           $ref: "#/components/schemas/constraintWeightPositive"
         fairness:
           $ref: "#/components/schemas/constraintFairness"
+    cooldownConstraint:
+      type: object
+      required:
+        - id
+        - importance
+        - targets
+      properties:
+        id:
+          $ref: "#/components/schemas/constraintId"
+        labels:
+          $ref: "#/components/schemas/constraintLabels"
+        importance:
+          $ref: "#/components/schemas/importanceWithStrict"
+        filters:
+          type: object
+          properties:
+            employees:
+              $ref: "#/components/schemas/constraintFiltersEmployees"
+        starts:
+          description: Defines the types of work that will trigger a cooldown. Currently,
+            only filters on shifts are supported as starts.
+          $ref: "#/components/schemas/cooldownStartsOrEnds"
+        ends:
+          description: Defines the types of work that should be avoided during a cooldown.
+            Currently, only filters on shifts are supported as ends.
+          $ref: "#/components/schemas/cooldownStartsOrEnds"
+        targets:
+          description: Defines the desired minimum duration of the cooldown. Can be
+            defined in either hours or days.
+          $ref: "#/components/schemas/cooldownTargets"
+        periods:
+          description: >-
+            Defines the periods in which the cooldown constraint should be
+            applied. If specified, cooldowns can only be 
+
+            triggered by work that occurs within the specified periods. The
+            cooldown itself will remain active until the
+
+            target duration has passed, regardless of whether it coincides with
+            the specified periods.
+          $ref: "#/components/schemas/periods"
+    consecutiveConstraint:
+      type: object
+      description: This constraint can be used to set targets on the number of
+        consecutive entities that an employee works.
+      required:
+        - id
+        - importance
+        - targets
+      properties:
+        id:
+          $ref: "#/components/schemas/constraintId"
+        labels:
+          $ref: "#/components/schemas/constraintLabels"
+        importance:
+          $ref: "#/components/schemas/importanceWithStrict"
+        filters:
+          $ref: "#/components/schemas/constraintFilters"
+        targets:
+          $ref: "#/components/schemas/consecutiveTargets"
     patternConstraint:
       type: object
       required:
@@ -1972,8 +2040,6 @@ components:
         the realized rest duration.
       required:
         - id
-        - minimumContinuousRestDuration
-        - periods
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
@@ -1983,12 +2049,8 @@ components:
           $ref: "#/components/schemas/importanceWithStrict"
         filters:
           $ref: "#/components/schemas/constraintFilters"
-        minimumContinuousRestDuration:
-          $ref: "#/components/schemas/duration"
-          description: The minimum duration of continuous rest the employee should have in
-            each period. For example, if the minimumContinuousRestDuration is
-            set to 24 hours, the employee should have at least one 24-hour long
-            continuous rest within each period.
+        targets:
+          $ref: "#/components/schemas/periodicRestTargets"
         periods:
           $ref: "#/components/schemas/periods"
           description: The periods in which the constraint should be applied.
@@ -2037,12 +2099,33 @@ components:
           $ref: "#/components/schemas/constraintFairness"
         weight:
           $ref: "#/components/schemas/constraintWeightPositive"
-    cooldownConstraint:
+    layoutConstraint:
+      type: object
+      required:
+        - id
+        - importance
+        - objectives
+      properties:
+        id:
+          $ref: "#/components/schemas/constraintId"
+        labels:
+          $ref: "#/components/schemas/constraintLabels"
+        importance:
+          $ref: "#/components/schemas/importance"
+        filters:
+          $ref: "#/components/schemas/constraintFilters"
+        objectives:
+          description: Describes the targets for this constraint. Targets can indicate
+            whether small/large groups are preferred and whether groups should
+            be placed close together or spread out.
+          $ref: "#/components/schemas/layoutObjectives"
+    rotationConstraint:
       type: object
       required:
         - id
         - importance
         - targets
+        - periods
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
@@ -2052,32 +2135,58 @@ components:
           $ref: "#/components/schemas/importanceWithStrict"
         filters:
           type: object
+          description: Filters to determine the scope of the constraint. Used to decide
+            which employees the constraint should be applied to.
           properties:
             employees:
               $ref: "#/components/schemas/constraintFiltersEmployees"
-        starts:
-          description: Defines the types of work that will trigger a cooldown. Currently,
-            only filters on shifts are supported as starts.
-          $ref: "#/components/schemas/cooldownStartsOrEnds"
-        ends:
-          description: Defines the types of work that should be avoided during a cooldown.
-            Currently, only filters on shifts are supported as ends.
-          $ref: "#/components/schemas/cooldownStartsOrEnds"
         targets:
-          description: Defines the desired minimum duration of the cooldown. Can be
-            defined in either hours or days.
-          $ref: "#/components/schemas/cooldownTargets"
+          $ref: "#/components/schemas/rotationConstraintTargets"
         periods:
-          description: >-
-            Defines the periods in which the cooldown constraint should be
-            applied. If specified, cooldowns can only be 
-
-            triggered by work that occurs within the specified periods. The
-            cooldown itself will remain active until the
-
-            target duration has passed, regardless of whether it coincides with
-            the specified periods.
+          description: The periods in which the constraint should be applied.
           $ref: "#/components/schemas/periods"
+        assignedRotations:
+          type: array
+          description: List of employees that have been assigned to specific rotations.
+            The solver will try to ensure that these employees follow the
+            specified rotations as much as possible.
+          items:
+            type: object
+            required:
+              - rotationIndex
+              - employeeIds
+            properties:
+              rotationIndex:
+                type: integer
+                description: The index of the rotation that the employees are assigned to.
+                  Starts at 0.
+              employeeIds:
+                type: array
+                description: List of employee ids that are assigned to the rotation.
+                uniqueItems: true
+                items:
+                  type: string
+        assignedPeriods:
+          type: array
+          description: List of employees that have been assigned to specific periods
+            already. The solver will try to ensure that these employees work
+            during the specified periods as much as possible.
+          items:
+            type: object
+            required:
+              - employeeId
+              - periodIndices
+            properties:
+              employeeId:
+                type: string
+                description: The id of the employee that is assigned to the period.
+              periodIndices:
+                type: array
+                description: List of period indices that the employee is assigned to. Starts at
+                  0.
+                uniqueItems: true
+                items:
+                  type: integer
     prioritizationConstraint:
       type: object
       description: >-
@@ -2313,113 +2422,6 @@ components:
                 $ref: "#/components/schemas/scheduleDays"
         weight:
           $ref: "#/components/schemas/constraintWeightPositive"
-    layoutConstraint:
-      type: object
-      required:
-        - id
-        - importance
-        - objectives
-      properties:
-        id:
-          $ref: "#/components/schemas/constraintId"
-        labels:
-          $ref: "#/components/schemas/constraintLabels"
-        importance:
-          $ref: "#/components/schemas/importance"
-        filters:
-          $ref: "#/components/schemas/constraintFilters"
-        objectives:
-          description: Describes the targets for this constraint. Targets can indicate
-            whether small/large groups are preferred and whether groups should
-            be placed close together or spread out.
-          $ref: "#/components/schemas/layoutObjectives"
-    consecutiveConstraint:
-      type: object
-      description: This constraint can be used to set targets on the number of
-        consecutive entities that an employee works.
-      required:
-        - id
-        - importance
-        - targets
-      properties:
-        id:
-          $ref: "#/components/schemas/constraintId"
-        labels:
-          $ref: "#/components/schemas/constraintLabels"
-        importance:
-          $ref: "#/components/schemas/importanceWithStrict"
-        filters:
-          $ref: "#/components/schemas/constraintFilters"
-        targets:
-          $ref: "#/components/schemas/consecutiveTargets"
-    rotationConstraint:
-      type: object
-      required:
-        - id
-        - importance
-        - targets
-        - periods
-      properties:
-        id:
-          $ref: "#/components/schemas/constraintId"
-        labels:
-          $ref: "#/components/schemas/constraintLabels"
-        importance:
-          $ref: "#/components/schemas/importanceWithStrict"
-        filters:
-          type: object
-          description: Filters to determine the scope of the constraint. Used to decide
-            which employees the constraint should be applied to.
-          properties:
-            employees:
-              $ref: "#/components/schemas/constraintFiltersEmployees"
-        targets:
-          $ref: "#/components/schemas/rotationConstraintTargets"
-        periods:
-          description: The periods in which the constraint should be applied.
-          $ref: "#/components/schemas/periods"
-        assignedRotations:
-          type: array
-          description: List of employees that have been assigned to specific rotations.
-            The solver will try to ensure that these employees follow the
-            specified rotations as much as possible.
-          items:
-            type: object
-            required:
-              - rotationIndex
-              - employeeIds
-            properties:
-              rotationIndex:
-                type: integer
-                description: The index of the rotation that the employees are assigned to.
-                  Starts at 0.
-              employeeIds:
-                type: array
-                description: List of employee ids that are assigned to the rotation.
-                uniqueItems: true
-                items:
-                  type: string
-        assignedPeriods:
-          type: array
-          description: List of employees that have been assigned to specific periods
-            already. The solver will try to ensure that these employees work
-            during the specified periods as much as possible.
-          items:
-            type: object
-            required:
-              - employeeId
-              - periodIndices
-            properties:
-              employeeId:
-                type: string
-                description: The id of the employee that is assigned to the period.
-              periodIndices:
-                type: array
-                description: List of period indices that the employee is assigned to. Starts at
-                  0.
-                uniqueItems: true
-                items:
-                  type: integer
     restBetweenShiftsConstraint:
       type: object
       description: >-
@@ -3576,6 +3578,18 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/employeeUtilizationConstraint"
+            cooldownConstraints:
+              description: Constraints that specify the minimum time between two kinds of work
+                for employees.
+              type: array
+              items:
+                $ref: "#/components/schemas/cooldownConstraint"
+            consecutiveConstraints:
+              description: Constraints that limit the number of consecutive entities an
+                employee can work.
+              type: array
+              items:
+                $ref: "#/components/schemas/consecutiveConstraint"
             patternConstraints:
               description: Constraints that specify patterns of shifts that are (un)desirable
                 for employees to follow.
@@ -3594,36 +3608,12 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/periodDistributionConstraint"
-            cooldownConstraints:
-              description: Constraints that specify the minimum time between two kinds of work
-                for employees.
-              type: array
-              items:
-                $ref: "#/components/schemas/cooldownConstraint"
-            prioritizationConstraints:
-              description: Constraints that prioritize certain employees for certain
-                shifts/demands.
-              type: array
-              items:
-                $ref: "#/components/schemas/prioritizationConstraint"
-            continuityConstraints:
-              description: Constraints that improve continuity by selecting the same employees
-                for the same shifts.
-              type: array
-              items:
-                $ref: "#/components/schemas/continuityConstraint"
             layoutConstraints:
               description: Constraints that improve the layout of shifts across the roster for
                 employees.
               type: array
               items:
                 $ref: "#/components/schemas/layoutConstraint"
-            consecutiveConstraints:
-              description: Constraints that limit the number of consecutive entities an
-                employee can work.
-              type: array
-              items:
-                $ref: "#/components/schemas/consecutiveConstraint"
             rotationConstraints:
               description: Constraints that specify targets for rotating employees through a
                 series of periods.
@@ -3680,11 +3670,6 @@ components:
               description: List of tasks used in this roster.
               items:
                 $ref: "#/components/schemas/task"
-        shiftTemplates:
-          type: array
-          description: UNSTABLE - New schema will be developed under 'extensions'.
-          items:
-            $ref: "#/components/schemas/shiftTemplate"
       example:
         jobInfo:
           id: job-id
@@ -5003,8 +4988,6 @@ components:
             the realized rest duration.
           required:
             - id
-            - minimumContinuousRestDuration
-            - periods
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
@@ -5014,12 +4997,8 @@ components:
               $ref: "#/components/schemas/importanceWithStrict"
             filters:
               $ref: "#/components/schemas/constraintFilters"
-            minimumContinuousRestDuration:
-              $ref: "#/components/schemas/duration"
-              description: The minimum duration of continuous rest the employee should have in
-                each period. For example, if the minimumContinuousRestDuration
-                is set to 24 hours, the employee should have at least one
-                24-hour long continuous rest within each period.
+            targets:
+              $ref: "#/components/schemas/periodicRestTargets"
             periods:
               $ref: "#/components/schemas/periods"
               description: The periods in which the constraint should be applied.
@@ -5027,6 +5006,14 @@ components:
               $ref: "#/components/schemas/constraintWeightPositive"
             fairness:
               $ref: "#/components/schemas/constraintFairness"
+        periodicRestTargets:
+          type: object
+          properties:
+            continuousRest:
+              type: object
+              properties:
+                minHours:
+                  type: number
         cooldownConstraint:
           type: object
           required:
