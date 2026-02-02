@@ -668,6 +668,19 @@ components:
 
             interval starts on the previous day, 0 on the same day, and 1 on the
             next day.
+        workload:
+          type: object
+          properties:
+            factor:
+              type: number
+              description: Factor by which the hours of this interval will be multiplied to
+                calculate the total FTE hours of an employee.
+              default: 1
+              minimum: 0
+            category:
+              type: string
+              description: Category of work carried out during the interval. Only relevant if
+                using TIME_DEMAND.
         breakMinutes:
           type: integer
           description: Minutes of break in this interval. The solver does not plan the
@@ -737,36 +750,12 @@ components:
       uniqueItems: true
     timeWindow:
       type: object
-      description: A time window. From a start timeStamp to an end timeStamp. The end
-        is not included. A timeWindow can wrap around midnight, in which case
-        the end timeStamp is before the start timeStamp.
+      description: Specifies an interval with start and end time. If the end time is
+        before the start time, the time window is assumed to wrap around
+        midnight.
       required:
         - start
         - end
-      examples:
-        - regular:
-            value:
-              start: 13:00
-              end: 16:00
-            summary: A regular 3 hour time window from 13:00 to 16:00.
-        - wrap_around_midnight:
-            value:
-              start: 08:00
-              end: 02:00
-            summary: A 18 hour long time window from 08:00 in the morning until 02:00 the
-              next morning.
-        - 24_hour:
-            value:
-              start: 00:00
-              end: 00:00
-            summary: A time window that spans the entire 24 hours of a day, from midnight to
-              midnight.
-        - single_timeStamp:
-            value:
-              start: 13:00
-              end: 13:01
-            summary: A timeWindow that is handled as a single timeStamp, meaning it has no
-              duration.
       properties:
         start:
           $ref: "#/components/schemas/timeStamp"
@@ -863,6 +852,25 @@ components:
             number. If not specified, will be equal to ideal.
         priority:
           $ref: "#/components/schemas/demandPriority"
+    periodsWithoutLabels:
+      type: object
+      minProperties: 1
+      maxProperties: 1
+      description: List of periods in the schedule. Periods can either be defined
+        explicitly using custom definitions, or through a recurrent definition.
+        A recurrent definition can be used to easily generate a list of similar
+        periods (such as weeks, months, etc.).
+      properties:
+        days:
+          $ref: "#/components/schemas/daysWithTime"
+        customDefinitions:
+          type: array
+          description: List of custom period definitions. Each custom period definition
+            defines one period in the schedule.
+          items:
+            $ref: "#/components/schemas/customPeriodDefinition"
+        recurrentDefinition:
+          $ref: "#/components/schemas/recurrentPeriodDefinition"
     shiftLabelRule:
       type: object
       properties:
@@ -894,41 +902,18 @@ components:
           description: If specified, the shift must have at least one of the work types
             specified in this list.
           uniqueItems: true
-    periodsWithoutLabels:
-      type: object
-      minProperties: 1
-      maxProperties: 1
-      description: List of periods in the schedule. Periods can either be defined
-        explicitly using custom definitions, or through a recurrent definition.
-        A recurrent definition can be used to easily generate a list of similar
-        periods (such as weeks, months, etc.).
-      properties:
-        days:
-          $ref: "#/components/schemas/daysWithTime"
-        customDefinitions:
-          type: array
-          description: List of custom period definitions. Each custom period definition
-            defines one period in the schedule.
-          items:
-            $ref: "#/components/schemas/customPeriodDefinition"
-        recurrentDefinition:
-          $ref: "#/components/schemas/recurrentPeriodDefinition"
-    workType:
+    periodLabelRule:
       type: object
       required:
-        - id
+        - label
+        - periods
       properties:
-        id:
+        label:
           type: string
-          description: Unique identifier.
-        factor:
-          type: number
-          description: Factor by which the hours of worked shifts of this work type will
-            be multiplied to calculate the total FTE hours of an employee. For
-            example, if an employee works 8 hours of shifts with factor 0.5,
-            then the employee's FTE hours for that day is 4.
-          default: 1
-          minimum: 0
+          description: The label to assign to the specified periods.
+        periods:
+          description: The periods to which the label should be applied.
+          $ref: "#/components/schemas/periodsWithoutLabels"
     solverParameters:
       type: array
       description: List of solver parameters used to tweak solver behaviour. Contact
@@ -1060,6 +1045,22 @@ components:
             Monday and 7 = Sunday.
         endTime:
           $ref: "#/components/schemas/timeStamp"
+    workType:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: Unique identifier.
+        factor:
+          type: number
+          description: Factor by which the hours of worked shifts of this work type will
+            be multiplied to calculate the total FTE hours of an employee. For
+            example, if an employee works 8 hours of shifts with factor 0.5,
+            then the employee's FTE hours for that day is 4.
+          default: 1
+          minimum: 0
     constraintFiltersEmployees:
       type: object
       description: Used to filter which employees the constraint should be applied to.
@@ -1434,19 +1435,19 @@ components:
             solver will only schedule shifts for days within the planning
             horizon. If you need to include locked shifts outside the period for
             which you have demands, the planning horizon should be extended to
-            include these days. For "RECURRING" jobs, this must be the first
+            include these days. For RECURRING jobs, this must be the first
             Monday of the first week.
         endDate:
           $ref: "#/components/schemas/date"
-          description: Format YYYY-MM-DD. Only required for "CALENDAR" jobs. The end date
-            of the planning horizon. The solver will only schedule shifts for
-            days within the planning horizon. If you need to include locked
-            shifts outside the period for which you have demands, the planning
-            horizon should be extended to include these days.
+          description: Format YYYY-MM-DD. Only required for CALENDAR jobs. The end date of
+            the planning horizon. The solver will only schedule shifts for days
+            within the planning horizon. If you need to include locked shifts
+            outside the period for which you have demands, the planning horizon
+            should be extended to include these days.
         nrOfWeeks:
           minimum: 1
           type: integer
-          description: Only required for "RECURRING" jobs. The number of weeks in the
+          description: Only required for RECURRING jobs. The number of weeks in the
             planning horizon.
         fteStartDay:
           $ref: "#/components/schemas/scheduleDay"
@@ -1502,10 +1503,9 @@ components:
           items:
             $ref: "#/components/schemas/attribute"
         roles:
-          description: List of roles that this employee can work in. Each role can have
-            additional attributes that the employee has when working in that
-            role. Note that roles are not required, and an employee can work
-            without any roles for.
+          description: Optional list of roles that this employee can work. Each role can
+            have additional attributes that the employee has when working that
+            role.
           type: array
           items:
             type: object
@@ -1649,6 +1649,10 @@ components:
             one employee. If set to false, the same employee has to cover the
             entire time slot from start to end.
           default: true
+        workloadCategory:
+          type: string
+          description: If set, demands with this time slot can only be covered by shifts
+            that have the same workload category.
         taskId:
           type: string
           description: Task id of the task to do during this time slot. The task needs to
@@ -2054,6 +2058,11 @@ components:
         periods:
           $ref: "#/components/schemas/periods"
           description: The periods in which the constraint should be applied.
+        blockedPeriods:
+          $ref: "#/components/schemas/periods"
+          description: Periods that should never be considered as rest. For example, use
+            this to indicate that public holidays should not be considered rest
+            periods even when unworked.
         weight:
           $ref: "#/components/schemas/constraintWeightPositive"
         fairness:
@@ -3224,31 +3233,21 @@ components:
       description: Configurations for this solver run.
       properties:
         labels:
+          description: Define automatic assignment of labels to shifts and periods. These
+            labels can be reused in constraints.
           type: object
           properties:
             shifts:
+              description: List of rules for automatically assigning labels to shifts based on
+                their properties.
               type: array
               items:
                 $ref: "#/components/schemas/shiftLabelRule"
-        periodLabels:
-          type: array
-          description: Configuration for labeled periods. This allows you to specify
-            labeled periods that can be reused in multiple places. For example,
-            one could send in a "weekend" label that applies to all weekends in
-            the schedule. This label can then be referred to in places that use
-            periods.
-          items:
-            type: object
-            required:
-              - label
-              - periods
-            properties:
-              label:
-                type: string
-                description: The label to assign to the specified periods.
-              periods:
-                description: The periods to which the label should be applied.
-                $ref: "#/components/schemas/periodsWithoutLabels"
+            periods:
+              description: List of labeled periods that can be reused in constraints.
+              type: array
+              items:
+                $ref: "#/components/schemas/periodLabelRule"
         fteBelongsToShift:
           type: boolean
           default: true
@@ -3256,16 +3255,6 @@ components:
             are part of a shift that is planned on a day inside the FTE count
             period. For example, a shift that starts at 23:00 on the last day of
             the FTE period.
-        workTypes:
-          type: array
-          minItems: 1
-          description: Represents list of possible work types that are relevant in this
-            roster (for example, WORK, ON_DUTY, ON_CALL etc.). This is required
-            as any defined shift (interval) or shift template has to have work
-            type defined so it is possible to calculate (using factor) employees
-            total FTE.
-          items:
-            $ref: "#/components/schemas/workType"
         bonusTimeRules:
           description: List of rules for assigning bonus minutes to employees based on the
             times of the shifts they work.
@@ -3791,10 +3780,9 @@ components:
               items:
                 $ref: "#/components/schemas/attribute"
             roles:
-              description: List of roles that this employee can work in. Each role can have
-                additional attributes that the employee has when working in that
-                role. Note that roles are not required, and an employee can work
-                without any roles for.
+              description: Optional list of roles that this employee can work. Each role can
+                have additional attributes that the employee has when working
+                that role.
               type: array
               items:
                 type: object
@@ -3899,6 +3887,10 @@ components:
                 one employee. If set to false, the same employee has to cover
                 the entire time slot from start to end.
               default: true
+            workloadCategory:
+              type: string
+              description: If set, demands with this time slot can only be covered by shifts
+                that have the same workload category.
             taskId:
               type: string
               description: Task id of the task to do during this time slot. The task needs to
@@ -4182,6 +4174,18 @@ components:
               description: The minimum number of employees on the demand matching this
                 attribute requirement.
               minimum: 1
+        periodLabelRule:
+          type: object
+          required:
+            - label
+            - periods
+          properties:
+            label:
+              type: string
+              description: The label to assign to the specified periods.
+            periods:
+              description: The periods to which the label should be applied.
+              $ref: "#/components/schemas/periodsWithoutLabels"
         shiftLabelRule:
           type: object
           properties:
@@ -4218,31 +4222,21 @@ components:
           description: Configurations for this solver run.
           properties:
             labels:
+              description: Define automatic assignment of labels to shifts and periods. These
+                labels can be reused in constraints.
               type: object
               properties:
                 shifts:
+                  description: List of rules for automatically assigning labels to shifts based on
+                    their properties.
                   type: array
                   items:
                     $ref: "#/components/schemas/shiftLabelRule"
-            periodLabels:
-              type: array
-              description: Configuration for labeled periods. This allows you to specify
-                labeled periods that can be reused in multiple places. For
-                example, one could send in a "weekend" label that applies to all
-                weekends in the schedule. This label can then be referred to in
-                places that use periods.
-              items:
-                type: object
-                required:
-                  - label
-                  - periods
-                properties:
-                  label:
-                    type: string
-                    description: The label to assign to the specified periods.
-                  periods:
-                    description: The periods to which the label should be applied.
-                    $ref: "#/components/schemas/periodsWithoutLabels"
+                periods:
+                  description: List of labeled periods that can be reused in constraints.
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/periodLabelRule"
             fteBelongsToShift:
               type: boolean
               default: true
@@ -4250,16 +4244,6 @@ components:
                 are part of a shift that is planned on a day inside the FTE
                 count period. For example, a shift that starts at 23:00 on the
                 last day of the FTE period.
-            workTypes:
-              type: array
-              minItems: 1
-              description: Represents list of possible work types that are relevant in this
-                roster (for example, WORK, ON_DUTY, ON_CALL etc.). This is
-                required as any defined shift (interval) or shift template has
-                to have work type defined so it is possible to calculate (using
-                factor) employees total FTE.
-              items:
-                $ref: "#/components/schemas/workType"
             bonusTimeRules:
               description: List of rules for assigning bonus minutes to employees based on the
                 times of the shifts they work.
@@ -4598,6 +4582,19 @@ components:
 
                 interval starts on the previous day, 0 on the same day, and 1 on
                 the next day.
+            workload:
+              type: object
+              properties:
+                factor:
+                  type: number
+                  description: Factor by which the hours of this interval will be multiplied to
+                    calculate the total FTE hours of an employee.
+                  default: 1
+                  minimum: 0
+                category:
+                  type: string
+                  description: Category of work carried out during the interval. Only relevant if
+                    using TIME_DEMAND.
             breakMinutes:
               type: integer
               description: Minutes of break in this interval. The solver does not plan the
@@ -5002,6 +4999,11 @@ components:
             periods:
               $ref: "#/components/schemas/periods"
               description: The periods in which the constraint should be applied.
+            blockedPeriods:
+              $ref: "#/components/schemas/periods"
+              description: Periods that should never be considered as rest. For example, use
+                this to indicate that public holidays should not be considered
+                rest periods even when unworked.
             weight:
               $ref: "#/components/schemas/constraintWeightPositive"
             fairness:

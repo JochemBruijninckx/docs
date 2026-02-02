@@ -52,7 +52,7 @@
       },
       {
         "tab": "API reference",
-        "openapi": "api-reference/openapi.no-deprecated.yml"
+        "openapi": "api-reference/openapi.yml"
       }
     ],
     "global": {
