@@ -22,11 +22,11 @@
             ]
           },
           {
-            "group": "Concepts",
+            "group": "Entities",
             "pages": [
-              "concepts/employees",
-              "concepts/shifts",
-              "concepts/demands",
+              "entities/employees",
+              "entities/shifts",
+              "entities/demands",
               {
                 "group": "Constraints",
                 "icon": "shield-check",
@@ -43,6 +43,10 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Concepts",
+            "pages": ["concepts/labels", "concepts/periods"]
           },
           {
             "group": "Other",
