@@ -9,15 +9,15 @@ Specifying such periods of time is done using the `periods` field. This page exp
 
 Periods can be defined in three different ways:
 
-1. Referral to specific days in the roster.
-2. Referall to custom periods defined by start and end days/times.
+1. Reference to specific days in the roster.
+2. Reference to custom periods defined by start and end days/times.
 3. Reference to recurrent periods (like weeks, weekends, nights, etc.)
 
-## Periods defined by days
+## Periods created through days
 
 The most basic way to define periods is to refer to specific days in the roster. This is done by using the `days` field in the `periods` object.
 
-Within this object, you can specify specific days using `dates` in `CALENDAR` payloads or `dayIndices` in `RECURRING` payloads.
+Within this object, you can specify specific days using `dates` (in `CALENDAR` payloads) or `dayIndices` (in `RECURRING` payloads).
 
 ```json title="Referring to specific days using dates"
 {
@@ -55,3 +55,70 @@ This could be useful for instance to specify that an employee is not available f
   }
 }
 ```
+
+<Info>
+  Creating periods through days will always consider each day in the roster as a
+  separate period. This is relevant on some constraints where the targets of the
+  constraint are applied to each period separately.
+</Info>
+
+## Periods created through custom definitions
+
+If you need to create periods consisting of multiple days, you can use the `customDefinitions` field in the `periods` object. These are defined through a start and end day (and optionally a start and end time).
+For example, the following periods definition will refer to the period from January 1st to January 5th and the period from February 10th to February 14th.
+
+```json title="Referring to a custom period using start and end days"
+{
+  "periods": {
+    "customDefinitions": [
+      {
+        "startDate": "2026-01-01",
+        "endDate": "2026-01-05"
+      },
+      {
+        "startDate": "2026-02-10",
+        "endDate": "2026-02-14"
+      }
+    ]
+  }
+}
+```
+
+Similarly to the `days` field, you can also add a `startTime` and `endTime` to the `customDefinitions` object to specify a time interval during the day.
+For example, the following periods definition will refer to the period from 10:00 on January 1st to 18:00 on January 5th.
+
+```json title="Referring to a custom period using start and end days and time interval"
+{
+  "periods": {
+    "customDefinitions": [
+      {
+        "startDate": "2026-01-01",
+        "endDate": "2026-01-05",
+        "startTime": "10:00",
+        "endTime": "18:00"
+      }
+    ]
+  }
+}
+```
+
+Finally, custom period definitions allow you to choose whether the start and end time should apply to each day individually.
+For example, the following periods definition will refer to all periods of time between 20:00 and 06:00 on every day between January 1st and January 31st.
+
+```json title="Referring to a custom period using start and end days and time interval and applying time to all days"
+{
+  "periods": {
+    "customDefinitions": [
+      {
+        "startDate": "2026-01-01",
+        "endDate": "2026-01-31",
+        "startTime": "20:00",
+        "endTime": "06:00",
+        "applyTimeToAllDays": true
+      }
+    ]
+  }
+}
+```
+
+By default, `applyTimeToAllDays` is set to `false`.
