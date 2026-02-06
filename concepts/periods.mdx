@@ -29,6 +29,8 @@ Within this object, you can specify specific days using `dates` (in `CALENDAR` p
 }
 ```
 
+### Days of the week
+
 Alternatively, you can specify the days of the week using `daysOfWeek`. For example, the following periods definition will refer to all Wednesdays and Fridays in the roster.
 
 ```json title="Referring to specific days using days of week"
@@ -40,6 +42,8 @@ Alternatively, you can specify the days of the week using `daysOfWeek`. For exam
   }
 }
 ```
+
+### Start and end times
 
 Finally, you can add a `startTime` and `endTime` to the `days` object to specify a time interval during the day. For example, the following periods definition will refer to all evenings on Wednesdays and Fridays.
 This could be useful for instance to specify that an employee is not available for work during these times (though they are still available for work earlier in these days).
@@ -84,6 +88,8 @@ For example, the following periods definition will refer to the period from Janu
 }
 ```
 
+### Start and end times
+
 Similarly to the `days` field, you can also add a `startTime` and `endTime` to the `customDefinitions` object to specify a time interval during the day.
 For example, the following periods definition will refer to the period from 10:00 on January 1st to 18:00 on January 5th.
 
@@ -101,6 +107,8 @@ For example, the following periods definition will refer to the period from 10:0
   }
 }
 ```
+
+### Applying time to all days
 
 Finally, custom period definitions allow you to choose whether the start and end time should apply to each day individually.
 For example, the following periods definition will refer to all periods of time between 20:00 and 06:00 on every day between January 1st and January 31st.
@@ -123,7 +131,79 @@ For example, the following periods definition will refer to all periods of time 
 
 By default, `applyTimeToAllDays` is set to `false`.
 
-{/* ## Periods created through recurrent definitions */}
+## Periods created through recurrent definitions
+
+If you want to create periods that are all the same length, the `recurrentDefintion` field might suit your needs. For example, if you want to create a constraint that applies on a weekly basis, the recurrent definition allows you to
+easily specify this without having to define each week by its exact start and end days.
+
+For example, the following recurrent definition will create a non-overlapping set of periods that are each 7 days long, starting from the first day and continuing until the last day of the roster.
+
+```json title="Defining weekly periods using a recurrent definition"
+{
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7
+    }
+  }
+}
+```
+
+### Restricting the range of periods
+
+If you only need your recurrent definition to create periods for a certain range within your roster, you can also specify the `startDay` and `endDay` properties.
+For example, the following recurrent definition will create a non-overlapping set of periods that are each 7 days long, starting from April 1st and continuing until June 30th.
+
+```json title="Defining weekly periods for a specific range" highlight="6, 9"
+{
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7,
+      "startDay": {
+        "date": "2026-04-01"
+      },
+      "endDay": {
+        "date": "2026-06-30"
+      }
+    }
+  }
+}
+```
+
+### Overlapping and non-consecutive periods
+
+By default, periods created through a recurrent definition will be non-overlapping and consecutive. If you want to create a sliding window of periods, you can use the
+`daysBetweenStarts` property. For example, we could use the following periods on a constraint to make sure that an employee never works more than 40 hours in _any_ 7-day period.
+
+```json title="Defining weekly periods with a sliding window" highlight="5"
+{
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7,
+      "daysBetweenStarts": 1
+    }
+  }
+}
+```
+
+### Start and end times
+
+Recurrent definitions allow for the use of start and end time similarly to custom definitions. This example shows a recurrent defintion for weekend periods that start Friday afternoon and last until Sunday night.
+
+```json title="Defining weekend periods with a start and end time" highlight="9-10"
+{
+  "periods": {
+    "recurrentDefinition": {
+      "startDay": {
+        "date": "2026-01-02" // Start on the first Friday of the roster
+      },
+      "daysPerPeriod": 3, // Periods last Friday-Sunday
+      "daysBetweenStarts": 7,
+      "startTime": "18:00", // Starts at 6pm on Friday
+      "endTime": "22:00" // Ends at 10pm on Sunday
+    }
+  }
+}
+```
 
 ## Period labels
 
@@ -137,7 +217,7 @@ This can greatly reduce the size of your payloads when handled properly, and it 
 
 The below example shows how to define labels for weekends and then reuse them on an employee availability constraint to make it undesirable for employees to work on weekends.
 
-```json title="Defining labels for commonly reused periods"
+```json title="Defining labels for commonly reused periods" highlight="6, 23"
 {
   "configuration": {
     "labels": {
