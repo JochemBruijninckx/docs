@@ -23,7 +23,7 @@
           },
           {
             "group": "Concepts",
-            "pages": ["concepts/labels", "concepts/periods"]
+            "pages": ["concepts/periods"]
           },
           {
             "group": "Entities",

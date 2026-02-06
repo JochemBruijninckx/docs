@@ -44,7 +44,7 @@ Alternatively, you can specify the days of the week using `daysOfWeek`. For exam
 Finally, you can add a `startTime` and `endTime` to the `days` object to specify a time interval during the day. For example, the following periods definition will refer to all evenings on Wednesdays and Fridays.
 This could be useful for instance to specify that an employee is not available for work during these times (though they are still available for work earlier in these days).
 
-```json title="Referring to specific days using days of week and time interval"
+```json title="Referring to specific days using days of week and time interval" highlight="5-6"
 {
   "periods": {
     "days": {
@@ -87,7 +87,7 @@ For example, the following periods definition will refer to the period from Janu
 Similarly to the `days` field, you can also add a `startTime` and `endTime` to the `customDefinitions` object to specify a time interval during the day.
 For example, the following periods definition will refer to the period from 10:00 on January 1st to 18:00 on January 5th.
 
-```json title="Referring to a custom period using start and end days and time interval"
+```json title="Referring to a custom period using start and end days and time interval" highlight="7-8"
 {
   "periods": {
     "customDefinitions": [
@@ -105,7 +105,7 @@ For example, the following periods definition will refer to the period from 10:0
 Finally, custom period definitions allow you to choose whether the start and end time should apply to each day individually.
 For example, the following periods definition will refer to all periods of time between 20:00 and 06:00 on every day between January 1st and January 31st.
 
-```json title="Referring to a custom period using start and end days and time interval and applying time to all days"
+```json title="Referring to a custom period using start and end days and time interval and applying time to all days" highlight="9"
 {
   "periods": {
     "customDefinitions": [
@@ -122,3 +122,5 @@ For example, the following periods definition will refer to all periods of time 
 ```
 
 By default, `applyTimeToAllDays` is set to `false`.
+
+## Periods created through recurrent definitions
