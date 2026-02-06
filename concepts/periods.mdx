@@ -123,4 +123,47 @@ For example, the following periods definition will refer to all periods of time 
 
 By default, `applyTimeToAllDays` is set to `false`.
 
-## Periods created through recurrent definitions
+{/* ## Periods created through recurrent definitions */}
+
+## Period labels
+
+If there are periods that are useful in multiple constraints, you can define them in the `labels` property of the `configuration`.
+This can greatly reduce the size of your payloads when handled properly, and it can be smart to identify which periods are applicable for this within your integration.
+
+<Tip>
+  Some commonly reused periods are for example weekends, weekdays, public
+  holidays and nights.
+</Tip>
+
+The below example shows how to define labels for weekends and then reuse them on an employee availability constraint to make it undesirable for employees to work on weekends.
+
+```json title="Defining labels for commonly reused periods"
+{
+  "configuration": {
+    "labels": {
+      "periods": [
+        {
+          "label": "weekends",
+          "periods": {
+            "days": {
+              "daysOfWeek": ["SAT", "SUN"]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "constraints": {
+    "employeeAvailabilityConstraints": [
+      {
+        "id": "weekend-availabity",
+        "importance": "HIGH",
+        "isDesired": false,
+        "periods": {
+          "labels": ["weekends"]
+        }
+      }
+    ]
+  }
+}
+```
