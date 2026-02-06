@@ -2,6 +2,12 @@
 title: Changelog
 ---
 
+## February 2026
+
+- Moved `tasks` and `taskGroups` to the new `extensions` object, grouping more complicated extension together.
+- Introduced `workload` on `shiftIntervals` and `workloadCategory` on `timeSlots`.
+- Introduced `blockedPeriods` on [**PeriodicRestConstraint**](/constraints/periodic-rest), allowing you to specify periods that should never be considered as rest.
+
 ## January 2026
 
 - Added `labels` on shifts and employees, allowing you to easily target groups of shifts or employees in constraints. Labels on shifts serve as a replacement for `shiftTypeIds`.
