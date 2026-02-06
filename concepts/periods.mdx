@@ -3,3 +3,55 @@ title: Periods
 description: Learn how to define references to periods of time in the roster.
 icon: "calendar-week"
 ---
+
+Many aspects that should be taken into consideration in producing a roster are only applicable during certain periods of time. For example, think of weekly limits for work, or the availability of employees during certain days of the week.
+Specifying such periods of time is done using the `periods` field. This page explains how to configure this field for different use cases.
+
+Periods can be defined in three different ways:
+
+1. Referral to specific days in the roster.
+2. Referall to custom periods defined by start and end days/times.
+3. Reference to recurrent periods (like weeks, weekends, nights, etc.)
+
+## Periods defined by days
+
+The most basic way to define periods is to refer to specific days in the roster. This is done by using the `days` field in the `periods` object.
+
+Within this object, you can specify specific days using `dates` in `CALENDAR` payloads or `dayIndices` in `RECURRING` payloads.
+
+```json title="Referring to specific days using dates"
+{
+  "periods": {
+    "days": {
+      "dates": ["2026-01-01", "2026-01-02", "2026-01-05"]
+    }
+  }
+}
+```
+
+Alternatively, you can specify the days of the week using `daysOfWeek`. For example, the following periods definition will refer to all Wednesdays and Fridays in the roster.
+
+```json title="Referring to specific days using days of week"
+{
+  "periods": {
+    "days": {
+      "daysOfWeek": ["WED", "FRI"]
+    }
+  }
+}
+```
+
+Finally, you can add a `startTime` and `endTime` to the `days` object to specify a time interval during the day. For example, the following periods definition will refer to all evenings on Wednesdays and Fridays.
+This could be useful for instance to specify that an employee is not available for work during these times (though they are still available for work earlier in these days).
+
+```json title="Referring to specific days using days of week and time interval"
+{
+  "periods": {
+    "days": {
+      "daysOfWeek": ["WED", "FRI"],
+      "startTime": "18:00",
+      "endTime": "23:00"
+    }
+  }
+}
+```

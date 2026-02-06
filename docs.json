@@ -22,6 +22,10 @@
             ]
           },
           {
+            "group": "Concepts",
+            "pages": ["concepts/labels", "concepts/periods"]
+          },
+          {
             "group": "Entities",
             "pages": [
               "entities/employees",
@@ -43,10 +47,6 @@
                 ]
               }
             ]
-          },
-          {
-            "group": "Concepts",
-            "pages": ["concepts/labels", "concepts/periods"]
           },
           {
             "group": "Other",
