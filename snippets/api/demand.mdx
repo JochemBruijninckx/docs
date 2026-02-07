@@ -1,0 +1,80 @@
+<ResponseField name="demand" type="demand Object">
+  <Expandable title="properties">
+    <ResponseField name="days" type="object Object">
+      List of days on which this demand exists. Multiple demands can exist on the same day.
+    </ResponseField>
+    <Expandable title="days – properties">
+      <ResponseField name="dates" type="array of date">
+        List of dates in the schedule. Only allowed in CALENDAR payloads.
+      </ResponseField>
+      <ResponseField name="dayIndices" type="array of dayIndex">
+        List of day indices in the schedule. Only allowed in RECURRING payloads.
+      </ResponseField>
+      <ResponseField name="daysOfWeek" type="array of dayOfWeek">
+        List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="shiftDemands" type="array of shiftDemand Object">
+      List of shift demands that exist on the days specified in the days field.
+    </ResponseField>
+    <Expandable title="shiftDemands – item structure">
+      <ResponseField name="shiftId" type="string">
+        Id of the shift for which there is demand. Required.
+      </ResponseField>
+      <ResponseField name="min" type="integer">
+        Minimum number of employees needed to cover the demand. The solver will try to cover the demand with at least this number of employees. If not specified, will be equal to ideal.
+      </ResponseField>
+      <ResponseField name="ideal" type="integer">
+        Ideal number of employees needed to cover the demand. The solver prefers to cover the demand with exactly this number of employees. Required.
+      </ResponseField>
+      <ResponseField name="max" type="integer">
+        Maximum number of employees needed to cover the demand. The solver will never assign more employees to cover the demand than this number. If not specified, will be equal to ideal.
+      </ResponseField>
+      <ResponseField name="attributeRequirementGroups" type="array of attributeRequirementGroup Object">
+        List of requirements on the attributes that an employee must meet to be eligible to cover this shift demand.
+      </ResponseField>
+      <Expandable title="attributeRequirementGroups – item structure">
+        <ResponseField name="attributeRequirements" type="array of attributeRequirement Object">
+          
+        </ResponseField>
+        <Expandable title="attributeRequirements – item structure">
+          <ResponseField name="category" type="string">
+            The category of the attribute.
+          </ResponseField>
+          <ResponseField name="values" type="array of string">
+            The targeted values for this requirement.
+          </ResponseField>
+          <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
+            Default: "ALL".
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="min" type="integer">
+          The minimum number of employees on the demand matching this attribute requirement.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="priority" type="number">
+        Priority of this demand. Increasing a demand's priority will make the solver prioritize it compared to demands, but also compared to constraints. Default: 1.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="timeDemands" type="array of timeDemand Object">
+      List of time demands that exist on the days specified in the days field.
+    </ResponseField>
+    <Expandable title="timeDemands – item structure">
+      <ResponseField name="timeSlotId" type="string">
+        Id of the time slot for which there is demand. Required.
+      </ResponseField>
+      <ResponseField name="min" type="integer">
+        Minimum number of employees needed to cover the demand. The solver will try to cover the demand with at least this number of employees. If not specified, will be equal to ideal.
+      </ResponseField>
+      <ResponseField name="ideal" type="integer">
+        Ideal number of employees needed to cover the demand. The solver prefers to cover the demand with exactly this number of employees. Required.
+      </ResponseField>
+      <ResponseField name="max" type="integer">
+        Maximum number of employees needed to cover the demand. The solver will never assign more employees to cover the demand than this number. If not specified, will be equal to ideal.
+      </ResponseField>
+      <ResponseField name="priority" type="number">
+        Priority of this demand. Increasing a demand's priority will make the solver prioritize it compared to demands, but also compared to constraints. Default: 1.
+      </ResponseField>
+    </Expandable>
+  </Expandable>
+</ResponseField>

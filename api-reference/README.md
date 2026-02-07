@@ -1,30 +1,26 @@
 # API reference
 
-## Stripping deprecated fields
+## Updating the API
 
-After dropping in a new `openapi.yml`, you can generate a copy without deprecated fields:
+When you have a new `openapi.yml`, run:
 
 ```bash
 cd api-reference
 npm install
-npm run strip-deprecated
+npm run update-api
 ```
 
-This reads `openapi.yml` and writes `openapi.no-deprecated.yml`.
+This single script:
 
-**Other usage:**
+1. **Strip deprecated** — Reads `openapi.yml`, removes deprecated fields and sets wide mode, writes `openapi.no-deprecated.yml`.
+2. **Schema snippets** — Generates Mintlify `ResponseField` / `Expandable` snippets from the schemas listed in `scripts/schema-to-mintlify.js` (`SCHEMAS_TO_CONVERT`) and writes them to **`snippets/api/`** as `{schemaName}.mdx`.
 
-- Custom input: `node strip-deprecated.js path/to/spec.yml`
-- Custom output: `node strip-deprecated.js openapi.yml output.yml`
+To change which schemas get snippets, edit `SCHEMAS_TO_CONVERT` in `scripts/schema-to-mintlify.js`. Schema names must match keys under `components.schemas` in the OpenAPI spec.
 
-## Mintlify schema snippets
+### Running steps individually
 
-To generate Mintlify `ResponseField` / `Expandable` markdown snippets from OpenAPI schemas:
+The logic lives in `scripts/` so you can run steps separately if needed:
 
-```bash
-node schema-to-mintlify.js [schema1] [schema2] ...
-```
-
-- Schema names are the keys under `components.schemas` in `openapi.no-deprecated.yml` (e.g. `employee`, `duration`, `job`).
-- If you omit schema names, the script uses the default list in `schema-to-mintlify.js` (edit `SCHEMAS_TO_CONVERT`).
-- Snippets are written to **`snippets/api/`** as `{schemaName}.mdx` (e.g. `snippets/api/employee.mdx`). You can include them in MDX with Mintlify’s snippet syntax.
+- `node scripts/strip-deprecated.js` — strip only (default: `openapi.yml` → `openapi.no-deprecated.yml`)
+- `node scripts/strip-deprecated.js input.yml output.yml` — custom in/out
+- `node scripts/schema-to-mintlify.js [schema1] [schema2] ...` — snippets only (default: uses `SCHEMAS_TO_CONVERT`)

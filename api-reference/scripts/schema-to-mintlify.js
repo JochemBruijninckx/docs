@@ -2,17 +2,11 @@
 /**
  * Generates Mintlify ResponseField/Expandable markdown snippets from OpenAPI schemas.
  *
- * Usage:
- *   node schema-to-mintlify.js [schema1] [schema2] ...
- *   node schema-to-mintlify.js [schema1] [schema2] ... > output.mdx
+ * Usage (from api-reference):
+ *   node scripts/schema-to-mintlify.js [schema1] [schema2] ...
  *
  * If no schema names are passed, the SCHEMAS_TO_CONVERT list below is used.
  * Schema names must match keys under components.schemas in openapi.no-deprecated.yml.
- *
- * Examples:
- *   node schema-to-mintlify.js employee job duration
- *   node schema-to-mintlify.js employee > employee-schema.mdx
- *   node schema-to-mintlify.js   # uses SCHEMAS_TO_CONVERT
  */
 
 const fs = require("fs");
@@ -23,15 +17,16 @@ const yaml = require("yaml");
 // INPUT: Add schema names here to generate snippets when no CLI args are passed
 // ---------------------------------------------------------------------------
 const SCHEMAS_TO_CONVERT = [
-  "duration",
   "employee",
-  "job",
   "periods",
+  "shift",
+  "demand",
   // Add more schema names from openapi.no-deprecated.yml components.schemas
 ];
 
-const OPENAPI_FILE = path.join(__dirname, "openapi.no-deprecated.yml");
-const SNIPPETS_API_DIR = path.join(__dirname, "..", "snippets", "api");
+const apiRefDir = path.join(__dirname, "..");
+const OPENAPI_FILE = path.join(apiRefDir, "openapi.no-deprecated.yml");
+const SNIPPETS_API_DIR = path.join(apiRefDir, "..", "snippets", "api");
 
 function loadSpec() {
   const content = fs.readFileSync(OPENAPI_FILE, "utf8");

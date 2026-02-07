@@ -5,10 +5,10 @@
  * - Removes the deprecated key from remaining objects
  * - Adds x-mint.metadata.mode: wide to each path operation so pages render in wide mode
  *
- * Usage:
- *   node strip-deprecated.js                    # in/out: openapi.yml → openapi.no-deprecated.yml
- *   node strip-deprecated.js input.yml         # out: input.no-deprecated.yml
- *   node strip-deprecated.js input.yml out.yml # explicit in/out
+ * Usage (from api-reference):
+ *   node scripts/strip-deprecated.js                    # openapi.yml → openapi.no-deprecated.yml
+ *   node scripts/strip-deprecated.js input.yml         # out: input.no-deprecated.yml
+ *   node scripts/strip-deprecated.js input.yml out.yml # explicit in/out
  */
 
 const fs = require('fs');
@@ -22,8 +22,9 @@ try {
   process.exit(1);
 }
 
+const apiRefDir = path.join(__dirname, '..');
 const args = process.argv.slice(2);
-const inputFile = args[0] || path.join(__dirname, 'openapi.yml');
+const inputFile = args[0] || path.join(apiRefDir, 'openapi.yml');
 const outputFile = args[1] || inputFile.replace(/\.(yml|yaml)$/i, '.no-deprecated.$1');
 
 function stripDeprecated(value) {

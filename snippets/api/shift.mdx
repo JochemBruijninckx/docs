@@ -1,0 +1,103 @@
+<ResponseField name="shift" type="shift Object">
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Unique identifier for the shift. Required.
+    </ResponseField>
+    <ResponseField name="labels" type="array of string">
+      List of labels assigned to this shift. Labels can be used in constraints to group shifts.
+    </ResponseField>
+    <ResponseField name="isReadOnly" type="boolean">
+      If set to true, the shift will not be assigned by the solver. Read only shifts will not be used in new assignments by the solver, their use is limited to preassigned shifts. Read only shifts can still be used to cover demand. Default: false.
+    </ResponseField>
+    <ResponseField name="canCoverDemand" type="boolean">
+      Only relevant for preassigned shifts. If set to false, assignments of this shift will not contribute towards demand coverage. Shifts that cannot cover demand will not be used in new assignments by the solver, their use is limited to preassigned shifts. Default: true.
+    </ResponseField>
+    <ResponseField name="availableDays" type="days Object">
+      List of days in the schedule. Days can be defined as an array of dates (in CALENDAR payloads), as an array of day indices (in RECURRING payloads), or as an array of weekdays (allowed in all payloads).
+    </ResponseField>
+    <Expandable title="availableDays – properties">
+      <ResponseField name="dates" type="array of date">
+        List of dates in the schedule. Only allowed in CALENDAR payloads.
+      </ResponseField>
+      <ResponseField name="dayIndices" type="array of dayIndex">
+        List of day indices in the schedule. Only allowed in RECURRING payloads.
+      </ResponseField>
+      <ResponseField name="daysOfWeek" type="array of dayOfWeek">
+        List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="intervals" type="array of shiftInterval Object">
+      List of intervals that this shift consists of. The maximum duration of a shift is 72 hours. Required.
+    </ResponseField>
+    <Expandable title="intervals – item structure">
+      <ResponseField name="startTime" type="string (time)">
+        TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight. Required.
+      </ResponseField>
+      <ResponseField name="endTime" type="string (time)">
+        TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight. Required.
+      </ResponseField>
+      <ResponseField name="dayIndicator" type="integer">
+        Indicates which day this interval belongs to, relative to the day that the shift belongs to. -1 indicates the interval starts on the previous day, 0 on the same day, and 1 on the next day. Required.
+      </ResponseField>
+      <ResponseField name="workload" type="object Object">
+        
+      </ResponseField>
+      <Expandable title="workload – properties">
+        <ResponseField name="factor" type="number">
+          Factor by which the hours of this interval will be multiplied to calculate the total FTE hours of an employee. Default: 1.
+        </ResponseField>
+        <ResponseField name="category" type="string">
+          Category of work carried out during the interval. Only relevant if using TIME_DEMAND.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="breakMinutes" type="integer">
+        Minutes of break in this interval. The solver does not plan the break at any specific time, but the break minutes are subtracted from the total FTE for the shift. Default: 0.
+      </ResponseField>
+      <ResponseField name="taskId" type="string">
+        Task id of the task that must be worked on during this interval. The task needs to be defined in the configuration part of the payload.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="connectedShiftsPreviousDay" type="connectedShifts Object">
+      List of shifts that are connected to this shift on the previous day. If defined, this shift will always be preceded by one of the connected shifts the previous day.
+    </ResponseField>
+    <Expandable title="connectedShiftsPreviousDay – properties">
+      <ResponseField name="shiftIds" type="array of string">
+        List of ids of shifts that are connected to this shift.
+      </ResponseField>
+      <ResponseField name="shiftTemplateIds" type="array of string">
+        List of ids of shift templates that are connected to this shift.
+      </ResponseField>
+      <ResponseField name="dayOff" type="boolean">
+        Whether the connected shift can be a day off. Default: false.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="connectedShiftsNextDay" type="connectedShifts Object">
+      List of shifts that are connected to this shift on the next day. If defined, this shift will always be followed by one of the connected shifts the next day.
+    </ResponseField>
+    <Expandable title="connectedShiftsNextDay – properties">
+      <ResponseField name="shiftIds" type="array of string">
+        List of ids of shifts that are connected to this shift.
+      </ResponseField>
+      <ResponseField name="shiftTemplateIds" type="array of string">
+        List of ids of shift templates that are connected to this shift.
+      </ResponseField>
+      <ResponseField name="dayOff" type="boolean">
+        Whether the connected shift can be a day off. Default: false.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="attributeRequirements" type="array of attributeRequirement Object">
+      List of requirements on the attributes that an employee needs to be eligible to work this Shift. If an employee does not meet all of the requirements, the employee can not work this Shift.
+    </ResponseField>
+    <Expandable title="attributeRequirements – item structure">
+      <ResponseField name="category" type="string">
+        The category of the attribute.
+      </ResponseField>
+      <ResponseField name="values" type="array of string">
+        The targeted values for this requirement.
+      </ResponseField>
+      <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
+        Default: "ALL".
+      </ResponseField>
+    </Expandable>
+  </Expandable>
+</ResponseField>
