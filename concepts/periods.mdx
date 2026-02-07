@@ -76,12 +76,20 @@ For example, the following periods definition will refer to the period from Janu
   "periods": {
     "customDefinitions": [
       {
-        "startDate": "2026-01-01",
-        "endDate": "2026-01-05"
+        "startDay": {
+          "date": "2026-01-01"
+        },
+        "endDay": {
+          "date": "2026-01-05"
+        }
       },
       {
-        "startDate": "2026-02-10",
-        "endDate": "2026-02-14"
+        "startDay": {
+          "date": "2026-02-10"
+        },
+        "endDay": {
+          "date": "2026-02-14"
+        }
       }
     ]
   }
@@ -93,13 +101,17 @@ For example, the following periods definition will refer to the period from Janu
 Similarly to the `days` field, you can also add a `startTime` and `endTime` to the `customDefinitions` object to specify a time interval during the day.
 For example, the following periods definition will refer to the period from 10:00 on January 1st to 18:00 on January 5th.
 
-```json title="Referring to a custom period using start and end days and time interval" highlight="7-8"
+```json title="Referring to a custom period using start and end days and time interval" highlight="11-12"
 {
   "periods": {
     "customDefinitions": [
       {
-        "startDate": "2026-01-01",
-        "endDate": "2026-01-05",
+        "startDay": {
+          "date": "2026-01-01"
+        },
+        "endDay": {
+          "date": "2026-01-05"
+        },
         "startTime": "10:00",
         "endTime": "18:00"
       }
@@ -113,13 +125,17 @@ For example, the following periods definition will refer to the period from 10:0
 Finally, custom period definitions allow you to choose whether the start and end time should apply to each day individually.
 For example, the following periods definition will refer to all periods of time between 20:00 and 06:00 on every day between January 1st and January 31st.
 
-```json title="Referring to a custom period using start and end days and time interval and applying time to all days" highlight="9"
+```json title="Referring to a custom period using start and end days and time interval and applying time to all days" highlight="13"
 {
   "periods": {
     "customDefinitions": [
       {
-        "startDate": "2026-01-01",
-        "endDate": "2026-01-31",
+        "startDay": {
+          "date": "2026-01-01"
+        },
+        "endDay": {
+          "date": "2026-01-31"
+        },
         "startTime": "20:00",
         "endTime": "06:00",
         "applyTimeToAllDays": true
@@ -133,7 +149,7 @@ By default, `applyTimeToAllDays` is set to `false`.
 
 ## Periods created through recurrent definitions
 
-If you want to create periods that are all the same length, the `recurrentDefintion` field might suit your needs. For example, if you want to create a constraint that applies on a weekly basis, the recurrent definition allows you to
+If you want to create periods that are all the same length, the `recurrentDefinition` field might suit your needs. For example, if you want to create a constraint that applies on a weekly basis, the recurrent definition allows you to
 easily specify this without having to define each week by its exact start and end days.
 
 For example, the following recurrent definition will create a non-overlapping set of periods that are each 7 days long, starting from the first day and continuing until the last day of the roster.
@@ -153,7 +169,7 @@ For example, the following recurrent definition will create a non-overlapping se
 If you only need your recurrent definition to create periods for a certain range within your roster, you can also specify the `startDay` and `endDay` properties.
 For example, the following recurrent definition will create a non-overlapping set of periods that are each 7 days long, starting from April 1st and continuing until June 30th.
 
-```json title="Defining weekly periods for a specific range" highlight="6, 9"
+```json title="Defining weekly periods for a specific range" highlight="6,9"
 {
   "periods": {
     "recurrentDefinition": {
@@ -187,7 +203,7 @@ By default, periods created through a recurrent definition will be non-overlappi
 
 ### Start and end times
 
-Recurrent definitions allow for the use of start and end time similarly to custom definitions. This example shows a recurrent defintion for weekend periods that start Friday afternoon and last until Sunday night.
+Recurrent definitions allow for the use of start and end time similarly to custom definitions. This example shows a recurrent definition for weekend periods that start Friday afternoon and last until Sunday night.
 
 ```json title="Defining weekend periods with a start and end time" highlight="9-10"
 {
