@@ -1,0 +1,247 @@
+<ResponseField name="employeeUtilizationConstraint" type="employeeUtilizationConstraint Object">
+  This constraint can be used to set targets for the number of hours worked by employees. The minimum number of hours is treated as a target, while the maximum number of hours acts as a hard limit and will never be exceeded. The constraint can be applied to specific employees, work types, or shifts. The constraint can also be applied to a specific time period, in which case it will act as a target for the number of hours worked in that period.
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Unique identifier for the constraint. Required.
+    </ResponseField>
+    <ResponseField name="labels" type="array of string">
+      Labels for the constraint. Labels can be used to group constraints together. For example, if multiple constraints are related to the same shift type, they can all be labeled with the same label.
+    </ResponseField>
+    <ResponseField name="importance" type="string (enum: NONE | VERY_LOW | LOW | MEDIUM | HIGH | ...)">
+      The importance of the constraint. The higher the importance, the more the solver will take the constraint into account.
+    </ResponseField>
+    <ResponseField name="filters" type="employeeUtilizationFilters Object">
+      Filters to determine the scope of the constraint. Used to decide which employees and which shifts the constraint should be applied to. Filters use logical OR filtering - an employee or shift is included as long as it is targeted by any of the filters.
+    </ResponseField>
+    <Expandable title="filters – properties">
+      <ResponseField name="employees" type="constraintFiltersEmployees Object">
+        Used to filter which employees the constraint should be applied to. If not specified, the constraint applies to all employees.
+      </ResponseField>
+      <Expandable title="employees – properties">
+        <ResponseField name="ids" type="array of string">
+          List of employee ids that the constraint should be applied to.
+        </ResponseField>
+        <ResponseField name="labels" type="array of string">
+          List of employee labels that the constraint should be applied to.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="shifts" type="constraintFiltersShifts Object">
+        Used to filter which shifts the constraint should be applied to. If not specified, the constraint applies to all shifts.
+      </ResponseField>
+      <Expandable title="shifts – properties">
+        <ResponseField name="ids" type="array of string">
+          List of shift ids that the constraint should be applied to.
+        </ResponseField>
+        <ResponseField name="labels" type="array of string">
+          List of shift labels that the constraint should be applied to.
+        </ResponseField>
+        <ResponseField name="advanced" type="advancedFilters Object">
+          Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
+        </ResponseField>
+        <Expandable title="advanced – properties">
+          <ResponseField name="filters" type="array of advancedFilter Object">
+            List of advanced filters to apply.
+          </ResponseField>
+          <Expandable title="filters – item structure">
+            <ResponseField name="field" type="string">
+              The field to filter on. Can be "id" or "label". Required.
+            </ResponseField>
+            <ResponseField name="values" type="array of string">
+              The values to filter on. Required.
+            </ResponseField>
+            <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
+              Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter. Default: "ANY".
+            </ResponseField>
+          </Expandable>
+          <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
+            Defines how the filters should be combined. For example, if set to NONE, an entity needs to not match any of the filters to be included. Default: "ANY".
+          </ResponseField>
+        </Expandable>
+      </Expandable>
+      <ResponseField name="work" type="constraintFiltersWork Object">
+        Defines filtering for specific work that the constraint should be applied to. For example, it can be used to apply the constraint only to work carried out in specific roles.
+      </ResponseField>
+      <Expandable title="work – properties">
+        <ResponseField name="roles" type="object Object">
+          Used to apply the constraint only to work carried out in specific roles.
+        </ResponseField>
+        <Expandable title="roles – properties">
+          <ResponseField name="ids" type="array of string">
+            List of role ids that the constraint should be applied to. If not specified, no filtering is applied based on role ids.
+          </ResponseField>
+        </Expandable>
+      </Expandable>
+    </Expandable>
+    <ResponseField name="targets" type="object Object">
+      Specifies the target utilization for the constraint. Targets can be specified in number of FTE hours, or in number of shifts worked during the period.
+    </ResponseField>
+    <Expandable title="targets – properties">
+      <ResponseField name="minHours" type="number">
+        The minimum number of hours that should be worked by employees on shifts that match the constraint in each period. This is treated as a target - it is not guaranteed that the number of hours worked will be greater than this value.
+      </ResponseField>
+      <ResponseField name="idealHours" type="number">
+        The ideal number of hours that should be worked by employees on shifts that match the constraint in each period. This is treated as a target - it is not guaranteed that the number of hours worked will be exactly this value.
+      </ResponseField>
+      <ResponseField name="maxHours" type="number">
+        The maximum number of hours that should be worked by employees on shifts that match the constraint in each period. This is treated as a hard limit - the number of hours worked will never exceed this value.
+      </ResponseField>
+      <ResponseField name="minShifts" type="integer">
+        The minimum number of shifts that match the constraint that an employee should work in each period. This is treated as a target - it is not guaranteed that the number of shifts worked will be greater than this value.
+      </ResponseField>
+      <ResponseField name="idealShifts" type="integer">
+        The ideal number of shifts that match the constraint that an employee should work in each period. This is treated as a target - it is not guaranteed that the number of shifts worked will be exactly this value.
+      </ResponseField>
+      <ResponseField name="maxShifts" type="integer">
+        The maximum number of shifts that match the constraint that an employee should work in each period. This is treated as a hard limit - the number of shifts worked will never exceed this value.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="bonusTime" type="object Object">
+      Settings to determine if and how bonus time rules affect the constraint.
+    </ResponseField>
+    <Expandable title="bonusTime – properties">
+      <ResponseField name="includeBonusHours" type="boolean">
+        Whether or not bonus hours should be included in the calculation of an employee's total hours worked for the constraint. Default: true.
+      </ResponseField>
+      <ResponseField name="averageHoursThreshold" type="number">
+        If a threshold is provided, bonus hours will only be included in the calculation of an employee's total hours worked if the average bonus hours per period exceed this threshold.
+      </ResponseField>
+      <ResponseField name="averageHoursCap" type="number">
+        If a cap is provided, the average number of bonus hours per period will be capped at this value. The employee can be eligible for more bonus hours, but they will not be counted beyond this cap.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="defaultTime" type="object Object">
+      Settings to determine if and how default time rules affect the constraint.
+    </ResponseField>
+    <Expandable title="defaultTime – properties">
+      <ResponseField name="includeDefaultHours" type="boolean">
+        Whether or not default hours should be included in the calculation of an employee's total hours worked for the constraint. Default: true.
+      </ResponseField>
+      <ResponseField name="minOverlapHours" type="number">
+        The minimum number of hours that this constraint should overlap with a day where a default time rule is active. If the overlap is below this amount, the hours from the default time rule will not be counted for this constraint.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="overlapRules" type="overlapRules Object">
+      Specifies overlap thresholds that a shift must meet with the constraint's periods in order for it to be counted as relevant for the constraint.
+    </ResponseField>
+    <Expandable title="overlapRules – properties">
+      <ResponseField name="minOverlapHours" type="integer">
+        The minimum number of hours that a shift must overlap with the constraint in order to be counted as relevant for this constraint.
+      </ResponseField>
+      <ResponseField name="minOverlapPercentage" type="integer">
+        The minimum percentage of the shift that must overlap with the constraint in order to be counted as relevant for this constraint.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="periods" type="periods Object">
+      List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods (such as weeks, months, etc.).
+    </ResponseField>
+    <Expandable title="periods – properties">
+      <ResponseField name="days" type="daysWithTime Object">
+        List of days in the schedule. Each day will become one period. By default, each period will last the entire day. If a startTime and/or endTime are specified, these will apply to each period.
+      </ResponseField>
+      <Expandable title="days – properties">
+        <ResponseField name="dates" type="array of date">
+          List of dates in the schedule. Only allowed in CALENDAR payloads.
+        </ResponseField>
+        <ResponseField name="dayIndices" type="array of dayIndex">
+          List of day indices in the schedule. Only allowed in RECURRING payloads.
+        </ResponseField>
+        <ResponseField name="daysOfWeek" type="array of dayOfWeek">
+          List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
+        </ResponseField>
+        <ResponseField name="startTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="endTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="customDefinitions" type="array of customPeriodDefinition Object">
+        List of custom period definitions. Each custom period definition defines one period in the schedule.
+      </ResponseField>
+      <Expandable title="customDefinitions – item structure">
+        <ResponseField name="startDay" type="day Object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="startDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="endDay" type="day Object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="endDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="startTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="endTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="applyTimeToAllDays" type="boolean">
+          If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="recurrentDefinition" type="recurrentPeriodDefinition Object">
+        A recurrent definition to easily create a set of similar periods.
+      </ResponseField>
+      <Expandable title="recurrentDefinition – properties">
+        <ResponseField name="daysPerPeriod" type="integer">
+          The number of days in each period. Required.
+        </ResponseField>
+        <ResponseField name="daysBetweenStarts" type="integer">
+          The number of days between the start of each period. If not specified, this defaults to the value of daysPerPeriod, creating non-overlapping consecutive periods. Setting daysBetweenStarts to 1 will create a sliding window of periods.
+        </ResponseField>
+        <ResponseField name="startDay" type="day Object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="startDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="endDay" type="day Object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="endDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="startTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="endTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="applyTimeToAllDays" type="boolean">
+          If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="labels" type="array of string">
+        Provide labels to re-use periods that were defined in the configuration.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="weight" type="unknown">
+      
+    </ResponseField>
+    <ResponseField name="fairness" type="unknown">
+      
+    </ResponseField>
+  </Expandable>
+</ResponseField>

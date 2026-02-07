@@ -1,0 +1,74 @@
+<ResponseField name="consecutiveConstraint" type="consecutiveConstraint Object">
+  This constraint can be used to set targets on the number of consecutive entities that an employee works.
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Unique identifier for the constraint. Required.
+    </ResponseField>
+    <ResponseField name="labels" type="array of string">
+      Labels for the constraint. Labels can be used to group constraints together. For example, if multiple constraints are related to the same shift type, they can all be labeled with the same label.
+    </ResponseField>
+    <ResponseField name="importance" type="string (enum: NONE | VERY_LOW | LOW | MEDIUM | HIGH | ...)">
+      The importance of the constraint. The higher the importance, the more the solver will take the constraint into account. Under strict importance, the constraint may never be violated. Required.
+    </ResponseField>
+    <ResponseField name="filters" type="constraintFilters Object">
+      Filters to determine the scope of the constraint. Used to indicate what the constraint should be applied to (which employees, which shifts, etc). Leaving this empty means that the constraint always applies.
+    </ResponseField>
+    <Expandable title="filters – properties">
+      <ResponseField name="employees" type="constraintFiltersEmployees Object">
+        Used to filter which employees the constraint should be applied to. If not specified, the constraint applies to all employees.
+      </ResponseField>
+      <Expandable title="employees – properties">
+        <ResponseField name="ids" type="array of string">
+          List of employee ids that the constraint should be applied to.
+        </ResponseField>
+        <ResponseField name="labels" type="array of string">
+          List of employee labels that the constraint should be applied to.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="shifts" type="constraintFiltersShifts Object">
+        Used to filter which shifts the constraint should be applied to. If not specified, the constraint applies to all shifts.
+      </ResponseField>
+      <Expandable title="shifts – properties">
+        <ResponseField name="ids" type="array of string">
+          List of shift ids that the constraint should be applied to.
+        </ResponseField>
+        <ResponseField name="labels" type="array of string">
+          List of shift labels that the constraint should be applied to.
+        </ResponseField>
+        <ResponseField name="advanced" type="advancedFilters Object">
+          Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
+        </ResponseField>
+        <Expandable title="advanced – properties">
+          <ResponseField name="filters" type="array of advancedFilter Object">
+            List of advanced filters to apply.
+          </ResponseField>
+          <Expandable title="filters – item structure">
+            <ResponseField name="field" type="string">
+              The field to filter on. Can be "id" or "label". Required.
+            </ResponseField>
+            <ResponseField name="values" type="array of string">
+              The values to filter on. Required.
+            </ResponseField>
+            <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
+              Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter. Default: "ANY".
+            </ResponseField>
+          </Expandable>
+          <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
+            Defines how the filters should be combined. For example, if set to NONE, an entity needs to not match any of the filters to be included. Default: "ANY".
+          </ResponseField>
+        </Expandable>
+      </Expandable>
+    </Expandable>
+    <ResponseField name="targets" type="consecutiveTargets Object">
+       Required.
+    </ResponseField>
+    <Expandable title="targets – properties">
+      <ResponseField name="min" type="integer">
+        The minimum number of consecutive entities that an employee should ideally work. This cannot be set as a strict limit and will be treated as a target instead.
+      </ResponseField>
+      <ResponseField name="max" type="integer">
+        The maximum number of consecutive entities that an employee can work. Currently only supports importance STRICT.
+      </ResponseField>
+    </Expandable>
+  </Expandable>
+</ResponseField>

@@ -3,6 +3,8 @@ title: Employee Utilization
 description: Set targets and limits for the number of hours or shifts worked by employees in specific periods.
 ---
 
+import SchemaSnippet from "/snippets/api/employeeUtilizationConstraint.mdx";
+
 The Employee Utilization constraint allows you to control how much work employees receive, either measured in FTE hours or in number of shifts. You can set minimum targets, ideal targets, and maximum limits for any combination of employees, shifts, and time periods.
 
 ## How targets work
@@ -15,9 +17,13 @@ The constraint supports three types of targets for both hours and shifts:
 
 <Info>
   You don't need to specify all targets - only include the ones relevant to your
-  use case. For example, you can set only `maxHours` to cap the total hours, or
-  only `idealShifts` to target a specific number of shifts.
+use case. For example, you can set only `maxHours` to cap the total hours, or
+only `idealShifts` to target a specific number of shifts.
 </Info>
+
+<Card title="Constraint schema">
+  <SchemaSnippet />
+</Card>
 
 ## Global utilization targets
 

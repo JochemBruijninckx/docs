@@ -3,12 +3,18 @@ title: Pattern
 description: Define desired or undesired shift patterns.
 ---
 
+import SchemaSnippet from "/snippets/api/patternConstraint.mdx";
+
 Pattern Constraint can be used to allow you to specify patterns that are desired or undesired for the employee to follow in the produced roster. Both possible use cases are discussed separately below.
 
 ## Undesired patterns
 
 For undesired patterns, simply define the patterns that you would not want employees to follow. By default, the solver will try to never assign shifts to employees that would make them follow the undesired patterns.
 However, if you so desire you can use the `startDays` field on a specific pattern to specify that the pattern should only be avoided at specific times. For example, some patterns might be fine to follow during the week, but only become undesired during the weekend.
+
+<Card title="Constraint schema">
+  <SchemaSnippet />
+</Card>
 
 <Tip>
   The constraint specified below makes it undesirable for employees to work the night shift on both Saturday and Sunday.

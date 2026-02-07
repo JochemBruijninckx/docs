@@ -21,6 +21,13 @@ const SCHEMAS_TO_CONVERT = [
   "periods",
   "shift",
   "demand",
+  "employeeAvailabilityConstraint",
+  "employeeUtilizationConstraint",
+  "cooldownConstraint",
+  "consecutiveConstraint",
+  "patternConstraint",
+  "periodicRestConstraint",
+  "periodDistributionConstraint",
   // Add more schema names from openapi.no-deprecated.yml components.schemas
 ];
 

@@ -3,7 +3,13 @@ title: "Cooldown"
 description: "Define minimum rest periods between shifts for employees."
 ---
 
+import SchemaSnippet from "/snippets/api/cooldownConstraint.mdx";
+
 This constraint allows you to enforce minimum rest periods between different types of work. It works by defining what triggers a cooldown (`starts`) and what should be avoided during that cooldown period (`ends`). This is useful for ensuring employees have adequate rest between demanding shifts, preventing burnout, and complying with labor regulations.
+
+<Card title="Constraint schema">
+  <SchemaSnippet />
+</Card>
 
 ## Basic cooldown between shifts
 
