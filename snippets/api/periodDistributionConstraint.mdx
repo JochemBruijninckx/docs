@@ -1,7 +1,7 @@
-<ResponseField name="periodDistributionConstraint" type="periodDistributionConstraint Object">
+<ResponseField name="periodDistributionConstraint">
   <Expandable title="properties">
-    <ResponseField name="id" type="string">
-      Unique identifier for the constraint. Required.
+    <ResponseField name="id" type="string" required>
+      Unique identifier for the constraint.
     </ResponseField>
     <ResponseField name="labels" type="array of string">
       Labels for the constraint. Labels can be used to group constraints together. For example, if multiple constraints are related to the same shift type, they can all be labeled with the same label.
@@ -9,11 +9,11 @@
     <ResponseField name="importance" type="string (enum: NONE | VERY_LOW | LOW | MEDIUM | HIGH | ...)">
       The importance of the constraint. The higher the importance, the more the solver will take the constraint into account. Under strict importance, the constraint may never be violated.
     </ResponseField>
-    <ResponseField name="filters" type="constraintFilters Object">
+    <ResponseField name="filters">
       Filters to determine the scope of the constraint. Used to indicate what the constraint should be applied to (which employees, which shifts, etc). Leaving this empty means that the constraint always applies.
     </ResponseField>
     <Expandable title="filters – properties">
-      <ResponseField name="employees" type="constraintFiltersEmployees Object">
+      <ResponseField name="employees">
         Used to filter which employees the constraint should be applied to. If not specified, the constraint applies to all employees.
       </ResponseField>
       <Expandable title="employees – properties">
@@ -24,7 +24,7 @@
           List of employee labels that the constraint should be applied to.
         </ResponseField>
       </Expandable>
-      <ResponseField name="shifts" type="constraintFiltersShifts Object">
+      <ResponseField name="shifts">
         Used to filter which shifts the constraint should be applied to. If not specified, the constraint applies to all shifts.
       </ResponseField>
       <Expandable title="shifts – properties">
@@ -34,19 +34,19 @@
         <ResponseField name="labels" type="array of string">
           List of shift labels that the constraint should be applied to.
         </ResponseField>
-        <ResponseField name="advanced" type="advancedFilters Object">
+        <ResponseField name="advanced">
           Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
         </ResponseField>
         <Expandable title="advanced – properties">
-          <ResponseField name="filters" type="array of advancedFilter Object">
+          <ResponseField name="filters">
             List of advanced filters to apply.
           </ResponseField>
           <Expandable title="filters – item structure">
-            <ResponseField name="field" type="string">
-              The field to filter on. Can be "id" or "label". Required.
+            <ResponseField name="field" type="string" required>
+              The field to filter on. Can be "id" or "label".
             </ResponseField>
-            <ResponseField name="values" type="array of string">
-              The values to filter on. Required.
+            <ResponseField name="values" type="array of string" required>
+              The values to filter on.
             </ResponseField>
             <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
               Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter. Default: "ANY".
@@ -70,7 +70,7 @@
     <ResponseField name="minSurroundingFreePeriods" type="integer">
       The minimum amount of non-worked periods both before and after a worked period.
     </ResponseField>
-    <ResponseField name="overlapRules" type="overlapRules Object">
+    <ResponseField name="overlapRules">
       Specifies overlap thresholds that a shift must meet with the constraint's periods in order for it to be counted as relevant for the constraint.
     </ResponseField>
     <Expandable title="overlapRules – properties">
@@ -81,11 +81,11 @@
         The minimum percentage of the shift that must overlap with the constraint in order to be counted as relevant for this constraint.
       </ResponseField>
     </Expandable>
-    <ResponseField name="periods" type="periods Object">
+    <ResponseField name="periods">
       List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods (such as weeks, months, etc.).
     </ResponseField>
     <Expandable title="periods – properties">
-      <ResponseField name="days" type="daysWithTime Object">
+      <ResponseField name="days">
         List of days in the schedule. Each day will become one period. By default, each period will last the entire day. If a startTime and/or endTime are specified, these will apply to each period.
       </ResponseField>
       <Expandable title="days – properties">
@@ -105,11 +105,11 @@
           TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
         </ResponseField>
       </Expandable>
-      <ResponseField name="customDefinitions" type="array of customPeriodDefinition Object">
+      <ResponseField name="customDefinitions">
         List of custom period definitions. Each custom period definition defines one period in the schedule.
       </ResponseField>
       <Expandable title="customDefinitions – item structure">
-        <ResponseField name="startDay" type="day Object">
+        <ResponseField name="startDay">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="startDay – properties">
@@ -120,7 +120,7 @@
             Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
-        <ResponseField name="endDay" type="day Object">
+        <ResponseField name="endDay">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="endDay – properties">
@@ -141,17 +141,17 @@
           If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
         </ResponseField>
       </Expandable>
-      <ResponseField name="recurrentDefinition" type="recurrentPeriodDefinition Object">
+      <ResponseField name="recurrentDefinition">
         A recurrent definition to easily create a set of similar periods.
       </ResponseField>
       <Expandable title="recurrentDefinition – properties">
-        <ResponseField name="daysPerPeriod" type="integer">
-          The number of days in each period. Required.
+        <ResponseField name="daysPerPeriod" type="integer" required>
+          The number of days in each period.
         </ResponseField>
         <ResponseField name="daysBetweenStarts" type="integer">
           The number of days between the start of each period. If not specified, this defaults to the value of daysPerPeriod, creating non-overlapping consecutive periods. Setting daysBetweenStarts to 1 will create a sliding window of periods.
         </ResponseField>
-        <ResponseField name="startDay" type="day Object">
+        <ResponseField name="startDay">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="startDay – properties">
@@ -162,7 +162,7 @@
             Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
-        <ResponseField name="endDay" type="day Object">
+        <ResponseField name="endDay">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="endDay – properties">
@@ -187,10 +187,10 @@
         Provide labels to re-use periods that were defined in the configuration.
       </ResponseField>
     </Expandable>
-    <ResponseField name="fairness" type="unknown">
+    <ResponseField name="fairness">
       
     </ResponseField>
-    <ResponseField name="weight" type="unknown">
+    <ResponseField name="weight">
       
     </ResponseField>
   </Expandable>

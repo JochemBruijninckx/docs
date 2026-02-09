@@ -123,6 +123,25 @@ function normalizeDescription(desc) {
   return String(desc).replace(/\s+/g, " ").trim();
 }
 
+/** True if type should be shown (primitive or array of primitives); hide for object types and array of object. */
+function shouldShowType(typeStr) {
+  if (!typeStr) return false;
+  if (typeStr.endsWith(" Object")) return false;
+  if (typeStr.startsWith("array of ")) return true;
+  const primitive = /^(string|integer|number|boolean)(\s|$)/;
+  return primitive.test(typeStr);
+}
+
+/** Build type attribute for ResponseField, or empty string if type should be hidden. */
+function typeAttr(typeStr) {
+  return shouldShowType(typeStr) ? ` type="${typeStr}"` : "";
+}
+
+/** Build required attribute for ResponseField when true. */
+function requiredAttr(required) {
+  return required ? " required" : "";
+}
+
 const INDENT = "  ";
 
 /**
@@ -163,7 +182,7 @@ function schemaToExpandableContent(spec, schema, schemaName, indent = "") {
         const d = propResolved?.default ?? propSchema?.default;
         propDesc = `Default: ${JSON.stringify(d)}.`;
       }
-      const reqLabel = required.has(propName) ? " Required." : "";
+      const isRequired = required.has(propName);
       const typeStr = getTypeString(
         spec,
         propResolved || propSchema,
@@ -192,8 +211,8 @@ function schemaToExpandableContent(spec, schema, schemaName, indent = "") {
         const innerTypeName =
           propResolved?.__refName || getRefName(propSchema?.$ref) || "object";
         lines.push(
-          `${indent}<ResponseField name="${propName}" type="${innerTypeName} Object">`,
-          `${indent}  ${normalizeDescription(propDesc)}${reqLabel}`,
+          `${indent}<ResponseField name="${propName}"${typeAttr(innerTypeName + " Object")}${requiredAttr(isRequired)}>`,
+          `${indent}  ${normalizeDescription(propDesc)}`,
           `${indent}</ResponseField>`,
           `${indent}<Expandable title="${propName} – properties">`,
           ...schemaToExpandableContent(
@@ -205,12 +224,10 @@ function schemaToExpandableContent(spec, schema, schemaName, indent = "") {
           `${indent}</Expandable>`
         );
       } else if (propIsArrayOfObject) {
+        const arrTypeStr = getTypeString(spec, propResolved);
         lines.push(
-          `${indent}<ResponseField name="${propName}" type="${getTypeString(
-            spec,
-            propResolved
-          )}">`,
-          `${indent}  ${propDesc}${reqLabel}`,
+          `${indent}<ResponseField name="${propName}"${typeAttr(arrTypeStr)}${requiredAttr(isRequired)}>`,
+          `${indent}  ${propDesc}`,
           `${indent}</ResponseField>`,
           `${indent}<Expandable title="${propName} – item structure">`,
           ...schemaToExpandableContent(
@@ -225,8 +242,8 @@ function schemaToExpandableContent(spec, schema, schemaName, indent = "") {
         );
       } else {
         lines.push(
-          `${indent}<ResponseField name="${propName}" type="${typeStr}">`,
-          `${indent}  ${propDesc}${reqLabel}`,
+          `${indent}<ResponseField name="${propName}"${typeAttr(typeStr)}${requiredAttr(isRequired)}>`,
+          `${indent}  ${propDesc}`,
           `${indent}</ResponseField>`
         );
       }
@@ -257,7 +274,7 @@ function schemaToMintlify(spec, schemaName) {
     Object.keys(resolved.properties).length > 0;
 
   const lines = [];
-  lines.push(`<ResponseField name="${schemaName}" type="${typeStr}">`);
+  lines.push(`<ResponseField name="${schemaName}"${typeAttr(typeStr)}>`);
   if (desc) lines.push(`  ${desc}`);
   if (hasProperties) {
     lines.push(`  <Expandable title="properties">`);

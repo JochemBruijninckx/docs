@@ -1,7 +1,7 @@
-<ResponseField name="shift" type="shift Object">
+<ResponseField name="shift">
   <Expandable title="properties">
-    <ResponseField name="id" type="string">
-      Unique identifier for the shift. Required.
+    <ResponseField name="id" type="string" required>
+      Unique identifier for the shift.
     </ResponseField>
     <ResponseField name="labels" type="array of string">
       List of labels assigned to this shift. Labels can be used in constraints to group shifts.
@@ -12,7 +12,7 @@
     <ResponseField name="canCoverDemand" type="boolean">
       Only relevant for preassigned shifts. If set to false, assignments of this shift will not contribute towards demand coverage. Shifts that cannot cover demand will not be used in new assignments by the solver, their use is limited to preassigned shifts. Default: true.
     </ResponseField>
-    <ResponseField name="availableDays" type="days Object">
+    <ResponseField name="availableDays">
       List of days in the schedule. Days can be defined as an array of dates (in CALENDAR payloads), as an array of day indices (in RECURRING payloads), or as an array of weekdays (allowed in all payloads).
     </ResponseField>
     <Expandable title="availableDays – properties">
@@ -26,20 +26,20 @@
         List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
       </ResponseField>
     </Expandable>
-    <ResponseField name="intervals" type="array of shiftInterval Object">
-      List of intervals that this shift consists of. The maximum duration of a shift is 72 hours. Required.
+    <ResponseField name="intervals" required>
+      List of intervals that this shift consists of. The maximum duration of a shift is 72 hours.
     </ResponseField>
     <Expandable title="intervals – item structure">
-      <ResponseField name="startTime" type="string (time)">
-        TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight. Required.
+      <ResponseField name="startTime" type="string (time)" required>
+        TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
       </ResponseField>
-      <ResponseField name="endTime" type="string (time)">
-        TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight. Required.
+      <ResponseField name="endTime" type="string (time)" required>
+        TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
       </ResponseField>
-      <ResponseField name="dayIndicator" type="integer">
-        Indicates which day this interval belongs to, relative to the day that the shift belongs to. -1 indicates the interval starts on the previous day, 0 on the same day, and 1 on the next day. Required.
+      <ResponseField name="dayIndicator" type="integer" required>
+        Indicates which day this interval belongs to, relative to the day that the shift belongs to. -1 indicates the interval starts on the previous day, 0 on the same day, and 1 on the next day.
       </ResponseField>
-      <ResponseField name="workload" type="object Object">
+      <ResponseField name="workload">
         
       </ResponseField>
       <Expandable title="workload – properties">
@@ -57,7 +57,7 @@
         Task id of the task that must be worked on during this interval. The task needs to be defined in the configuration part of the payload.
       </ResponseField>
     </Expandable>
-    <ResponseField name="connectedShiftsPreviousDay" type="connectedShifts Object">
+    <ResponseField name="connectedShiftsPreviousDay">
       List of shifts that are connected to this shift on the previous day. If defined, this shift will always be preceded by one of the connected shifts the previous day.
     </ResponseField>
     <Expandable title="connectedShiftsPreviousDay – properties">
@@ -71,7 +71,7 @@
         Whether the connected shift can be a day off. Default: false.
       </ResponseField>
     </Expandable>
-    <ResponseField name="connectedShiftsNextDay" type="connectedShifts Object">
+    <ResponseField name="connectedShiftsNextDay">
       List of shifts that are connected to this shift on the next day. If defined, this shift will always be followed by one of the connected shifts the next day.
     </ResponseField>
     <Expandable title="connectedShiftsNextDay – properties">
@@ -85,7 +85,7 @@
         Whether the connected shift can be a day off. Default: false.
       </ResponseField>
     </Expandable>
-    <ResponseField name="attributeRequirements" type="array of attributeRequirement Object">
+    <ResponseField name="attributeRequirements">
       List of requirements on the attributes that an employee needs to be eligible to work this Shift. If an employee does not meet all of the requirements, the employee can not work this Shift.
     </ResponseField>
     <Expandable title="attributeRequirements – item structure">
