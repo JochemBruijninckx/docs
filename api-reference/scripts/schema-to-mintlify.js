@@ -86,21 +86,20 @@ function getTypeString(spec, schema, refName = null) {
     const items = schema.items || {};
     const itemRef = items.$ref ? getRefName(items.$ref) : null;
     const itemResolved = items.$ref ? resolveRef(spec, items.$ref) : items;
+    const isItemObject =
+      itemResolved?.type === "object" && itemResolved?.properties;
+    if (isItemObject) return "array of object";
     const itemType = itemRef
       ? itemRef
       : typeof itemResolved?.type === "string"
       ? itemResolved.type
       : "object";
-    const suffix =
-      itemResolved?.type === "object" && itemResolved?.properties
-        ? " Object"
-        : "";
-    return `array of ${itemType}${suffix}`;
+    const format = itemResolved?.format ? ` (${itemResolved.format})` : "";
+    return `array of ${itemType}${format}`;
   }
 
   if (rawType === "object") {
-    const name = refName || schema.__refName || "object";
-    return `${name} Object`;
+    return "object";
   }
 
   if (
@@ -123,18 +122,9 @@ function normalizeDescription(desc) {
   return String(desc).replace(/\s+/g, " ").trim();
 }
 
-/** True if type should be shown (primitive or array of primitives); hide for object types and array of object. */
-function shouldShowType(typeStr) {
-  if (!typeStr) return false;
-  if (typeStr.endsWith(" Object")) return false;
-  if (typeStr.startsWith("array of ")) return true;
-  const primitive = /^(string|integer|number|boolean)(\s|$)/;
-  return primitive.test(typeStr);
-}
-
-/** Build type attribute for ResponseField, or empty string if type should be hidden. */
+/** Build type attribute for ResponseField (always show type). */
 function typeAttr(typeStr) {
-  return shouldShowType(typeStr) ? ` type="${typeStr}"` : "";
+  return typeStr ? ` type="${typeStr}"` : "";
 }
 
 /** Build required attribute for ResponseField when true. */
@@ -211,7 +201,7 @@ function schemaToExpandableContent(spec, schema, schemaName, indent = "") {
         const innerTypeName =
           propResolved?.__refName || getRefName(propSchema?.$ref) || "object";
         lines.push(
-          `${indent}<ResponseField name="${propName}"${typeAttr(innerTypeName + " Object")}${requiredAttr(isRequired)}>`,
+          `${indent}<ResponseField name="${propName}"${typeAttr(typeStr)}${requiredAttr(isRequired)}>`,
           `${indent}  ${normalizeDescription(propDesc)}`,
           `${indent}</ResponseField>`,
           `${indent}<Expandable title="${propName} – properties">`,

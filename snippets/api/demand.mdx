@@ -1,10 +1,10 @@
-<ResponseField name="demand">
+<ResponseField name="demand" type="object">
   <Expandable title="properties">
-    <ResponseField name="days">
+    <ResponseField name="days" type="object">
       List of days on which this demand exists. Multiple demands can exist on the same day.
     </ResponseField>
     <Expandable title="days – properties">
-      <ResponseField name="dates" type="array of date">
+      <ResponseField name="dates" type="array of date (date)">
         List of dates in the schedule. Only allowed in CALENDAR payloads.
       </ResponseField>
       <ResponseField name="dayIndices" type="array of dayIndex">
@@ -14,7 +14,7 @@
         List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
       </ResponseField>
     </Expandable>
-    <ResponseField name="shiftDemands">
+    <ResponseField name="shiftDemands" type="array of object">
       List of shift demands that exist on the days specified in the days field.
     </ResponseField>
     <Expandable title="shiftDemands – item structure">
@@ -30,11 +30,11 @@
       <ResponseField name="max" type="integer">
         Maximum number of employees needed to cover the demand. The solver will never assign more employees to cover the demand than this number. If not specified, will be equal to ideal.
       </ResponseField>
-      <ResponseField name="attributeRequirementGroups">
+      <ResponseField name="attributeRequirementGroups" type="array of object">
         List of requirements on the attributes that an employee must meet to be eligible to cover this shift demand.
       </ResponseField>
       <Expandable title="attributeRequirementGroups – item structure">
-        <ResponseField name="attributeRequirements">
+        <ResponseField name="attributeRequirements" type="array of object">
           
         </ResponseField>
         <Expandable title="attributeRequirements – item structure">
@@ -56,7 +56,7 @@
         Priority of this demand. Increasing a demand's priority will make the solver prioritize it compared to demands, but also compared to constraints. Default: 1.
       </ResponseField>
     </Expandable>
-    <ResponseField name="timeDemands">
+    <ResponseField name="timeDemands" type="array of object">
       List of time demands that exist on the days specified in the days field.
     </ResponseField>
     <Expandable title="timeDemands – item structure">

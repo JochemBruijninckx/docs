@@ -1,4 +1,4 @@
-<ResponseField name="patternConstraint">
+<ResponseField name="patternConstraint" type="object">
   <Expandable title="properties">
     <ResponseField name="id" type="string" required>
       Unique identifier for the constraint.
@@ -12,11 +12,11 @@
     <ResponseField name="isDesired" type="boolean" required>
       If set to true, the solver will try to make employees follow the specified patterns. Else, it will try to avoid making employees follow any of the specified patterns.
     </ResponseField>
-    <ResponseField name="filters">
+    <ResponseField name="filters" type="object">
       Filters to determine the scope of the constraint. Used to decide which employees the constraint should be applied to.
     </ResponseField>
     <Expandable title="filters – properties">
-      <ResponseField name="employees">
+      <ResponseField name="employees" type="object">
         Used to filter which employees the constraint should be applied to. If not specified, the constraint applies to all employees.
       </ResponseField>
       <Expandable title="employees – properties">
@@ -28,15 +28,15 @@
         </ResponseField>
       </Expandable>
     </Expandable>
-    <ResponseField name="periods">
+    <ResponseField name="periods" type="object">
       List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods (such as weeks, months, etc.).
     </ResponseField>
     <Expandable title="periods – properties">
-      <ResponseField name="days">
+      <ResponseField name="days" type="object">
         List of days in the schedule. Each day will become one period. By default, each period will last the entire day. If a startTime and/or endTime are specified, these will apply to each period.
       </ResponseField>
       <Expandable title="days – properties">
-        <ResponseField name="dates" type="array of date">
+        <ResponseField name="dates" type="array of date (date)">
           List of dates in the schedule. Only allowed in CALENDAR payloads.
         </ResponseField>
         <ResponseField name="dayIndices" type="array of dayIndex">
@@ -52,11 +52,11 @@
           TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
         </ResponseField>
       </Expandable>
-      <ResponseField name="customDefinitions">
+      <ResponseField name="customDefinitions" type="array of object">
         List of custom period definitions. Each custom period definition defines one period in the schedule.
       </ResponseField>
       <Expandable title="customDefinitions – item structure">
-        <ResponseField name="startDay">
+        <ResponseField name="startDay" type="object">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="startDay – properties">
@@ -67,7 +67,7 @@
             Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
-        <ResponseField name="endDay">
+        <ResponseField name="endDay" type="object">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="endDay – properties">
@@ -88,7 +88,7 @@
           If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
         </ResponseField>
       </Expandable>
-      <ResponseField name="recurrentDefinition">
+      <ResponseField name="recurrentDefinition" type="object">
         A recurrent definition to easily create a set of similar periods.
       </ResponseField>
       <Expandable title="recurrentDefinition – properties">
@@ -98,7 +98,7 @@
         <ResponseField name="daysBetweenStarts" type="integer">
           The number of days between the start of each period. If not specified, this defaults to the value of daysPerPeriod, creating non-overlapping consecutive periods. Setting daysBetweenStarts to 1 will create a sliding window of periods.
         </ResponseField>
-        <ResponseField name="startDay">
+        <ResponseField name="startDay" type="object">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="startDay – properties">
@@ -109,7 +109,7 @@
             Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
-        <ResponseField name="endDay">
+        <ResponseField name="endDay" type="object">
           Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="endDay – properties">
@@ -134,15 +134,15 @@
         Provide labels to re-use periods that were defined in the configuration.
       </ResponseField>
     </Expandable>
-    <ResponseField name="patterns" required>
+    <ResponseField name="patterns" type="array of object" required>
       
     </ResponseField>
     <Expandable title="patterns – item structure">
-      <ResponseField name="patternDays" required>
+      <ResponseField name="patternDays" type="array of object" required>
         Defines the pattern that should be followed. Each element in the array represents a day in the pattern. Note that DAY_OFF is not allowed on strict undesired pattern constraints.
       </ResponseField>
       <Expandable title="patternDays – item structure">
-        <ResponseField name="shifts">
+        <ResponseField name="shifts" type="object">
           Used to filter which shifts the constraint should be applied to. If not specified, the constraint applies to all shifts.
         </ResponseField>
         <Expandable title="shifts – properties">
@@ -152,11 +152,11 @@
           <ResponseField name="labels" type="array of string">
             List of shift labels that the constraint should be applied to.
           </ResponseField>
-          <ResponseField name="advanced">
+          <ResponseField name="advanced" type="object">
             Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
           </ResponseField>
           <Expandable title="advanced – properties">
-            <ResponseField name="filters">
+            <ResponseField name="filters" type="array of object">
               List of advanced filters to apply.
             </ResponseField>
             <Expandable title="filters – item structure">
@@ -179,11 +179,11 @@
           A keyword to represent that a day must be a day off (DAY_OFF), must be a worked day (ANY_SHIFT), or that there are no requirements on this day (ANY).
         </ResponseField>
       </Expandable>
-      <ResponseField name="startDays">
+      <ResponseField name="startDays" type="object">
         List of days in the schedule. Days can be defined as an array of dates (in CALENDAR payloads), as an array of day indices (in RECURRING payloads), or as an array of weekdays (allowed in all payloads).
       </ResponseField>
       <Expandable title="startDays – properties">
-        <ResponseField name="dates" type="array of date">
+        <ResponseField name="dates" type="array of date (date)">
           List of dates in the schedule. Only allowed in CALENDAR payloads.
         </ResponseField>
         <ResponseField name="dayIndices" type="array of dayIndex">
@@ -200,7 +200,7 @@
         The offset that the pattern may start with on the start day. If set to 0, the pattern must start with the first pattern day on each start day. If set to 1, the pattern may start from any of its pattern days on the start day. If set to 7 (for example), the pattern may start with every 7th pattern day on the start day. The pattern is then continued as usual. Default: 0.
       </ResponseField>
     </Expandable>
-    <ResponseField name="emptyDayBehaviours">
+    <ResponseField name="emptyDayBehaviours" type="object">
       Describes whether the pattern should skip over days that could be considered irrelevant for the pattern.
     </ResponseField>
     <Expandable title="emptyDayBehaviours – properties">

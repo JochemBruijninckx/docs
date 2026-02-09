@@ -1,4 +1,4 @@
-<ResponseField name="shift">
+<ResponseField name="shift" type="object">
   <Expandable title="properties">
     <ResponseField name="id" type="string" required>
       Unique identifier for the shift.
@@ -12,11 +12,11 @@
     <ResponseField name="canCoverDemand" type="boolean">
       Only relevant for preassigned shifts. If set to false, assignments of this shift will not contribute towards demand coverage. Shifts that cannot cover demand will not be used in new assignments by the solver, their use is limited to preassigned shifts. Default: true.
     </ResponseField>
-    <ResponseField name="availableDays">
+    <ResponseField name="availableDays" type="object">
       List of days in the schedule. Days can be defined as an array of dates (in CALENDAR payloads), as an array of day indices (in RECURRING payloads), or as an array of weekdays (allowed in all payloads).
     </ResponseField>
     <Expandable title="availableDays – properties">
-      <ResponseField name="dates" type="array of date">
+      <ResponseField name="dates" type="array of date (date)">
         List of dates in the schedule. Only allowed in CALENDAR payloads.
       </ResponseField>
       <ResponseField name="dayIndices" type="array of dayIndex">
@@ -26,7 +26,7 @@
         List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
       </ResponseField>
     </Expandable>
-    <ResponseField name="intervals" required>
+    <ResponseField name="intervals" type="array of object" required>
       List of intervals that this shift consists of. The maximum duration of a shift is 72 hours.
     </ResponseField>
     <Expandable title="intervals – item structure">
@@ -39,7 +39,7 @@
       <ResponseField name="dayIndicator" type="integer" required>
         Indicates which day this interval belongs to, relative to the day that the shift belongs to. -1 indicates the interval starts on the previous day, 0 on the same day, and 1 on the next day.
       </ResponseField>
-      <ResponseField name="workload">
+      <ResponseField name="workload" type="object">
         
       </ResponseField>
       <Expandable title="workload – properties">
@@ -57,7 +57,7 @@
         Task id of the task that must be worked on during this interval. The task needs to be defined in the configuration part of the payload.
       </ResponseField>
     </Expandable>
-    <ResponseField name="connectedShiftsPreviousDay">
+    <ResponseField name="connectedShiftsPreviousDay" type="object">
       List of shifts that are connected to this shift on the previous day. If defined, this shift will always be preceded by one of the connected shifts the previous day.
     </ResponseField>
     <Expandable title="connectedShiftsPreviousDay – properties">
@@ -71,7 +71,7 @@
         Whether the connected shift can be a day off. Default: false.
       </ResponseField>
     </Expandable>
-    <ResponseField name="connectedShiftsNextDay">
+    <ResponseField name="connectedShiftsNextDay" type="object">
       List of shifts that are connected to this shift on the next day. If defined, this shift will always be followed by one of the connected shifts the next day.
     </ResponseField>
     <Expandable title="connectedShiftsNextDay – properties">
@@ -85,7 +85,7 @@
         Whether the connected shift can be a day off. Default: false.
       </ResponseField>
     </Expandable>
-    <ResponseField name="attributeRequirements">
+    <ResponseField name="attributeRequirements" type="array of object">
       List of requirements on the attributes that an employee needs to be eligible to work this Shift. If an employee does not meet all of the requirements, the employee can not work this Shift.
     </ResponseField>
     <Expandable title="attributeRequirements – item structure">
