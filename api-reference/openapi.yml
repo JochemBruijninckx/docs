@@ -1719,7 +1719,7 @@ components:
           type: string
     employeeAvailabilityConstraint:
       type: object
-      description: ''
+      description: Used to indicate when employees are strictly or preferably available or unavailable to work.
       required:
         - id
         - importance
@@ -1739,12 +1739,8 @@ components:
         periods:
           $ref: '#/components/schemas/periods'
     employeeUtilizationConstraint:
+      description: Used to set targets and limits for the amount of hours or shifts worked by employees within given periods.
       type: object
-      description: |-
-        This constraint can be used to set targets for the number of hours worked by employees. The minimum number
-        of hours is treated as a target, while the maximum number of hours acts as a hard limit and will never be exceeded.
-        The constraint can be applied to specific employees, work types, or shifts. The constraint can also be applied to
-        a specific time period, in which case it will act as a target for the number of hours worked in that period.
       required:
         - id
       properties:
@@ -1876,6 +1872,7 @@ components:
         fairness:
           $ref: '#/components/schemas/constraintFairness'
     cooldownConstraint:
+      description: Used to define required or desired rest between working shifts.
       type: object
       required:
         - id
@@ -1914,7 +1911,7 @@ components:
           $ref: '#/components/schemas/cooldownConstraintScope'
     consecutiveConstraint:
       type: object
-      description: This constraint can be used to set targets on the number of consecutive entities that an employee works.
+      description: Used to set targets and limits on the number of consecutive shifts that an employee works.
       required:
         - id
         - importance
@@ -1935,6 +1932,7 @@ components:
         targets:
           $ref: '#/components/schemas/consecutiveTargets'
     patternConstraint:
+      description: Used to define patterns of shifts that employees should follow or avoid.
       type: object
       required:
         - id
@@ -2035,13 +2033,8 @@ components:
           description: DEPRECATED - Use filters instead.
           $ref: '#/components/schemas/constraintEmployeeIds'
     periodicRestConstraint:
+      description: Used to set targets for continuous rest within specific periods.
       type: object
-      description: |-
-        This constraint defines the minimum duration of continuous rest that an employee should have within a given period.
-        One periodic rest constraint can be applied to multiple periods. For example, the constraint can be used to 
-        require that each employee receives at least 48 hours of rest within each 7-day period. The constraint can be
-        applied to specific employees, and can be configured to only include specific shifts or work types when calculating
-        the realized rest duration.
       required:
         - id
       properties:
@@ -2061,6 +2054,11 @@ components:
         blockedPeriods:
           $ref: '#/components/schemas/periods'
           description: Periods that should never be considered as rest. For example, use this to indicate that public holidays should not be considered rest periods even when unworked.
+        periodGroups:
+          description: Groups of periods during which periodic rest should be met. The constraint is considered satisfied if there is at least one period group for which the periodic rest is met for all of its periods. Cannot be used together with the regular 'periods' field.
+          type: array
+          items:
+            $ref: '#/components/schemas/periods'
         employeeIds:
           deprecated: true
           description: DEPRECATED - Use filters instead.
@@ -2078,6 +2076,7 @@ components:
           deprecated: true
           description: DEPRECATED.
     periodDistributionConstraint:
+      description: Used to define targets and limits for the distribution of periods (like weekends, holidays, nights).
       type: object
       required:
         - id
@@ -4703,7 +4702,7 @@ components:
               description: The id of the task group that the cooldown applies to.
         employeeAvailabilityConstraint:
           type: object
-          description: ''
+          description: Used to indicate when employees are strictly or preferably available or unavailable to work.
           required:
             - id
             - importance
@@ -4754,12 +4753,8 @@ components:
               deprecated: true
               $ref: '#/components/schemas/constraintWorkTypeIds'
         employeeUtilizationConstraint:
+          description: Used to set targets and limits for the amount of hours or shifts worked by employees within given periods.
           type: object
-          description: |-
-            This constraint can be used to set targets for the number of hours worked by employees. The minimum number
-            of hours is treated as a target, while the maximum number of hours acts as a hard limit and will never be exceeded.
-            The constraint can be applied to specific employees, work types, or shifts. The constraint can also be applied to
-            a specific time period, in which case it will act as a target for the number of hours worked in that period.
           required:
             - id
           properties:
@@ -4891,13 +4886,8 @@ components:
             fairness:
               $ref: '#/components/schemas/constraintFairness'
         periodicRestConstraint:
+          description: Used to set targets for continuous rest within specific periods.
           type: object
-          description: |-
-            This constraint defines the minimum duration of continuous rest that an employee should have within a given period.
-            One periodic rest constraint can be applied to multiple periods. For example, the constraint can be used to 
-            require that each employee receives at least 48 hours of rest within each 7-day period. The constraint can be
-            applied to specific employees, and can be configured to only include specific shifts or work types when calculating
-            the realized rest duration.
           required:
             - id
           properties:
@@ -4917,6 +4907,11 @@ components:
             blockedPeriods:
               $ref: '#/components/schemas/periods'
               description: Periods that should never be considered as rest. For example, use this to indicate that public holidays should not be considered rest periods even when unworked.
+            periodGroups:
+              description: Groups of periods during which periodic rest should be met. The constraint is considered satisfied if there is at least one period group for which the periodic rest is met for all of its periods. Cannot be used together with the regular 'periods' field.
+              type: array
+              items:
+                $ref: '#/components/schemas/periods'
             employeeIds:
               deprecated: true
               description: DEPRECATED - Use filters instead.
@@ -4942,6 +4937,7 @@ components:
                 minHours:
                   type: number
         cooldownConstraint:
+          description: Used to define required or desired rest between working shifts.
           type: object
           required:
             - id
@@ -5026,6 +5022,7 @@ components:
                   description: DEPRECATED - Use 'advanced' instead.
                   $ref: '#/components/schemas/matchType'
         patternConstraint:
+          description: Used to define patterns of shifts that employees should follow or avoid.
           type: object
           required:
             - id
@@ -5166,7 +5163,7 @@ components:
               $ref: '#/components/schemas/objective'
         consecutiveConstraint:
           type: object
-          description: This constraint can be used to set targets on the number of consecutive entities that an employee works.
+          description: Used to set targets and limits on the number of consecutive shifts that an employee works.
           required:
             - id
             - importance
@@ -5278,6 +5275,7 @@ components:
               description: Describes which employees the constraint applies to. If not specified, the constraint applies to all employees.
               $ref: '#/components/schemas/advancedFilters'
         periodDistributionConstraint:
+          description: Used to define targets and limits for the distribution of periods (like weekends, holidays, nights).
           type: object
           required:
             - id

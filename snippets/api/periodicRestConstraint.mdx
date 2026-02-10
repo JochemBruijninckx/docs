@@ -1,5 +1,5 @@
 <ResponseField name="periodicRestConstraint" type="object">
-  This constraint defines the minimum duration of continuous rest that an employee should have within a given period. One periodic rest constraint can be applied to multiple periods. For example, the constraint can be used to require that each employee receives at least 48 hours of rest within each 7-day period. The constraint can be applied to specific employees, and can be configured to only include specific shifts or work types when calculating the realized rest duration.
+  Used to set targets for continuous rest within specific periods.
   <Expandable title="properties">
     <ResponseField name="id" type="string" required>
       Unique identifier for the constraint.
@@ -182,6 +182,112 @@
       List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods (such as weeks, months, etc.).
     </ResponseField>
     <Expandable title="blockedPeriods – properties">
+      <ResponseField name="days" type="object">
+        List of days in the schedule. Each day will become one period. By default, each period will last the entire day. If a startTime and/or endTime are specified, these will apply to each period.
+      </ResponseField>
+      <Expandable title="days – properties">
+        <ResponseField name="dates" type="array of date (date)">
+          List of dates in the schedule. Only allowed in CALENDAR payloads.
+        </ResponseField>
+        <ResponseField name="dayIndices" type="array of dayIndex">
+          List of day indices in the schedule. Only allowed in RECURRING payloads.
+        </ResponseField>
+        <ResponseField name="daysOfWeek" type="array of dayOfWeek">
+          List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
+        </ResponseField>
+        <ResponseField name="startTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="endTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="customDefinitions" type="array of object">
+        List of custom period definitions. Each custom period definition defines one period in the schedule.
+      </ResponseField>
+      <Expandable title="customDefinitions – item structure">
+        <ResponseField name="startDay" type="object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="startDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="endDay" type="object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="endDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="startTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="endTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="applyTimeToAllDays" type="boolean">
+          If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="recurrentDefinition" type="object">
+        A recurrent definition to easily create a set of similar periods.
+      </ResponseField>
+      <Expandable title="recurrentDefinition – properties">
+        <ResponseField name="daysPerPeriod" type="integer" required>
+          The number of days in each period.
+        </ResponseField>
+        <ResponseField name="daysBetweenStarts" type="integer">
+          The number of days between the start of each period. If not specified, this defaults to the value of daysPerPeriod, creating non-overlapping consecutive periods. Setting daysBetweenStarts to 1 will create a sliding window of periods.
+        </ResponseField>
+        <ResponseField name="startDay" type="object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="startDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="endDay" type="object">
+          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+        </ResponseField>
+        <Expandable title="endDay – properties">
+          <ResponseField name="date" type="string (date)">
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+          </ResponseField>
+          <ResponseField name="dayIndex" type="integer">
+            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+          </ResponseField>
+        </Expandable>
+        <ResponseField name="startTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="endTime" type="string (time)">
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+        </ResponseField>
+        <ResponseField name="applyTimeToAllDays" type="boolean">
+          If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
+        </ResponseField>
+      </Expandable>
+      <ResponseField name="labels" type="array of string">
+        Provide labels to re-use periods that were defined in the configuration.
+      </ResponseField>
+    </Expandable>
+    <ResponseField name="periodGroups" type="array of object">
+      Groups of periods during which periodic rest should be met. The constraint is considered satisfied if there is at least one period group for which the periodic rest is met for all of its periods. Cannot be used together with the regular 'periods' field.
+    </ResponseField>
+    <Expandable title="periodGroups – item structure">
       <ResponseField name="days" type="object">
         List of days in the schedule. Each day will become one period. By default, each period will last the entire day. If a startTime and/or endTime are specified, these will apply to each period.
       </ResponseField>
