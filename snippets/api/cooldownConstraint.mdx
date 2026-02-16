@@ -5,17 +5,24 @@
       Unique identifier for the constraint.
     </ResponseField>
     <ResponseField name="labels" type="array of string">
-      Labels for the constraint. Labels can be used to group constraints together. For example, if multiple constraints are related to the same shift type, they can all be labeled with the same label.
+      Labels for the constraint. Labels can be used to group constraints
+      together. For example, if multiple constraints are related to the same
+      shift type, they can all be labeled with the same label.
     </ResponseField>
-    <ResponseField name="importance" type="string (enum: NONE | VERY_LOW | LOW | MEDIUM | HIGH | ...)" required>
-      The importance of the constraint. The higher the importance, the more the solver will take the constraint into account. Under strict importance, the constraint may never be violated.
+    <ResponseField
+      name="importance"
+      type="string (enum: NONE | VERY_LOW | LOW | MEDIUM | HIGH | ...)"
+      required
+    >
+      The importance of the constraint. The higher the importance, the more the
+      solver will take the constraint into account. Under strict importance, the
+      constraint may never be violated.
     </ResponseField>
-    <ResponseField name="filters" type="object">
-      
-    </ResponseField>
+    <ResponseField name="filters" type="object"></ResponseField>
     <Expandable title="filters – properties">
       <ResponseField name="employees" type="object">
-        Used to filter which employees the constraint should be applied to. If not specified, the constraint applies to all employees.
+        Used to filter which employees the constraint should be applied to. If
+        not specified, the constraint applies to all employees.
       </ResponseField>
       <Expandable title="employees – properties">
         <ResponseField name="ids" type="array of string">
@@ -27,21 +34,20 @@
       </Expandable>
     </Expandable>
     <ResponseField name="starts" type="object">
-      Defines the types of work that will trigger a cooldown. Currently, only filters on shifts are supported as starts.
+      Defines the types of work that will trigger a cooldown. Currently, only
+      filters on shifts are supported as starts.
     </ResponseField>
     <Expandable title="starts – properties">
-      <ResponseField name="shifts" type="object">
-        
-      </ResponseField>
+      <ResponseField name="shifts" type="object"></ResponseField>
       <Expandable title="shifts – properties">
         <ResponseField name="ids" type="array of string">
-          List of shift ids that the constraint should be applied to. If not specified, no filtering is applied based on shift ids.
+          List of shift ids that the constraint should be applied to. If not
+          specified, no filtering is applied based on shift ids.
         </ResponseField>
-        <ResponseField name="labels" type="array of string">
-          
-        </ResponseField>
+        <ResponseField name="labels" type="array of string"></ResponseField>
         <ResponseField name="advanced" type="object">
-          Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
+          Can be used to define more complex filtering logic (using NOT, AND,
+          OR) for employees or shifts.
         </ResponseField>
         <Expandable title="advanced – properties">
           <ResponseField name="filters" type="array of object">
@@ -54,17 +60,24 @@
             <ResponseField name="values" type="array of string" required>
               The values to filter on.
             </ResponseField>
-            <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-              Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter. Default: "ANY".
+            <ResponseField
+              name="matchType"
+              type="string (enum: NONE | ANY | ALL)"
+            >
+              Defines how the values should be matched. For example, if set to
+              ALL, an entity needs to have all of the specified values to match
+              this filter. Default: "ANY".
             </ResponseField>
           </Expandable>
-          <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-            Defines how the filters should be combined. For example, if set to NONE, an entity needs to not match any of the filters to be included. Default: "ANY".
+          <ResponseField
+            name="matchType"
+            type="string (enum: NONE | ANY | ALL)"
+          >
+            Defines how the filters should be combined. For example, if set to
+            NONE, an entity needs to not match any of the filters to be
+            included. Default: "ANY".
           </ResponseField>
         </Expandable>
-        <ResponseField name="filters" type="array of object">
-          DEPRECATED - Use 'advanced' instead.
-        </ResponseField>
         <Expandable title="filters – item structure">
           <ResponseField name="field" type="string" required>
             The field to filter on. Can be "id" or "label".
@@ -72,31 +85,32 @@
           <ResponseField name="values" type="array of string" required>
             The values to filter on.
           </ResponseField>
-          <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-            Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter. Default: "ANY".
+          <ResponseField
+            name="matchType"
+            type="string (enum: NONE | ANY | ALL)"
+          >
+            Defines how the values should be matched. For example, if set to
+            ALL, an entity needs to have all of the specified values to match
+            this filter. Default: "ANY".
           </ResponseField>
         </Expandable>
-        <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-          DEPRECATED - Use 'advanced' instead. Default: "ANY".
-        </ResponseField>
       </Expandable>
     </Expandable>
     <ResponseField name="ends" type="object">
-      Defines the types of work that should be avoided during a cooldown. Currently, only filters on shifts are supported as ends.
+      Defines the types of work that should be avoided during a cooldown.
+      Currently, only filters on shifts are supported as ends.
     </ResponseField>
     <Expandable title="ends – properties">
-      <ResponseField name="shifts" type="object">
-        
-      </ResponseField>
+      <ResponseField name="shifts" type="object"></ResponseField>
       <Expandable title="shifts – properties">
         <ResponseField name="ids" type="array of string">
-          List of shift ids that the constraint should be applied to. If not specified, no filtering is applied based on shift ids.
+          List of shift ids that the constraint should be applied to. If not
+          specified, no filtering is applied based on shift ids.
         </ResponseField>
-        <ResponseField name="labels" type="array of string">
-          
-        </ResponseField>
+        <ResponseField name="labels" type="array of string"></ResponseField>
         <ResponseField name="advanced" type="object">
-          Can be used to define more complex filtering logic (using NOT, AND, OR) for employees or shifts.
+          Can be used to define more complex filtering logic (using NOT, AND,
+          OR) for employees or shifts.
         </ResponseField>
         <Expandable title="advanced – properties">
           <ResponseField name="filters" type="array of object">
@@ -109,17 +123,24 @@
             <ResponseField name="values" type="array of string" required>
               The values to filter on.
             </ResponseField>
-            <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-              Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter. Default: "ANY".
+            <ResponseField
+              name="matchType"
+              type="string (enum: NONE | ANY | ALL)"
+            >
+              Defines how the values should be matched. For example, if set to
+              ALL, an entity needs to have all of the specified values to match
+              this filter. Default: "ANY".
             </ResponseField>
           </Expandable>
-          <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-            Defines how the filters should be combined. For example, if set to NONE, an entity needs to not match any of the filters to be included. Default: "ANY".
+          <ResponseField
+            name="matchType"
+            type="string (enum: NONE | ANY | ALL)"
+          >
+            Defines how the filters should be combined. For example, if set to
+            NONE, an entity needs to not match any of the filters to be
+            included. Default: "ANY".
           </ResponseField>
         </Expandable>
-        <ResponseField name="filters" type="array of object">
-          DEPRECATED - Use 'advanced' instead.
-        </ResponseField>
         <Expandable title="filters – item structure">
           <ResponseField name="field" type="string" required>
             The field to filter on. Can be "id" or "label".
@@ -127,17 +148,20 @@
           <ResponseField name="values" type="array of string" required>
             The values to filter on.
           </ResponseField>
-          <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-            Defines how the values should be matched. For example, if set to ALL, an entity needs to have all of the specified values to match this filter. Default: "ANY".
+          <ResponseField
+            name="matchType"
+            type="string (enum: NONE | ANY | ALL)"
+          >
+            Defines how the values should be matched. For example, if set to
+            ALL, an entity needs to have all of the specified values to match
+            this filter. Default: "ANY".
           </ResponseField>
         </Expandable>
-        <ResponseField name="matchType" type="string (enum: NONE | ANY | ALL)">
-          DEPRECATED - Use 'advanced' instead. Default: "ANY".
-        </ResponseField>
       </Expandable>
     </Expandable>
     <ResponseField name="targets" type="object" required>
-      Defines the desired minimum duration of the cooldown. Can be defined in either hours or days.
+      Defines the desired minimum duration of the cooldown. Can be defined in
+      either hours or days.
     </ResponseField>
     <Expandable title="targets – properties">
       <ResponseField name="minHours" type="number">
@@ -148,63 +172,83 @@
       </ResponseField>
     </Expandable>
     <ResponseField name="periods" type="object">
-      List of periods in the schedule. Periods can either be defined explicitly using custom definitions, or through a recurrent definition. A recurrent definition can be used to easily generate a list of similar periods (such as weeks, months, etc.).
+      List of periods in the schedule. Periods can either be defined explicitly
+      using custom definitions, or through a recurrent definition. A recurrent
+      definition can be used to easily generate a list of similar periods (such
+      as weeks, months, etc.).
     </ResponseField>
     <Expandable title="periods – properties">
       <ResponseField name="days" type="object">
-        List of days in the schedule. Each day will become one period. By default, each period will last the entire day. If a startTime and/or endTime are specified, these will apply to each period.
+        List of days in the schedule. Each day will become one period. By
+        default, each period will last the entire day. If a startTime and/or
+        endTime are specified, these will apply to each period.
       </ResponseField>
       <Expandable title="days – properties">
         <ResponseField name="dates" type="array of date (date)">
           List of dates in the schedule. Only allowed in CALENDAR payloads.
         </ResponseField>
         <ResponseField name="dayIndices" type="array of dayIndex">
-          List of day indices in the schedule. Only allowed in RECURRING payloads.
+          List of day indices in the schedule. Only allowed in RECURRING
+          payloads.
         </ResponseField>
         <ResponseField name="daysOfWeek" type="array of dayOfWeek">
-          List of days of the week. Will apply to all days in the schedule that match any of the specified weekdays.
+          List of days of the week. Will apply to all days in the schedule that
+          match any of the specified weekdays.
         </ResponseField>
         <ResponseField name="startTime" type="string (time)">
-          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single
+          day. Use 00:00 to represent midnight.
         </ResponseField>
         <ResponseField name="endTime" type="string (time)">
-          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single
+          day. Use 00:00 to represent midnight.
         </ResponseField>
       </Expandable>
       <ResponseField name="customDefinitions" type="array of object">
-        List of custom period definitions. Each custom period definition defines one period in the schedule.
+        List of custom period definitions. Each custom period definition defines
+        one period in the schedule.
       </ResponseField>
       <Expandable title="customDefinitions – item structure">
         <ResponseField name="startDay" type="object">
-          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+          Describes one day in the schedule. Can be defined as a date (in
+          CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="startDay – properties">
           <ResponseField name="date" type="string (date)">
-            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used
+            when schedule type is CALENDAR.
           </ResponseField>
           <ResponseField name="dayIndex" type="integer">
-            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+            Day index relative to the first day of the period (starts at 0). Can
+            only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
         <ResponseField name="endDay" type="object">
-          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+          Describes one day in the schedule. Can be defined as a date (in
+          CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="endDay – properties">
           <ResponseField name="date" type="string (date)">
-            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used
+            when schedule type is CALENDAR.
           </ResponseField>
           <ResponseField name="dayIndex" type="integer">
-            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+            Day index relative to the first day of the period (starts at 0). Can
+            only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
         <ResponseField name="startTime" type="string (time)">
-          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single
+          day. Use 00:00 to represent midnight.
         </ResponseField>
         <ResponseField name="endTime" type="string (time)">
-          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single
+          day. Use 00:00 to represent midnight.
         </ResponseField>
         <ResponseField name="applyTimeToAllDays" type="boolean">
-          If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
+          If true, the startTime and endTime will be applied to each individual
+          day in the period. If false, the startTime will apply to the first day
+          and the endTime will apply to the last day. Default: false.
         </ResponseField>
       </Expandable>
       <ResponseField name="recurrentDefinition" type="object">
@@ -215,38 +259,51 @@
           The number of days in each period.
         </ResponseField>
         <ResponseField name="daysBetweenStarts" type="integer">
-          The number of days between the start of each period. If not specified, this defaults to the value of daysPerPeriod, creating non-overlapping consecutive periods. Setting daysBetweenStarts to 1 will create a sliding window of periods.
+          The number of days between the start of each period. If not specified,
+          this defaults to the value of daysPerPeriod, creating non-overlapping
+          consecutive periods. Setting daysBetweenStarts to 1 will create a
+          sliding window of periods.
         </ResponseField>
         <ResponseField name="startDay" type="object">
-          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+          Describes one day in the schedule. Can be defined as a date (in
+          CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="startDay – properties">
           <ResponseField name="date" type="string (date)">
-            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used
+            when schedule type is CALENDAR.
           </ResponseField>
           <ResponseField name="dayIndex" type="integer">
-            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+            Day index relative to the first day of the period (starts at 0). Can
+            only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
         <ResponseField name="endDay" type="object">
-          Describes one day in the schedule. Can be defined as a date (in CALENDAR payloads) or as a day index (in RECURRING payloads).
+          Describes one day in the schedule. Can be defined as a date (in
+          CALENDAR payloads) or as a day index (in RECURRING payloads).
         </ResponseField>
         <Expandable title="endDay – properties">
           <ResponseField name="date" type="string (date)">
-            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used when schedule type is CALENDAR.
+            Date is specified in ISO8601 format YYYY-MM-DD. Can only be used
+            when schedule type is CALENDAR.
           </ResponseField>
           <ResponseField name="dayIndex" type="integer">
-            Day index relative to the first day of the period (starts at 0). Can only be used when schedule type is RECURRING.
+            Day index relative to the first day of the period (starts at 0). Can
+            only be used when schedule type is RECURRING.
           </ResponseField>
         </Expandable>
         <ResponseField name="startTime" type="string (time)">
-          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single
+          day. Use 00:00 to represent midnight.
         </ResponseField>
         <ResponseField name="endTime" type="string (time)">
-          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single day. Use 00:00 to represent midnight.
+          TIME ISO 8601 format hh:mm. Equivalent to the 24h format of a single
+          day. Use 00:00 to represent midnight.
         </ResponseField>
         <ResponseField name="applyTimeToAllDays" type="boolean">
-          If true, the startTime and endTime will be applied to each individual day in the period. If false, the startTime will apply to the first day and the endTime will apply to the last day. Default: false.
+          If true, the startTime and endTime will be applied to each individual
+          day in the period. If false, the startTime will apply to the first day
+          and the endTime will apply to the last day. Default: false.
         </ResponseField>
       </Expandable>
       <ResponseField name="labels" type="array of string">

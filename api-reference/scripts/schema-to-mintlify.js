@@ -154,6 +154,9 @@ function schemaToExpandableContent(spec, schema, schemaName, indent = "") {
     const required = new Set(resolved.required || []);
     for (const [propName, propSchema] of Object.entries(props)) {
       const propResolved = resolveSchema(spec, propSchema);
+      if (propSchema?.deprecated === true || propResolved?.deprecated === true) {
+        continue;
+      }
       let propDesc = normalizeDescription(
         propResolved?.description || propSchema?.description
       );
