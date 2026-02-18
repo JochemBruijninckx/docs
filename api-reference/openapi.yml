@@ -1810,19 +1810,6 @@ components:
                 If a cap is provided, the average number of bonus hours per period will be capped at this value. The employee 
                 can be eligible for more bonus hours, but they will not be counted beyond this cap.
               minimum: 0
-        defaultTime:
-          description: Settings to determine if and how default time rules affect the constraint.
-          type: object
-          properties:
-            includeDefaultHours:
-              type: boolean
-              description: Whether or not default hours should be included in the calculation of an employee's total hours worked for the constraint.
-              default: true
-            minOverlapHours:
-              type: number
-              description: |-
-                The minimum number of hours that this constraint should overlap with a day where a default time rule is active.
-                If the overlap is below this amount, the hours from the default time rule will not be counted for this constraint.
         overlapRules:
           description: |-
             Specify when a scheduled shift should count towards the targets of this constraint. If both minOverlapHours
@@ -4824,19 +4811,6 @@ components:
                     If a cap is provided, the average number of bonus hours per period will be capped at this value. The employee 
                     can be eligible for more bonus hours, but they will not be counted beyond this cap.
                   minimum: 0
-            defaultTime:
-              description: Settings to determine if and how default time rules affect the constraint.
-              type: object
-              properties:
-                includeDefaultHours:
-                  type: boolean
-                  description: Whether or not default hours should be included in the calculation of an employee's total hours worked for the constraint.
-                  default: true
-                minOverlapHours:
-                  type: number
-                  description: |-
-                    The minimum number of hours that this constraint should overlap with a day where a default time rule is active.
-                    If the overlap is below this amount, the hours from the default time rule will not be counted for this constraint.
             overlapRules:
               description: |-
                 Specify when a scheduled shift should count towards the targets of this constraint. If both minOverlapHours

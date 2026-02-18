@@ -20,8 +20,11 @@ A good example of this constraint is to ensure that employees get at least 48 ho
   "periodicRestConstraints": [
     {
       "id": "48-hours-per-week",
-      "minimumContinuousRestDuration": {
-        "hours": 48
+      "importance": "HIGH",
+      "targets": {
+        "continuousRest": {
+          "minHours": 48
+        }
       },
       "periods": {
         "recurrentDefinition": {
@@ -43,8 +46,11 @@ A good example of this constraint is to ensure that employees get at least 48 ho
   "periodicRestConstraints": [
     {
       "id": "72-hours-per-month",
-      "minimumContinuousRestDuration": {
-        "hours": 72
+      "importance": "HIGH",
+      "targets": {
+        "continuousRest": {
+          "minHours": 72
+        }
       },
       "periods": {
         "customDefinitions": [
