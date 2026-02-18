@@ -641,8 +641,6 @@ components:
             solver. For read-only employees, all shifts are automatically
             considered locked.
           default: false
-        scheduleDays:
-          $ref: "#/components/schemas/scheduleDaysWithoutWeekDays"
     dayIndicator:
       type: integer
       minimum: -1
@@ -1390,8 +1388,6 @@ components:
         - startTime
         - endTime
       properties:
-        scheduleDays:
-          $ref: "#/components/schemas/scheduleDays"
         startTime:
           $ref: "#/components/schemas/timeStamp"
         endTime:
@@ -1828,10 +1824,6 @@ components:
           $ref: "#/components/schemas/periods"
           description: The periods in which the constraint should be applied. The minHours
             and maxHours will be applied to each period separately.
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     cooldownConstraint:
       description: Used to define required or desired rest between working shifts.
       type: object
@@ -2051,10 +2043,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/periods"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     periodDistributionConstraint:
       description: Used to define targets and limits for the distribution of periods
         (like weekends, holidays, nights).
@@ -2094,10 +2082,6 @@ components:
           $ref: "#/components/schemas/overlapRules"
         periods:
           $ref: "#/components/schemas/periods"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
     layoutConstraint:
       type: object
       required:
@@ -2366,8 +2350,6 @@ components:
             minItems: 1
             items:
               $ref: "#/components/schemas/priorityScore"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
     continuityConstraint:
       type: object
       description: >-
@@ -2412,15 +2394,6 @@ components:
               shiftGroupLabel:
                 type: string
                 description: An optional descriptive label for the shift group.
-              scheduleDays:
-                description: The days on which the continuity constraint should be active for
-                  this group. You can use this to encourage the solver to ensure
-                  continuity within a specific time period. When left empty,
-                  this continuity group will be active for the entire scheduling
-                  period.
-                $ref: "#/components/schemas/scheduleDays"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
     restBetweenShiftsConstraint:
       type: object
       description: >-
@@ -2473,10 +2446,6 @@ components:
             two shifts that meet the constraint filters.
           minimum: 0
           default: 0
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
     shiftPatternConstraint:
       type: object
       description: >-
@@ -2538,8 +2507,6 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightFullRange"
         isStrictStart:
           type: boolean
           description: >-
@@ -2635,8 +2602,6 @@ components:
           type: integer
           minimum: 1
           maximum: 7
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     shiftUtilizationConstraint:
       type: object
       description: >-
@@ -2672,8 +2637,6 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
         occurrenceMin:
           type: integer
           description: The minimum number of times the shifts can be used within the
@@ -2711,8 +2674,6 @@ components:
             into account. Periods on this constraint are only used to define the
             days on which the constraint applies.
           $ref: "#/components/schemas/periods"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     shiftLayoutConstraint:
       type: object
       description: >-
@@ -2778,8 +2739,6 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
         minDaysBetweenShifts:
           type: integer
           minimum: 1
@@ -2799,8 +2758,6 @@ components:
             constrained.
         employeeIds:
           $ref: "#/components/schemas/constraintEmployeeIds"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     newWorkingDayConstraint:
       type: object
       description: >-
@@ -2846,20 +2803,10 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
-        scheduleDays:
-          $ref: "#/components/schemas/scheduleDays"
-          description: The constraint is only applied to the days specified. If no days
-            are specified the constraint is applied to all days. If a specific
-            day is specified, the solver will try to avoid adding a shift to
-            that day.
         workTypeIds:
           $ref: "#/components/schemas/constraintWorkTypeIds"
         employeeIds:
           $ref: "#/components/schemas/constraintEmployeeIds"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     existingWorkingDayChangeConstraint:
       type: object
       description: >-
@@ -2892,14 +2839,10 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
         workTypeIds:
           $ref: "#/components/schemas/constraintWorkTypeIds"
         employeeIds:
           $ref: "#/components/schemas/constraintEmployeeIds"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     consecutiveTimeOffConstraint:
       type: object
       description: >-
@@ -2935,8 +2878,6 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
         dayOffType:
           type: string
           enum:
@@ -3031,8 +2972,6 @@ components:
               summary: Employee should have consecutive time off that contains Monday.
         employeeIds:
           $ref: "#/components/schemas/constraintEmployeeIds"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     weekendDistributionConstraint:
       type: object
       description: >-
@@ -3074,8 +3013,6 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightPositive"
         maxWorkingWeekends:
           type: integer
           description: Defines the number of weekends in the scheduling period that
@@ -3096,8 +3033,6 @@ components:
           $ref: "#/components/schemas/constraintWorkTypeIds"
         employeeIds:
           $ref: "#/components/schemas/constraintEmployeeIds"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
     blockedTimeConstraint:
       type: object
       description: Defines time periods in which employees are not available or not
@@ -3113,11 +3048,6 @@ components:
           items:
             type: object
             properties:
-              scheduleDays:
-                $ref: "#/components/schemas/scheduleDays"
-                description: Defines the days of schedule where blocked time constraint is
-                  applied. If not specified, the blocked time constraint is
-                  applied to all days of schedule.
               startTime:
                 $ref: "#/components/schemas/timeStamp"
                 description: Defines the start time of blocked time period. Defaults to start of
@@ -3168,16 +3098,12 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
-        weight:
-          $ref: "#/components/schemas/constraintWeightFullRange"
         intervals:
           type: array
           items:
             $ref: "#/components/schemas/workingTimePreferenceInterval"
         employeeIds:
           $ref: "#/components/schemas/constraintEmployeeIds"
-        fairness:
-          $ref: "#/components/schemas/constraintFairness"
       examples:
         - example_1:
             value:
@@ -4649,8 +4575,6 @@ components:
                 solver. For read-only employees, all shifts are automatically
                 considered locked.
               default: false
-            scheduleDays:
-              $ref: "#/components/schemas/scheduleDaysWithoutWeekDays"
         taskGroup:
           type: object
           required:
@@ -4944,10 +4868,6 @@ components:
               $ref: "#/components/schemas/periods"
               description: The periods in which the constraint should be applied. The minHours
                 and maxHours will be applied to each period separately.
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         periodicRestConstraint:
           description: Used to set targets for continuous rest within specific periods.
           type: object
@@ -4981,10 +4901,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/periods"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         periodicRestTargets:
           type: object
           properties:
@@ -5406,10 +5322,6 @@ components:
               $ref: "#/components/schemas/overlapRules"
             periods:
               $ref: "#/components/schemas/periods"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
         prioritizationConstraint:
           type: object
           description: >-
@@ -5591,8 +5503,6 @@ components:
                 minItems: 1
                 items:
                   $ref: "#/components/schemas/priorityScore"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
         continuityConstraint:
           type: object
           description: >-
@@ -5637,15 +5547,6 @@ components:
                   shiftGroupLabel:
                     type: string
                     description: An optional descriptive label for the shift group.
-                  scheduleDays:
-                    description: The days on which the continuity constraint should be active for
-                      this group. You can use this to encourage the solver to
-                      ensure continuity within a specific time period. When left
-                      empty, this continuity group will be active for the entire
-                      scheduling period.
-                    $ref: "#/components/schemas/scheduleDays"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
         blockedTimeConstraint:
           type: object
           description: Defines time periods in which employees are not available or not
@@ -5661,11 +5562,6 @@ components:
               items:
                 type: object
                 properties:
-                  scheduleDays:
-                    $ref: "#/components/schemas/scheduleDays"
-                    description: Defines the days of schedule where blocked time constraint is
-                      applied. If not specified, the blocked time constraint is
-                      applied to all days of schedule.
                   startTime:
                     $ref: "#/components/schemas/timeStamp"
                     description: Defines the start time of blocked time period. Defaults to start of
@@ -5738,10 +5634,6 @@ components:
                 two shifts that meet the constraint filters.
               minimum: 0
               default: 0
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
         weekendDistributionConstraint:
           type: object
           description: >-
@@ -5783,8 +5675,6 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
             maxWorkingWeekends:
               type: integer
               description: Defines the number of weekends in the scheduling period that
@@ -5805,8 +5695,6 @@ components:
               $ref: "#/components/schemas/constraintWorkTypeIds"
             employeeIds:
               $ref: "#/components/schemas/constraintEmployeeIds"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         workingTimePreferenceConstraint:
           type: object
           description: >-
@@ -5838,16 +5726,12 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightFullRange"
             intervals:
               type: array
               items:
                 $ref: "#/components/schemas/workingTimePreferenceInterval"
             employeeIds:
               $ref: "#/components/schemas/constraintEmployeeIds"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
           examples:
             - example_1:
                 value:
@@ -5899,8 +5783,6 @@ components:
             - startTime
             - endTime
           properties:
-            scheduleDays:
-              $ref: "#/components/schemas/scheduleDays"
             startTime:
               $ref: "#/components/schemas/timeStamp"
             endTime:
@@ -5968,8 +5850,6 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightFullRange"
             isStrictStart:
               type: boolean
               description: >-
@@ -6065,8 +5945,6 @@ components:
               type: integer
               minimum: 1
               maximum: 7
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         patternDayKeyword:
           type: string
           description: A keyword to represent that a day must be a day off (DAY_OFF), must
@@ -6119,8 +5997,6 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
             occurrenceMin:
               type: integer
               description: The minimum number of times the shifts can be used within the
@@ -6158,8 +6034,6 @@ components:
                 into account. Periods on this constraint are only used to define
                 the days on which the constraint applies.
               $ref: "#/components/schemas/periods"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         shiftLayoutConstraint:
           type: object
           description: >-
@@ -6226,8 +6100,6 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
             minDaysBetweenShifts:
               type: integer
               minimum: 1
@@ -6247,8 +6119,6 @@ components:
                 constrained.
             employeeIds:
               $ref: "#/components/schemas/constraintEmployeeIds"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         newWorkingDayConstraint:
           type: object
           description: >-
@@ -6294,20 +6164,10 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
-            scheduleDays:
-              $ref: "#/components/schemas/scheduleDays"
-              description: The constraint is only applied to the days specified. If no days
-                are specified the constraint is applied to all days. If a
-                specific day is specified, the solver will try to avoid adding a
-                shift to that day.
             workTypeIds:
               $ref: "#/components/schemas/constraintWorkTypeIds"
             employeeIds:
               $ref: "#/components/schemas/constraintEmployeeIds"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         existingWorkingDayChangeConstraint:
           type: object
           description: >-
@@ -6340,14 +6200,10 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
             workTypeIds:
               $ref: "#/components/schemas/constraintWorkTypeIds"
             employeeIds:
               $ref: "#/components/schemas/constraintEmployeeIds"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
         consecutiveTimeOffConstraint:
           type: object
           description: >-
@@ -6383,8 +6239,6 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
-            weight:
-              $ref: "#/components/schemas/constraintWeightPositive"
             dayOffType:
               type: string
               enum:
@@ -6481,8 +6335,6 @@ components:
                   summary: Employee should have consecutive time off that contains Monday.
             employeeIds:
               $ref: "#/components/schemas/constraintEmployeeIds"
-            fairness:
-              $ref: "#/components/schemas/constraintFairness"
     job:
       $schema: https://json-schema.org/draft/2020-12/schema
       $id: job.yml

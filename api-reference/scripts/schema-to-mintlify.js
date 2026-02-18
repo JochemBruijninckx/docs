@@ -69,6 +69,19 @@ function resolveSchema(spec, schema) {
   return schema;
 }
 
+/** True if this property schema is deprecated or refers to a deprecated schema (direct $ref or array items $ref). */
+function isPropertyDeprecated(spec, propSchema) {
+  if (propSchema?.deprecated === true) return true;
+  const propResolved = resolveSchema(spec, propSchema);
+  if (propResolved?.deprecated === true) return true;
+  const itemsRef = propResolved?.items?.$ref || propSchema?.items?.$ref;
+  if (itemsRef) {
+    const itemResolved = resolveRef(spec, itemsRef);
+    if (itemResolved?.deprecated === true) return true;
+  }
+  return false;
+}
+
 /** Get display type string for a schema (no $ref, already resolved or inline). */
 function getTypeString(spec, schema, refName = null) {
   if (!schema) return "unknown";
@@ -154,7 +167,7 @@ function schemaToExpandableContent(spec, schema, schemaName, indent = "") {
     const required = new Set(resolved.required || []);
     for (const [propName, propSchema] of Object.entries(props)) {
       const propResolved = resolveSchema(spec, propSchema);
-      if (propSchema?.deprecated === true || propResolved?.deprecated === true) {
+      if (isPropertyDeprecated(spec, propSchema)) {
         continue;
       }
       let propDesc = normalizeDescription(

@@ -2,6 +2,7 @@
 /**
  * Strips all deprecated fields from an OpenAPI YAML file and sets wide mode on every path.
  * - Removes any property whose value is an object with deprecated: true
+ * - Removes any property whose value is a $ref (or array of $ref) to a deprecated schema
  * - Removes the deprecated key from remaining objects
  * - Adds x-mint.metadata.mode: wide to each path operation so pages render in wide mode
  *
@@ -27,13 +28,43 @@ const args = process.argv.slice(2);
 const inputFile = args[0] || path.join(apiRefDir, 'openapi.yml');
 const outputFile = args[1] || inputFile.replace(/\.(yml|yaml)$/i, '.no-deprecated.$1');
 
-function stripDeprecated(value) {
+/** Returns schema name for #/components/schemas/Name or null. */
+function getSchemaNameFromRef(ref) {
+  if (!ref || typeof ref !== 'string') return null;
+  const match = ref.match(/^#\/components\/schemas\/(.+)$/);
+  return match ? match[1] : null;
+}
+
+/** Returns true if the value is a ref (or array of ref) to a deprecated schema. */
+function isRefToDeprecatedSchema(val, deprecatedSchemaNames) {
+  if (!val || typeof val !== 'object' || Array.isArray(val) || !deprecatedSchemaNames.size) return false;
+  const directRef = getSchemaNameFromRef(val.$ref);
+  if (directRef && deprecatedSchemaNames.has(directRef)) return true;
+  if (val.type === 'array' && val.items && typeof val.items === 'object' && val.items.$ref) {
+    const itemsRef = getSchemaNameFromRef(val.items.$ref);
+    if (itemsRef && deprecatedSchemaNames.has(itemsRef)) return true;
+  }
+  return false;
+}
+
+/** Build set of schema names that are deprecated (in components.schemas). */
+function buildDeprecatedSchemaNames(spec) {
+  const names = new Set();
+  const schemas = spec?.components?.schemas;
+  if (!schemas || typeof schemas !== 'object') return names;
+  for (const [name, schema] of Object.entries(schemas)) {
+    if (schema && typeof schema === 'object' && schema.deprecated === true) names.add(name);
+  }
+  return names;
+}
+
+function stripDeprecated(value, deprecatedSchemaNames) {
   if (value === null || typeof value !== 'object') {
     return value;
   }
 
   if (Array.isArray(value)) {
-    return value.map(stripDeprecated);
+    return value.map((v) => stripDeprecated(v, deprecatedSchemaNames));
   }
 
   const result = {};
@@ -43,7 +74,11 @@ function stripDeprecated(value) {
     if (val && typeof val === 'object' && !Array.isArray(val) && val.deprecated === true) {
       continue;
     }
-    result[key] = stripDeprecated(val);
+    // Remove property if it refers to a deprecated schema (direct $ref or array items $ref)
+    if (isRefToDeprecatedSchema(val, deprecatedSchemaNames)) {
+      continue;
+    }
+    result[key] = stripDeprecated(val, deprecatedSchemaNames);
     // Remove deprecated key from objects we keep
     if (result[key] && typeof result[key] === 'object' && 'deprecated' in result[key]) {
       delete result[key].deprecated;
@@ -77,7 +112,8 @@ function main() {
 
   const content = fs.readFileSync(inputFile, 'utf8');
   const spec = yaml.parse(content);
-  const stripped = stripDeprecated(spec);
+  const deprecatedSchemaNames = buildDeprecatedSchemaNames(spec);
+  const stripped = stripDeprecated(spec, deprecatedSchemaNames);
   ensureWideMode(stripped);
 
   fs.writeFileSync(outputFile, yaml.stringify(stripped), 'utf8');
