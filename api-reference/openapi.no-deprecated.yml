@@ -1367,6 +1367,25 @@ components:
           description: Describes which employees the constraint applies to. If not
             specified, the constraint applies to all employees.
           $ref: "#/components/schemas/advancedFilters"
+    constraintFiltersConstraints:
+      type: object
+      description: Used to filter which other constraints this constraint should be
+        applied to.
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          description: List of constraint ids that this fairness constraint should be
+            applied to.
+          uniqueItems: true
+        labels:
+          type: array
+          description: List of constraint labels that this fairness constraint should be
+            applied to.
+          items:
+            type: string
+          uniqueItems: true
     priorityScore:
       type: integer
       description: A score of the priority of an employee covering a demand. The
@@ -2156,21 +2175,30 @@ components:
       type: object
       required:
         - id
-        - constraintIds
       properties:
         id:
           $ref: "#/components/schemas/constraintId"
         importance:
           description: The importance of adhering to this fairness constraint.
           $ref: "#/components/schemas/importance"
-        constraintIds:
-          type: array
-          description: List of constraint ids for which the corresponding (in)conveniences
-            should be distributed fairly. May only contain constraints of the
-            same type.
-          items:
-            type: string
-          uniqueItems: true
+        filters:
+          type: object
+          properties:
+            constraints:
+              description: Used to filter which constraints this fairness constraint should be
+                applied to. May only contain constraints of the same type.
+              $ref: "#/components/schemas/constraintFiltersConstraints"
+        applyConstraintImportanceScaling:
+          type: boolean
+          description: If true, more importance is given to (in)conveniences for
+            constraints with a higher importance.
+          default: true
+        applyWorkloadScaling:
+          type: boolean
+          description: If true, the measured (in)conveniences are scaled proportionally to
+            each employee's workload, ensuring fairness accounts for differences
+            in hours worked.
+          default: false
         constraintFactors:
           type: array
           description: Technical property. Contact dev team for information on how to use
@@ -2187,17 +2215,6 @@ components:
                   constraint when calculating fairness.
                 minimum: 0
                 maximum: 2
-        applyConstraintImportanceScaling:
-          type: boolean
-          description: If true, more importance is given to (in)conveniences for
-            constraints with a higher importance.
-          default: true
-        applyWorkloadScaling:
-          type: boolean
-          description: If true, the measured (in)conveniences are scaled proportionally to
-            each employee's workload, ensuring fairness accounts for differences
-            in hours worked.
-          default: false
     prioritizationConstraint:
       type: object
       description: >-
@@ -4423,6 +4440,25 @@ components:
 
                     based on role ids.
                   uniqueItems: true
+        constraintFiltersConstraints:
+          type: object
+          description: Used to filter which other constraints this constraint should be
+            applied to.
+          properties:
+            ids:
+              type: array
+              items:
+                type: string
+              description: List of constraint ids that this fairness constraint should be
+                applied to.
+              uniqueItems: true
+            labels:
+              type: array
+              description: List of constraint labels that this fairness constraint should be
+                applied to.
+              items:
+                type: string
+              uniqueItems: true
         importance:
           type: string
           enum:
@@ -5308,21 +5344,30 @@ components:
           type: object
           required:
             - id
-            - constraintIds
           properties:
             id:
               $ref: "#/components/schemas/constraintId"
             importance:
               description: The importance of adhering to this fairness constraint.
               $ref: "#/components/schemas/importance"
-            constraintIds:
-              type: array
-              description: List of constraint ids for which the corresponding (in)conveniences
-                should be distributed fairly. May only contain constraints of
-                the same type.
-              items:
-                type: string
-              uniqueItems: true
+            filters:
+              type: object
+              properties:
+                constraints:
+                  description: Used to filter which constraints this fairness constraint should be
+                    applied to. May only contain constraints of the same type.
+                  $ref: "#/components/schemas/constraintFiltersConstraints"
+            applyConstraintImportanceScaling:
+              type: boolean
+              description: If true, more importance is given to (in)conveniences for
+                constraints with a higher importance.
+              default: true
+            applyWorkloadScaling:
+              type: boolean
+              description: If true, the measured (in)conveniences are scaled proportionally to
+                each employee's workload, ensuring fairness accounts for
+                differences in hours worked.
+              default: false
             constraintFactors:
               type: array
               description: Technical property. Contact dev team for information on how to use
@@ -5339,17 +5384,6 @@ components:
                       constraint when calculating fairness.
                     minimum: 0
                     maximum: 2
-            applyConstraintImportanceScaling:
-              type: boolean
-              description: If true, more importance is given to (in)conveniences for
-                constraints with a higher importance.
-              default: true
-            applyWorkloadScaling:
-              type: boolean
-              description: If true, the measured (in)conveniences are scaled proportionally to
-                each employee's workload, ensuring fairness accounts for
-                differences in hours worked.
-              default: false
         prioritizationConstraint:
           type: object
           description: >-
