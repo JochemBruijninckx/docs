@@ -360,7 +360,7 @@ For a fixed daily window starting at 01:00, define periods via `customDefinition
   "importance": "HIGH",
   "isDesired": true,
   "filters": {
-    "employees": { "ids": ["1", "2"] },
+    "employees": { "ids": ["1"] },
     "work": { "workloadCategories": ["WORK"] }
   },
   "periods": {
@@ -563,6 +563,10 @@ For multiple intervals with different preferences, use multiple **employeeAvaila
 
 _Weekday 1 = Monday … 7 = Sunday._
 
+**Two-day patterns (no DAY_OFF):** When the pattern is exactly two days and neither day is DAY_OFF, prefer **cooldownConstraint**: require at least 1 day rest after the first shift type before working the second (e.g. `starts` = first day’s shifts, `ends` = second day’s shifts, `targets.minDays: 1`). CooldownConstraint does not support DAY_OFF, so two-day patterns that involve day off must stay as patternConstraint.
+
+**ScheduleRows → employee filter:** When the XML lists specific `<ScheduleRows><RowNbr>N</RowNbr>...</ScheduleRows>`, the JSON equivalent should restrict to those employees via `filters.employees.ids` (e.g. RowNbr 1 and 2 → `"ids": ["1", "2"]`). Row numbers in the source data typically correspond to employee ids.
+
 ### BOTH_SATSUN (two constraints)
 
 ```xml
@@ -599,13 +603,16 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Two undesired patterns for the weekend: (work, day off) and (day off, work). Use `periods` with a recurrent weekend definition so the pattern is evaluated per weekend.
+**JSON equivalent (patternConstraints):** Two undesired patterns for the weekend: (work, day off) and (day off, work). Use `periods` with a recurrent weekend definition so the pattern is evaluated per weekend. ScheduleRows 1 and 2 → restrict to those employees.
 
 ```json
 {
   "id": "BOTH_SATSUN",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "startDays": { "daysOfWeek": ["SAT"] },
@@ -654,34 +661,52 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: day shift(s) followed by night shift(s).
+**JSON equivalent (cooldownConstraint preferred):** Two-day pattern without DAY_OFF: require at least 1 day rest after day shifts before night shifts. ScheduleRows 1 and 2 → apply to employees 1 and 2.
+
+```json
+{
+  "id": "DONT_ROTATE_BACK_BEFORE",
+  "importance": "MEDIUM",
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "starts": {
+    "shifts": {
+      "labels": ["MORNING", "DAY", "EVENING"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["NIGHT"]
+    }
+  },
+  "targets": {
+    "minDays": 1
+  }
+}
+```
+
+Alternatively, **patternConstraint** (undesired pattern: day shift(s) followed by night shift(s)):
 
 ```json
 {
   "id": "DONT_ROTATE_BACK_BEFORE",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
         {
           "shifts": {
-            "labels": [
-              "MORNING_W",
-              "DAY_W",
-              "EVENING_W",
-              "MORNING_WD",
-              "DAY_WD",
-              "EVENING_WD",
-              "MORNING_D",
-              "DAY_D",
-              "EVENING_D"
-            ]
+            "labels": ["MORNING", "DAY", "EVENING"]
           }
         },
         {
           "shifts": {
-            "labels": ["NIGHT_W_PREV", "NIGHT_WD_PREV", "NIGHT_D_PREV"]
+            "labels": ["NIGHT"]
           }
         }
       ]
@@ -713,41 +738,52 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: night shift(s) followed by day shift(s).
+**JSON equivalent (cooldownConstraint preferred):** Two-day pattern: require at least 1 day rest after night shifts before day shifts.
+
+```json
+{
+  "id": "DONT_ROTATE_BACK_AFTER",
+  "importance": "MEDIUM",
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "starts": {
+    "shifts": {
+      "labels": ["NIGHT"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["MORNING", "DAY", "EVENING"]
+    }
+  },
+  "targets": {
+    "minDays": 1
+  }
+}
+```
+
+Alternatively, **patternConstraint** (undesired pattern: night shift(s) followed by day shift(s)):
 
 ```json
 {
   "id": "DONT_ROTATE_BACK_AFTER",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
         {
           "shifts": {
-            "labels": [
-              "NIGHT_W_NEXT",
-              "NIGHT_W",
-              "NIGHT_WD_NEXT",
-              "NIGHT_WD",
-              "NIGHT_D_NEXT",
-              "NIGHT_D"
-            ]
+            "labels": ["NIGHT"]
           }
         },
         {
           "shifts": {
-            "labels": [
-              "MORNING_W",
-              "DAY_W",
-              "EVENING_W",
-              "MORNING_WD",
-              "DAY_WD",
-              "EVENING_WD",
-              "MORNING_D",
-              "DAY_D",
-              "EVENING_D"
-            ]
+            "labels": ["MORNING", "DAY", "EVENING"]
           }
         }
       ]
@@ -777,36 +813,52 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: evening/night on-duty followed by morning/day.
+**JSON equivalent (cooldownConstraint preferred):** Two-day pattern: require at least 1 day rest after evening/night on-duty before morning/day.
+
+```json
+{
+  "id": "AVOID_ONDUTY_DAY",
+  "importance": "HIGH",
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "starts": {
+    "shifts": {
+      "labels": ["EVENING", "NIGHT"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["MORNING", "DAY"]
+    }
+  },
+  "targets": {
+    "minDays": 1
+  }
+}
+```
+
+Alternatively, **patternConstraint** (undesired pattern: evening/night on-duty followed by morning/day):
 
 ```json
 {
   "id": "AVOID_ONDUTY_DAY",
   "importance": "HIGH",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
         {
           "shifts": {
-            "labels": [
-              "EVENING_WD_NEXT",
-              "EVENING_D_NEXT",
-              "NIGHT_WD_NEXT",
-              "NIGHT_D_NEXT"
-            ]
+            "labels": ["EVENING", "NIGHT"]
           }
         },
         {
           "shifts": {
-            "labels": [
-              "MORNING_W",
-              "DAY_W",
-              "MORNING_WD",
-              "DAY_WD",
-              "MORNING_D",
-              "DAY_D"
-            ]
+            "labels": ["MORNING", "DAY"]
           }
         }
       ]
@@ -836,38 +888,52 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: morning/day followed by evening/night on-duty.
+**JSON equivalent (cooldownConstraint preferred):** Two-day pattern: require at least 1 day rest after morning/day before evening/night on-duty.
+
+```json
+{
+  "id": "AVOID_ONDUTY_DAY_BEFORE",
+  "importance": "HIGH",
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "starts": {
+    "shifts": {
+      "labels": ["MORNING", "DAY"]
+    }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["EVENING", "NIGHT"]
+    }
+  },
+  "targets": {
+    "minDays": 1
+  }
+}
+```
+
+Alternatively, **patternConstraint** (undesired pattern: morning/day followed by evening/night on-duty):
 
 ```json
 {
   "id": "AVOID_ONDUTY_DAY_BEFORE",
   "importance": "HIGH",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
         {
           "shifts": {
-            "labels": [
-              "MORNING_W",
-              "DAY_W",
-              "MORNING_WD",
-              "DAY_WD",
-              "MORNING_D",
-              "DAY_D"
-            ]
+            "labels": ["MORNING", "DAY"]
           }
         },
         {
           "shifts": {
-            "labels": [
-              "EVENING_WD_PREV",
-              "EVENING_D_PREV",
-              "NIGHT_WD_PREV",
-              "NIGHT_WD",
-              "NIGHT_D_PREV",
-              "NIGHT_D"
-            ]
+            "labels": ["EVENING", "NIGHT"]
           }
         }
       ]
@@ -897,27 +963,46 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: evening work followed by evening/night on-duty.
+**JSON equivalent (cooldownConstraint preferred):** Two-day pattern: require at least 1 day rest after evening work before evening/night on-duty.
+
+```json
+{
+  "id": "AVOID_ONDUTY_EVENING_BEFORE",
+  "importance": "HIGH",
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "starts": {
+    "shifts": { "labels": ["EVENING"] }
+  },
+  "ends": {
+    "shifts": {
+      "labels": ["EVENING", "NIGHT"]
+    }
+  },
+  "targets": {
+    "minDays": 1
+  }
+}
+```
+
+Alternatively, **patternConstraint** (undesired pattern: evening work followed by evening/night on-duty):
 
 ```json
 {
   "id": "AVOID_ONDUTY_EVENING_BEFORE",
   "importance": "HIGH",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
-        { "shifts": { "labels": ["EVENING_W"] } },
+        { "shifts": { "labels": ["EVENING"] } },
         {
           "shifts": {
-            "labels": [
-              "EVENING_WD_PREV",
-              "EVENING_D_PREV",
-              "NIGHT_WD_PREV",
-              "NIGHT_WD",
-              "NIGHT_D_PREV",
-              "NIGHT_D"
-            ]
+            "labels": ["EVENING", "NIGHT"]
           }
         }
       ]
@@ -946,13 +1031,16 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: day off → work → day off.
+**JSON equivalent (patternConstraints):** Undesired pattern: day off → work → day off. ScheduleRows 1 and 2 → apply to employees 1 and 2. (Cannot use cooldown: pattern involves DAY_OFF.)
 
 ```json
 {
   "id": "OFF_ON_OFF",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
@@ -989,13 +1077,16 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: work → day off → work.
+**JSON equivalent (patternConstraints):** Undesired pattern: work → day off → work. ScheduleRows 1 and 2 → apply to employees 1 and 2. (Cannot use cooldown: pattern involves DAY_OFF.)
 
 ```json
 {
   "id": "ON_OFF_ON",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
@@ -1036,17 +1127,20 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: evening shift then two days off.
+**JSON equivalent (patternConstraints):** Undesired pattern: evening shift then two days off. ScheduleRows 1 and 2 → apply to employees 1 and 2.
 
 ```json
 {
   "id": "EVENING_OFF_OFF",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
-        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } },
+        { "shifts": { "labels": ["EVENING"] } },
         { "keyword": "DAY_OFF" },
         { "keyword": "DAY_OFF" }
       ]
@@ -1074,17 +1168,20 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: evening shift then day off.
+**JSON equivalent (patternConstraints):** Undesired pattern: evening shift then day off. ScheduleRows 1 and 2 → apply to employees 1 and 2. (Cannot use cooldown: pattern involves DAY_OFF.)
 
 ```json
 {
   "id": "EVENING_OFF",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
-        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } },
+        { "shifts": { "labels": ["EVENING"] } },
         { "keyword": "DAY_OFF" }
       ]
     }
@@ -1112,19 +1209,22 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern: two days off then morning shift.
+**JSON equivalent (patternConstraints):** Undesired pattern: two days off then morning shift. ScheduleRows 1 and 2 → apply to employees 1 and 2.
 
 ```json
 {
   "id": "OFF_OFF_MORNING",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "patternDays": [
         { "keyword": "DAY_OFF" },
         { "keyword": "DAY_OFF" },
-        { "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] } }
+        { "shifts": { "labels": ["MORNING"] } }
       ]
     }
   ]
@@ -1152,13 +1252,16 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern starting Sunday: work → morning → evening.
+**JSON equivalent (patternConstraints):** Undesired pattern starting Sunday: work → morning → evening. ScheduleRows 1 and 2 → apply to employees 1 and 2.
 
 ```json
 {
   "id": "SUN_MORNING_TUE",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "startDays": { "daysOfWeek": ["SUN"] },
@@ -1168,8 +1271,8 @@ and
             "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
           }
         },
-        { "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] } },
-        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } }
+        { "shifts": { "labels": ["MORNING"] } },
+        { "shifts": { "labels": ["EVENING"] } }
       ]
     }
   ]
@@ -1197,13 +1300,16 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern starting Sunday: work → day shift → evening.
+**JSON equivalent (patternConstraints):** Undesired pattern starting Sunday: work → day shift → evening. ScheduleRows 1 and 2 → apply to employees 1 and 2.
 
 ```json
 {
   "id": "SUN_DAY_TUE",
   "importance": "MEDIUM",
   "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
   "patterns": [
     {
       "startDays": { "daysOfWeek": ["SUN"] },
@@ -1213,8 +1319,8 @@ and
             "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
           }
         },
-        { "shifts": { "labels": ["DAY_W", "DAY_WD", "DAY_D"] } },
-        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } }
+        { "shifts": { "labels": ["DAY"] } },
+        { "shifts": { "labels": ["EVENING"] } }
       ]
     }
   ]
@@ -1241,6 +1347,28 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Undesired pattern starting Friday: evening then day off (Friday evening shift then Saturday off). Cannot use cooldown (DAY_OFF). ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "FRIEVEN_SAT",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["FRI"] },
+      "patternDays": [
+        { "shifts": { "labels": ["EVENING"] } },
+        { "keyword": "DAY_OFF" }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### MON_OFF_IF_FRI_SAT_SUN
@@ -1263,7 +1391,29 @@ and
 </ShiftPatternConstraint>
 ```
 
-> **Open question:** How should the `!` (NOT) indicator be done?
+**JSON equivalent (patternConstraints):** Desired pattern starting Friday: work on Fri–Sun, then work (not day off) on Monday. Use `patternDays` with work for all four days so the solver prefers having Monday worked when Fri–Sat–Sun are worked. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "MON_OFF_IF_FRI_SAT_SUN",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["FRI"] },
+      "patternDays": [
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } }
+      ]
+    }
+  ]
+}
+```
 
 ---
 
@@ -1287,6 +1437,30 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Desired pattern starting Friday: day off Friday, then work Sat–Mon. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "FRI_OFF_IF_SAT_SUN_MON",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["FRI"] },
+      "patternDays": [
+        { "keyword": "DAY_OFF" },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### DAYOFF_AFTER_NIGHT_CLUSTER_NEXT
@@ -1304,6 +1478,27 @@ and
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: night shift then work (no day off). Encourages a day off after a night cluster. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "DAYOFF_AFTER_NIGHT_CLUSTER_NEXT",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } }
+      ]
+    }
+  ]
+}
 ```
 
 ---
@@ -1329,6 +1524,27 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Undesired pattern: night cluster then work (no day off). Encourages a day off after nights. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "DAYOFF_AFTER_NIGHT_CLUSTER_PREV",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"] } }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### OFF_EVE_EVE_DAY
@@ -1350,6 +1566,29 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Desired pattern: day off → evening → evening → day. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "OFF_EVE_EVE_DAY",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "patternDays": [
+        { "keyword": "DAY_OFF" },
+        { "shifts": { "labels": ["EVENING"] } },
+        { "shifts": { "labels": ["EVENING"] } },
+        { "shifts": { "labels": ["DAY"] } }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### OFF_DAY_EVE_EVE
@@ -1369,6 +1608,29 @@ and
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Desired pattern: day off → day → evening → evening. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "OFF_DAY_EVE_EVE",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "patternDays": [
+        { "keyword": "DAY_OFF" },
+        { "shifts": { "labels": ["DAY"] } },
+        { "shifts": { "labels": ["EVENING"] } },
+        { "shifts": { "labels": ["EVENING"] } }
+      ]
+    }
+  ]
+}
 ```
 
 ---
@@ -1395,6 +1657,28 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Undesired pattern: night → day off → night. ScheduleRows 1 and 2. (Cannot use cooldown: pattern involves DAY_OFF.)
+
+```json
+{
+  "id": "AVOID_NIGHT_OFF_NIGHT",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "keyword": "DAY_OFF" },
+        { "shifts": { "labels": ["NIGHT"] } }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### AVOID_FRI_EVENING_EVENING
@@ -1413,6 +1697,43 @@ and
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (cooldownConstraint or patternConstraints):** Undesired: two consecutive evenings (e.g. Friday–Saturday). Prefer **cooldownConstraint**: at least 1 day rest after evening before next evening. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "AVOID_FRI_EVENING_EVENING",
+  "importance": "MEDIUM",
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "starts": { "shifts": { "labels": ["EVENING"] } },
+  "ends": { "shifts": { "labels": ["EVENING"] } },
+  "targets": { "minDays": 1 }
+}
+```
+
+Alternatively **patternConstraint** (undesired pattern starting Friday: evening, evening):
+
+```json
+{
+  "id": "AVOID_FRI_EVENING_EVENING",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["FRI"] },
+      "patternDays": [
+        { "shifts": { "labels": ["EVENING"] } },
+        { "shifts": { "labels": ["EVENING"] } }
+      ]
+    }
+  ]
+}
 ```
 
 ---
@@ -1442,6 +1763,29 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Desired pattern starting Friday: three consecutive night shifts. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "PREFER_FRI_NIGHT_NIGHT_NIGHT",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["FRI"] },
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### PREFER_FRI_NIGHT_NIGHT_NIGHT2
@@ -1461,6 +1805,29 @@ and
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Desired pattern starting Saturday: three consecutive night shifts. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "PREFER_FRI_NIGHT_NIGHT_NIGHT2",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["SAT"] },
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } }
+      ]
+    }
+  ]
+}
 ```
 
 ---
@@ -1486,6 +1853,27 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints or consecutiveConstraint):** Desired: two consecutive night shifts. Use **patternConstraint** with (NIGHT, NIGHT), or **consecutiveConstraint** with `targets.min: 2` and `filters.shifts.labels: ["NIGHT"]` to encourage at least 2 nights in a row. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "PREFER_NIGHT_NIGHT",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### PREFER_SAT_NIGHT_NIGHT_NIGHT
@@ -1505,6 +1893,29 @@ and
     <RowNbr>2</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Desired pattern starting Sunday: three consecutive night shifts. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "PREFER_SAT_NIGHT_NIGHT_NIGHT",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["SUN"] },
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } }
+      ]
+    }
+  ]
+}
 ```
 
 ---
@@ -1534,6 +1945,29 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Desired pattern starting Saturday: three consecutive night shifts. ScheduleRows 1 and 2.
+
+```json
+{
+  "id": "PREFER_SAT_NIGHT_NIGHT_NIGHT2",
+  "importance": "MEDIUM",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  },
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["SAT"] },
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } },
+        { "shifts": { "labels": ["NIGHT"] } }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ### max_continous_dayoff#3
@@ -1554,7 +1988,32 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (patternConstraints):** Undesired pattern: four consecutive days off (max 3 in a row). ConsecutiveConstraint applies to consecutive *shifts*, not days off; use patternConstraint to forbid 4× DAY_OFF in a row. ScheduleRows 1 → apply to employee 1.
+
+```json
+{
+  "id": "max_continous_dayoff#3",
+  "importance": "STRICT",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["1"] }
+  },
+  "patterns": [
+    {
+      "patternDays": [
+        { "keyword": "DAY_OFF" },
+        { "keyword": "DAY_OFF" },
+        { "keyword": "DAY_OFF" },
+        { "keyword": "DAY_OFF" }
+      ]
+    }
+  ]
+}
+```
+
 ---
+
+**"X consecutive in a row" (max/min N shifts of a type):** XML patterns that limit or encourage how many consecutive shifts of a given type can occur in a row (e.g. max 3 night shifts in a row, min 1 evening in a row) should be implemented with **consecutiveConstraint**, not patternConstraint. Use `targets.max` for maximum consecutive (requires importance STRICT) and `targets.min` for minimum consecutive (target only). Use `filters.shifts` to restrict by shift type.
 
 ### max_continous_dutycall_shifts#7
 
@@ -1578,6 +2037,22 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (consecutiveConstraint):** Max 7 consecutive ON_CALL shifts in a row. ScheduleRows 1 → apply to employee 1.
+
+```json
+{
+  "id": "max_continous_dutycall_shifts#7",
+  "importance": "STRICT",
+  "filters": {
+    "employees": { "ids": ["1"] },
+    "shifts": { "labels": ["ON_CALL"] }
+  },
+  "targets": {
+    "max": 7
+  }
+}
+```
+
 ---
 
 ### max_continous_evenings#3
@@ -1596,6 +2071,22 @@ and
     <RowNbr>1</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (consecutiveConstraint):** Max 3 consecutive evening shifts in a row. ScheduleRows 1 → apply to employee 1.
+
+```json
+{
+  "id": "max_continous_evenings#3",
+  "importance": "STRICT",
+  "filters": {
+    "employees": { "ids": ["1"] },
+    "shifts": { "labels": ["EVENING"] }
+  },
+  "targets": {
+    "max": 3
+  }
+}
 ```
 
 ---
@@ -1626,23 +2117,19 @@ and
 </ShiftPatternConstraint>
 ```
 
-**JSON equivalent (patternConstraints):** Undesired pattern of 4 consecutive days of night shifts (max 3 in a row). Define one pattern with 4 pattern days, each allowing night shift types; use importance STRICT to make it hard.
+**JSON equivalent (consecutiveConstraint):** Max 3 consecutive night shifts in a row. Use `targets.max` with importance STRICT and filter by night shift labels. ScheduleRows 1 → apply to employee 1.
 
 ```json
 {
   "id": "max_continous_nights#3",
   "importance": "STRICT",
-  "isDesired": false,
-  "patterns": [
-    {
-      "patternDays": [
-        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } },
-        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } },
-        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } },
-        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } }
-      ]
-    }
-  ]
+  "filters": {
+    "employees": { "ids": ["1"] },
+    "shifts": { "labels": ["NIGHT"] }
+  },
+  "targets": {
+    "max": 3
+  }
 }
 ```
 
@@ -1662,6 +2149,22 @@ and
     <RowNbr>1</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (consecutiveConstraint):** Max 1 consecutive ON_DUTY shift in a row (no two ON_DUTY days in a row). ScheduleRows 1 → apply to employee 1.
+
+```json
+{
+  "id": "max_continous_onduty_shifts#1",
+  "importance": "STRICT",
+  "filters": {
+    "employees": { "ids": ["1"] },
+    "shifts": { "labels": ["ON_DUTY"] }
+  },
+  "targets": {
+    "max": 1
+  }
+}
 ```
 
 ---
@@ -1686,6 +2189,22 @@ and
 </ShiftPatternConstraint>
 ```
 
+**JSON equivalent (consecutiveConstraint):** Max 5 consecutive work days (WORK or ON_DUTY) in a row. ScheduleRows 1 → apply to employee 1.
+
+```json
+{
+  "id": "max_continous_shifts#5",
+  "importance": "STRICT",
+  "filters": {
+    "employees": { "ids": ["1"] },
+    "shifts": { "labels": ["WORK", "ON_DUTY"] }
+  },
+  "targets": {
+    "max": 5
+  }
+}
+```
+
 ---
 
 ### min_continous_evenings#1
@@ -1702,6 +2221,22 @@ and
     <RowNbr>1</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (consecutiveConstraint):** Min 1 consecutive evening shift when working evenings (undesired pattern in XML is “not evening” twice in a row). Use `targets.min` as a target; the solver will try to avoid single isolated evening shifts.
+
+```json
+{
+  "id": "min_continous_evenings#1",
+  "importance": "MEDIUM",
+  "filters": {
+    "employees": { "ids": ["1"] },
+    "shifts": { "labels": ["EVENING"] }
+  },
+  "targets": {
+    "min": 1
+  }
+}
 ```
 
 ---
@@ -1724,6 +2259,22 @@ and
     <RowNbr>1</RowNbr>
   </ScheduleRows>
 </ShiftPatternConstraint>
+```
+
+**JSON equivalent (consecutiveConstraint):** Min 1 consecutive night shift when working nights (undesired pattern in XML is “not night” twice in a row). Use `targets.min` as a target.
+
+```json
+{
+  "id": "min_continous_nights#1",
+  "importance": "MEDIUM",
+  "filters": {
+    "employees": { "ids": ["1"] },
+    "shifts": { "labels": ["NIGHT"] }
+  },
+  "targets": {
+    "min": 1
+  }
+}
 ```
 
 ---
@@ -1829,7 +2380,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
       },
       "filters": {
         "employees": { "ids": ["1"] },
-        "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] }
+        "shifts": { "labels": ["MORNING"] }
       },
       "periods": {
         "recurrentDefinition": { "daysPerPeriod": 7 }
@@ -1842,7 +2393,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
       },
       "filters": {
         "employees": { "ids": ["2"] },
-        "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] }
+        "shifts": { "labels": ["MORNING"] }
       },
       "periods": {
         "recurrentDefinition": { "daysPerPeriod": 7 }
@@ -1894,7 +2445,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
       },
       "filters": {
         "employees": { "ids": ["1"] },
-        "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] }
+        "shifts": { "labels": ["EVENING"] }
       },
       "periods": {
         "recurrentDefinition": { "daysPerPeriod": 7 }
@@ -1907,7 +2458,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
       },
       "filters": {
         "employees": { "ids": ["2"] },
-        "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] }
+        "shifts": { "labels": ["EVENING"] }
       },
       "periods": {
         "recurrentDefinition": { "daysPerPeriod": 7 }
@@ -1969,20 +2520,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
       "filters": {
         "employees": { "ids": ["1"] },
         "shifts": {
-          "labels": [
-            "NIGHT_W_PREV",
-            "NIGHT_W_NEXT",
-            "NIGHT_W",
-            "EVENING_W_NEXT",
-            "NIGHT_WD_PREV",
-            "NIGHT_WD_NEXT",
-            "NIGHT_WD",
-            "EVENING_WD_NEXT",
-            "NIGHT_D_PREV",
-            "NIGHT_D_NEXT",
-            "NIGHT_D",
-            "EVENING_D_NEXT"
-          ]
+          "labels": ["NIGHT", "EVENING"]
         }
       },
       "periods": {
@@ -1997,20 +2535,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
       "filters": {
         "employees": { "ids": ["2"] },
         "shifts": {
-          "labels": [
-            "NIGHT_W_PREV",
-            "NIGHT_W_NEXT",
-            "NIGHT_W",
-            "EVENING_W_NEXT",
-            "NIGHT_WD_PREV",
-            "NIGHT_WD_NEXT",
-            "NIGHT_WD",
-            "EVENING_WD_NEXT",
-            "NIGHT_D_PREV",
-            "NIGHT_D_NEXT",
-            "NIGHT_D",
-            "EVENING_D_NEXT"
-          ]
+          "labels": ["NIGHT", "EVENING"]
         }
       },
       "periods": {
@@ -2219,7 +2744,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
     "maxShifts": 8
   },
   "filters": {
-    "shifts": { "labels": ["EVENING_W", "EVENING_W_NEXT"] }
+    "shifts": { "labels": ["EVENING"] }
   },
   "periods": {
     "recurrentDefinition": { "daysPerPeriod": 7 }
@@ -2260,13 +2785,7 @@ Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shift
   },
   "filters": {
     "shifts": {
-      "labels": [
-        "NIGHT_W_NEXT",
-        "NIGHT_WD_NEXT",
-        "NIGHT_W",
-        "NIGHT_W_PREV",
-        "NIGHT_WD_PREV"
-      ]
+      "labels": ["NIGHT"]
     }
   },
   "periods": {
