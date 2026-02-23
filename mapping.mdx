@@ -1,0 +1,2708 @@
+# XML Constraint Examples — Mapping Reference
+
+This document maps legacy XML constraint types to their counterparts and provides example definitions for each. **JSON equivalents** use the API constraint types from the [API reference](/api-reference) and constraint docs ([Employee Availability](/constraints/employee-availability), [Employee Utilization](/constraints/employee-utilization), [Cooldown](/constraints/cooldown), [Consecutive](/constraints/consecutive), [Pattern](/constraints/pattern), [Periodic Rest](/constraints/periodic-rest), [Period Distribution](/constraints/period-distribution), [Fairness](/constraints/fairness)).
+
+---
+
+## AdjustedTimeConstraints ⇒ _TBD_
+
+### RESCHEDULE_FAIR_HOURS
+
+```xml
+<AdjustedTimeConstraint>
+  <Id>RESCHEDULE_FAIR_HOURS</Id>
+  <Weight>90</Weight>
+  <RateAdjustFairness>false</RateAdjustFairness>
+  <Types>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Types>
+</AdjustedTimeConstraint>
+```
+
+**JSON equivalent:** No direct mapping yet. When available, this will likely map to a fairness constraint over working-hours distribution for work types WORK and ON_DUTY.
+
+---
+
+## BlockedHoursConstraint ⇒ EmployeeAvailabilityConstraint
+
+### Example
+
+```xml
+<BlockedHoursConstraint>
+  <Block>
+    <WeekDay>1</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+  </Block>
+  <Block>
+    <WeekDay>2</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+  </Block>
+  <Block>
+    <WeekDay>3</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+  </Block>
+  <ScheduleRows>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</BlockedHoursConstraint>
+```
+
+**JSON equivalent (employeeAvailabilityConstraints):**
+
+```json
+{
+  "id": "blocked-hours-row2",
+  "importance": "STRICT",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["2"] }
+  },
+  "periods": {
+    "days": {
+      "daysOfWeek": ["MON", "TUE", "WED"]
+    }
+  }
+}
+```
+
+---
+
+## ConsecutiveTimeOffConstraint ⇒ PeriodicRestConstraint
+
+### min_longweekends#1#1
+
+```xml
+<ConsecutiveTimeOffConstraint>
+  <Id>min_longweekends#1#1</Id>
+  <Weight>100</Weight>
+  <MinNumberOfDays>1</MinNumberOfDays>
+  <MinNumberOfWeeks>1</MinNumberOfWeeks>
+  <Type>DAY_BASED</Type>
+  <RequiredWeekDays>
+    <WeekDay>5</WeekDay>
+    <WeekDay>6</WeekDay>
+    <WeekDay>7</WeekDay>
+  </RequiredWeekDays>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ConsecutiveTimeOffConstraint>
+```
+
+**JSON equivalent (consecutiveTimeOffConstraint):** Requires at least 1 consecutive day off that includes Friday–Sunday, in at least 1 week.
+
+```json
+{
+  "id": "min_longweekends#1#1",
+  "importance": "STRICT",
+  "dayOffType": "DAY_BETWEEN_SHIFTS",
+  "minNumberOfDays": 1,
+  "minNumberOfWeeks": 1,
+  "requiredWeekDaysOff": [5, 6, 7],
+  "filters": {
+    "employees": { "ids": ["1"] }
+  }
+}
+```
+
+**JSON equivalent (periodicRestConstraint):** Same intent via minimum continuous rest per week (e.g. 24 hours covering a weekend day).
+
+```json
+{
+  "id": "min_longweekends#1#1",
+  "importance": "STRICT",
+  "targets": {
+    "continuousRest": { "minHours": 24 }
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 3
+      "daysBetweenStarts": 7
+      "startDay": {
+        "date": "2026-02-27" // Start on first Friday of the roster
+      }
+    }
+  },
+  "filters": {
+    "employees": { "ids": ["1"] }
+  }
+}
+```
+
+---
+
+## DayRestRule ⇒ periodicRestConstraints
+
+```xml
+<DayRestRule>
+  <Id>013N000BB001</Id>
+  <Type>TIME</Type>
+  <MinRestHours>9</MinRestHours>
+  <TimeStart>1:00</TimeStart>
+</DayRestRule>
+```
+
+**JSON equivalent (periodicRestConstraint):** Minimum 9 hours continuous rest per period. Use periods to align with your “day” (e.g. 24h or custom window from 01:00).
+
+```json
+{
+  "id": "013N000BB001",
+  "importance": "STRICT",
+  "targets": {
+    "continuousRest": { "minHours": 9 }
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 1,
+      "daysBetweenStarts": 1
+    }
+  }
+}
+```
+
+For a fixed daily window starting at 01:00, define periods via `customDefinitions` or use **cooldownConstraint** with `targets.minHours: 9` between shifts.
+
+---
+
+## NewWorkingDayConstraints ⇒ _TBD_
+
+### RESCHEDULE_FAIR_DAYS
+
+```xml
+<NewWorkingDayConstraint>
+  <Id>RESCHEDULE_FAIR_DAYS</Id>
+  <Weight>85</Weight>
+  <WeekDays>1#2#3#4#5#6#7</WeekDays>
+  <Types>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Types>
+</NewWorkingDayConstraint>
+```
+
+**JSON equivalent (newWorkingDayConstraint):** Rescheduling: prefer reusing existing working days for WORK and ON_DUTY (all weekdays).
+
+```json
+{
+  "id": "RESCHEDULE_FAIR_DAYS",
+  "workloadCategories": ["WORK", "ON_DUTY"]
+}
+```
+
+### RESCHEDULE_FAIR_DAYS_WEEKEND
+
+```xml
+<NewWorkingDayConstraint>
+  <Id>RESCHEDULE_FAIR_DAYS_WEEKEND</Id>
+  <Weight>99</Weight>
+  <WeekDays>6#7</WeekDays>
+  <Types>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Types>
+</NewWorkingDayConstraint>
+```
+
+**JSON equivalent (newWorkingDayConstraint):** Same as above but scoped to weekend days (Saturday=6, Sunday=7). Use when your payload or solver supports restricting which days count as “new working days” (e.g. via configuration or a separate weekend-specific constraint).
+
+```json
+{
+  "id": "RESCHEDULE_FAIR_DAYS_WEEKEND",
+  "workloadCategories": ["WORK", "ON_DUTY"]
+}
+```
+
+---
+
+## PointConstraint ⇒ EmployeeAvailabilityConstraint
+
+### PREFERABLE_HOURS
+
+```xml
+<PointConstraint>
+  <Id>PREFERABLE_HOURS</Id>
+  <Weight>99</Weight>
+  <Interval>
+    <!-- Weekday 1=Monday ... 7=Sunday !-->
+    <WeekDay>1</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>06:00</TimeEnd>
+    <Points>4</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>2</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>06:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>3</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>06:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>4</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>06:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>5</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>06:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>1</WeekDay>
+    <TimeStart>19:00</TimeStart>
+    <TimeEnd>22:00</TimeEnd>
+    <Points>1</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>2</WeekDay>
+    <TimeStart>19:00</TimeStart>
+    <TimeEnd>22:00</TimeEnd>
+    <Points>1</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>3</WeekDay>
+    <TimeStart>19:00</TimeStart>
+    <TimeEnd>22:00</TimeEnd>
+    <Points>1</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>4</WeekDay>
+    <TimeStart>19:00</TimeStart>
+    <TimeEnd>22:00</TimeEnd>
+    <Points>1</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>5</WeekDay>
+    <TimeStart>19:00</TimeStart>
+    <TimeEnd>22:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>1</WeekDay>
+    <TimeStart>22:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>2</WeekDay>
+    <TimeStart>22:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>3</WeekDay>
+    <TimeStart>22:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>4</WeekDay>
+    <TimeStart>22:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+    <Points>2</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>5</WeekDay>
+    <TimeStart>22:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+    <Points>8</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>6</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+    <Points>8</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <Interval>
+    <WeekDay>7</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>24:00</TimeEnd>
+    <Points>8</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</PointConstraint>
+```
+
+**JSON equivalent (employeeAvailabilityConstraints):** Desired availability for WORK on specific weekday/time windows. Use one constraint per “weight” band or combine periods; importance reflects strength.
+
+```json
+{
+  "id": "PREFERABLE_HOURS",
+  "importance": "HIGH",
+  "isDesired": true,
+  "filters": {
+    "employees": { "ids": ["1", "2"] },
+    "work": { "workloadCategories": ["WORK"] }
+  },
+  "periods": {
+    "days": {
+      "daysOfWeek": ["MON", "TUE", "WED", "THU", "FRI"],
+      "endTime": "06:00"
+    }
+  }
+}
+```
+
+For multiple intervals with different preferences, use multiple **employeeAvailabilityConstraint** objects (e.g. one for early morning weekdays, one for evening, one for late evening, one for weekend full day) each with its own `id` and `importance`.
+
+> **Open questions:**
+>
+> - How to put the weight differently in separate constraints?
+> - How to add Weekday and time interval in the best way?
+
+---
+
+### NON_PREFERABLE_HOURS
+
+```xml
+<PointConstraint>
+  <Id>NON_PREFERABLE_HOURS</Id>
+  <Weight>-99</Weight>
+  <Interval>
+    <WeekDay>1</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>06:00</TimeEnd>
+    <Points>4</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <!-- ... additional intervals ... -->
+  <ScheduleRows>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</PointConstraint>
+```
+
+**JSON equivalent (employeeAvailabilityConstraints):** Undesired availability for the same weekday/time intervals; higher importance = stronger avoidance.
+
+```json
+{
+  "id": "NON_PREFERABLE_HOURS",
+  "importance": "HIGH",
+  "isDesired": false,
+  "filters": {
+    "employees": { "ids": ["2"] },
+    "work": { "workloadCategories": ["WORK"] }
+  },
+  "periods": {
+    "days": {
+      "daysOfWeek": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+    }
+  }
+}
+```
+
+---
+
+### FAIR_NON_PREFERABLE_HOURS
+
+```xml
+<PointConstraint>
+  <Id>FAIR_NON_PREFERABLE_HOURS</Id>
+  <Weight>0</Weight>
+  <Fairness>50</Fairness>
+  <RateAdjustFairness>true</RateAdjustFairness>
+  <Interval>
+    <WeekDay>1</WeekDay>
+    <TimeStart>00:00</TimeStart>
+    <TimeEnd>06:00</TimeEnd>
+    <Points>4</Points>
+    <Type>WORK</Type>
+  </Interval>
+  <!-- ... additional intervals ... -->
+  <ScheduleRows>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</PointConstraint>
+```
+
+**JSON equivalent:** Use an **employeeAvailabilityConstraint** with `isDesired: false` for the same periods, plus a **fairnessConstraint** that references the constraint ids of per-employee (or per-group) availability constraints so (un)desired hours are distributed fairly.
+
+```json
+{
+  "constraints": {
+    "employeeAvailabilityConstraints": [
+      {
+        "id": "FAIR_NON_PREFERABLE_1",
+        "importance": "NONE",
+        "isDesired": false,
+        "filters": {
+          "employees": { "ids": ["1", "2"] }
+        },
+        "periods": {
+          "days": {
+            "daysOfWeek": ["MON"],
+            "endTime": "06:00"
+          }
+        }
+      }
+    ],
+    "fairnessConstraints": [
+      {
+        "id": "FAIR_NON_PREFERABLE_HOURS",
+        "importance": "HIGH",
+        "filters": {
+          "constraints": {
+            "ids": ["FAIR_NON_PREFERABLE_1"]
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+---
+
+## RestBetweenShiftsConstraint
+
+### min_hours_between_shifts#13
+
+```xml
+<RestBetweenShiftsConstraint>
+  <Id>min_hours_between_shifts#13</Id>
+  <MinRestHours>13</MinRestHours>
+  <Types>
+    <Type>WORK</Type>
+  </Types>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</RestBetweenShiftsConstraint>
+```
+
+**JSON equivalent (cooldownConstraints):** Minimum 13 hours rest between any two shifts. Omit `starts`/`ends` to apply between all shifts; use `starts`/`ends` with shift labels to restrict to specific shift types.
+
+```json
+{
+  "id": "min_hours_between_shifts#13",
+  "importance": "STRICT",
+  "targets": {
+    "minHours": 13
+  },
+  "filters": {
+    "employees": { "ids": ["1"] }
+  }
+}
+```
+
+---
+
+## ShiftLayoutConstraint ⇒ RestBetweenShifts
+
+### days_between_undesirable#2
+
+```xml
+<ShiftLayoutConstraints>
+  <ShiftLayoutConstraint>
+    <Id>days_between_undesirable#2</Id>
+    <Weight>100</Weight>
+    <MinDays>2</MinDays>
+    <Shifts>
+      <Name>UNDESIRABLE</Name>
+    </Shifts>
+    <ScheduleRows>
+      <RowNbr>1</RowNbr>
+    </ScheduleRows>
+  </ShiftLayoutConstraint>
+</ShiftLayoutConstraints>
+```
+
+**JSON equivalent (cooldownConstraints):** At least 2 full days between shifts with label UNDESIRABLE for the same employee.
+
+```json
+{
+  "id": "days_between_undesirable#2",
+  "importance": "STRICT",
+  "starts": {
+    "shifts": { "labels": ["UNDESIRABLE"] }
+  },
+  "ends": {
+    "shifts": { "labels": ["UNDESIRABLE"] }
+  },
+  "targets": {
+    "minDays": 2
+  },
+  "filters": {
+    "employees": { "ids": ["1"] }
+  }
+}
+```
+
+---
+
+## ShiftPatternConstraint ⇒ Pattern
+
+_Weekday 1 = Monday … 7 = Sunday._
+
+### BOTH_SATSUN (two constraints)
+
+```xml
+<ShiftPatternConstraint>
+  <Id>BOTH_SATSUN1</Id>
+  <Weight>-90</Weight>
+  <WeekDayStart>6</WeekDayStart>
+  <Pattern>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+and
+
+```xml
+<ShiftPatternConstraint>
+  <Id>BOTH_SATSUN2</Id>
+  <Weight>-90</Weight>
+  <WeekDayStart>6</WeekDayStart>
+  <Pattern>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Two undesired patterns for the weekend: (work, day off) and (day off, work). Use `periods` with a recurrent weekend definition so the pattern is evaluated per weekend.
+
+```json
+{
+  "id": "BOTH_SATSUN",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["SAT"] },
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
+          }
+        },
+        { "keyword": "DAY_OFF" }
+      ]
+    },
+    {
+      "startDays": { "daysOfWeek": ["SAT"] },
+      "patternDays": [
+        { "keyword": "DAY_OFF" },
+        {
+          "shifts": {
+            "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### DONT_ROTATE_BACK_BEFORE
+
+```xml
+<ShiftPatternConstraint>
+  <Id>DONT_ROTATE_BACK_BEFORE</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>
+      MORNING_W#DAY_W#EVENING_W#MORNING_WD#DAY_WD#EVENING_WD#MORNING_D#DAY_D#EVENING_D
+    </ShiftType>
+    <ShiftType>NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: day shift(s) followed by night shift(s).
+
+```json
+{
+  "id": "DONT_ROTATE_BACK_BEFORE",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": [
+              "MORNING_W",
+              "DAY_W",
+              "EVENING_W",
+              "MORNING_WD",
+              "DAY_WD",
+              "EVENING_WD",
+              "MORNING_D",
+              "DAY_D",
+              "EVENING_D"
+            ]
+          }
+        },
+        {
+          "shifts": {
+            "labels": ["NIGHT_W_PREV", "NIGHT_WD_PREV", "NIGHT_D_PREV"]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### DONT_ROTATE_BACK_AFTER
+
+```xml
+<ShiftPatternConstraint>
+  <Id>DONT_ROTATE_BACK_AFTER</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      MORNING_W#DAY_W#EVENING_W#MORNING_WD#DAY_WD#EVENING_WD#MORNING_D#DAY_D#EVENING_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: night shift(s) followed by day shift(s).
+
+```json
+{
+  "id": "DONT_ROTATE_BACK_AFTER",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": [
+              "NIGHT_W_NEXT",
+              "NIGHT_W",
+              "NIGHT_WD_NEXT",
+              "NIGHT_WD",
+              "NIGHT_D_NEXT",
+              "NIGHT_D"
+            ]
+          }
+        },
+        {
+          "shifts": {
+            "labels": [
+              "MORNING_W",
+              "DAY_W",
+              "EVENING_W",
+              "MORNING_WD",
+              "DAY_WD",
+              "EVENING_WD",
+              "MORNING_D",
+              "DAY_D",
+              "EVENING_D"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### AVOID_ONDUTY_DAY
+
+```xml
+<ShiftPatternConstraint>
+  <Id>AVOID_ONDUTY_DAY</Id>
+  <Weight>-99</Weight>
+  <Pattern>
+    <ShiftType>
+      EVENING_WD_NEXT#EVENING_D_NEXT#NIGHT_WD_NEXT#NIGHT_D_NEXT
+    </ShiftType>
+    <ShiftType>MORNING_W#DAY_W#MORNING_WD#DAY_WD#MORNING_D#DAY_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: evening/night on-duty followed by morning/day.
+
+```json
+{
+  "id": "AVOID_ONDUTY_DAY",
+  "importance": "HIGH",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": [
+              "EVENING_WD_NEXT",
+              "EVENING_D_NEXT",
+              "NIGHT_WD_NEXT",
+              "NIGHT_D_NEXT"
+            ]
+          }
+        },
+        {
+          "shifts": {
+            "labels": [
+              "MORNING_W",
+              "DAY_W",
+              "MORNING_WD",
+              "DAY_WD",
+              "MORNING_D",
+              "DAY_D"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### AVOID_ONDUTY_DAY_BEFORE
+
+```xml
+<ShiftPatternConstraint>
+  <Id>AVOID_ONDUTY_DAY_BEFORE</Id>
+  <Weight>-99</Weight>
+  <Pattern>
+    <ShiftType>MORNING_W#DAY_W#MORNING_WD#DAY_WD#MORNING_D#DAY_D</ShiftType>
+    <ShiftType>
+      EVENING_WD_PREV#EVENING_D_PREV#NIGHT_WD_PREV#NIGHT_WD#NIGHT_D_PREV#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: morning/day followed by evening/night on-duty.
+
+```json
+{
+  "id": "AVOID_ONDUTY_DAY_BEFORE",
+  "importance": "HIGH",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": [
+              "MORNING_W",
+              "DAY_W",
+              "MORNING_WD",
+              "DAY_WD",
+              "MORNING_D",
+              "DAY_D"
+            ]
+          }
+        },
+        {
+          "shifts": {
+            "labels": [
+              "EVENING_WD_PREV",
+              "EVENING_D_PREV",
+              "NIGHT_WD_PREV",
+              "NIGHT_WD",
+              "NIGHT_D_PREV",
+              "NIGHT_D"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### AVOID_ONDUTY_EVENING_BEFORE
+
+```xml
+<ShiftPatternConstraint>
+  <Id>AVOID_ONDUTY_EVENING_BEFORE</Id>
+  <Weight>-99</Weight>
+  <Pattern>
+    <ShiftType>EVENING_W</ShiftType>
+    <ShiftType>
+      EVENING_WD_PREV#EVENING_D_PREV#NIGHT_WD_PREV#NIGHT_WD#NIGHT_D_PREV#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: evening work followed by evening/night on-duty.
+
+```json
+{
+  "id": "AVOID_ONDUTY_EVENING_BEFORE",
+  "importance": "HIGH",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["EVENING_W"] } },
+        {
+          "shifts": {
+            "labels": [
+              "EVENING_WD_PREV",
+              "EVENING_D_PREV",
+              "NIGHT_WD_PREV",
+              "NIGHT_WD",
+              "NIGHT_D_PREV",
+              "NIGHT_D"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### OFF_ON_OFF
+
+```xml
+<ShiftPatternConstraint>
+  <Id>OFF_ON_OFF</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: day off → work → day off.
+
+```json
+{
+  "id": "OFF_ON_OFF",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        { "keyword": "DAY_OFF" },
+        {
+          "shifts": {
+            "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
+          }
+        },
+        { "keyword": "DAY_OFF" }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### ON_OFF_ON
+
+```xml
+<ShiftPatternConstraint>
+  <Id>ON_OFF_ON</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: work → day off → work.
+
+```json
+{
+  "id": "ON_OFF_ON",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
+          }
+        },
+        { "keyword": "DAY_OFF" },
+        {
+          "shifts": {
+            "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### EVENING_OFF_OFF
+
+```xml
+<ShiftPatternConstraint>
+  <Id>EVENING_OFF_OFF</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: evening shift then two days off.
+
+```json
+{
+  "id": "EVENING_OFF_OFF",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } },
+        { "keyword": "DAY_OFF" },
+        { "keyword": "DAY_OFF" }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### EVENING_OFF
+
+```xml
+<ShiftPatternConstraint>
+  <Id>EVENING_OFF</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: evening shift then day off.
+
+```json
+{
+  "id": "EVENING_OFF",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } },
+        { "keyword": "DAY_OFF" }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### OFF_OFF_MORNING
+
+```xml
+<ShiftPatternConstraint>
+  <Id>OFF_OFF_MORNING</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>MORNING_W#MORNING_WD#MORNING_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern: two days off then morning shift.
+
+```json
+{
+  "id": "OFF_OFF_MORNING",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        { "keyword": "DAY_OFF" },
+        { "keyword": "DAY_OFF" },
+        { "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] } }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### SUN_MORNING_TUE
+
+```xml
+<ShiftPatternConstraint>
+  <Id>SUN_MORNING_TUE</Id>
+  <Weight>-90</Weight>
+  <WeekDayStart>7</WeekDayStart>
+  <Pattern>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>MORNING_W#MORNING_WD#MORNING_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern starting Sunday: work → morning → evening.
+
+```json
+{
+  "id": "SUN_MORNING_TUE",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["SUN"] },
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
+          }
+        },
+        { "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] } },
+        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### SUN_DAY_TUE
+
+```xml
+<ShiftPatternConstraint>
+  <Id>SUN_DAY_TUE</Id>
+  <Weight>-90</Weight>
+  <WeekDayStart>7</WeekDayStart>
+  <Pattern>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>DAY_W#DAY_WD#DAY_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern starting Sunday: work → day shift → evening.
+
+```json
+{
+  "id": "SUN_DAY_TUE",
+  "importance": "MEDIUM",
+  "isDesired": false,
+  "patterns": [
+    {
+      "startDays": { "daysOfWeek": ["SUN"] },
+      "patternDays": [
+        {
+          "shifts": {
+            "labels": ["workloadCategory:WORK", "workloadCategory:ON_DUTY"]
+          }
+        },
+        { "shifts": { "labels": ["DAY_W", "DAY_WD", "DAY_D"] } },
+        { "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] } }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### FRIEVEN_SAT
+
+```xml
+<ShiftPatternConstraint>
+  <Id>FRIEVEN_SAT</Id>
+  <Weight>-90</Weight>
+  <WeekDayStart>5</WeekDayStart>
+  <Pattern>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### MON_OFF_IF_FRI_SAT_SUN
+
+```xml
+<ShiftPatternConstraint>
+  <Id>MON_OFF_IF_FRI_SAT_SUN</Id>
+  <Weight>90</Weight>
+  <WeekDayStart>5</WeekDayStart>
+  <Pattern>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>!DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+> **Open question:** How should the `!` (NOT) indicator be done?
+
+---
+
+### FRI_OFF_IF_SAT_SUN_MON
+
+```xml
+<ShiftPatternConstraint>
+  <Id>FRI_OFF_IF_SAT_SUN_MON</Id>
+  <Weight>90</Weight>
+  <WeekDayStart>5</WeekDayStart>
+  <Pattern>
+    <ShiftType>!DAYOFF</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### DAYOFF_AFTER_NIGHT_CLUSTER_NEXT
+
+```xml
+<ShiftPatternConstraint>
+  <Id>DAYOFF_AFTER_NIGHT_CLUSTER_NEXT</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>NIGHT_W_NEXT#NIGHT_WD_NEXT#NIGHT_D_NEXT</ShiftType>
+    <ShiftType>!NIGHT_W_NEXT#NIGHT_WD_NEXT#NIGHT_D_NEXT#DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### DAYOFF_AFTER_NIGHT_CLUSTER_PREV
+
+```xml
+<ShiftPatternConstraint>
+  <Id>DAYOFF_AFTER_NIGHT_CLUSTER_PREV</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>
+      NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV#NIGHT_W#NIGHT_WD#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      !NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV#NIGHT_W#NIGHT_WD#NIGHT_D#DAYOFF
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### OFF_EVE_EVE_DAY
+
+```xml
+<ShiftPatternConstraint>
+  <Id>OFF_EVE_EVE_DAY</Id>
+  <Weight>90</Weight>
+  <Pattern>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>DAY_W#DAY_WD#DAY_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### OFF_DAY_EVE_EVE
+
+```xml
+<ShiftPatternConstraint>
+  <Id>OFF_DAY_EVE_EVE</Id>
+  <Weight>90</Weight>
+  <Pattern>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>DAY_W#DAY_WD#DAY_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### AVOID_NIGHT_OFF_NIGHT
+
+```xml
+<ShiftPatternConstraint>
+  <Id>AVOID_NIGHT_OFF_NIGHT</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>
+      NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>
+      NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### AVOID_FRI_EVENING_EVENING
+
+```xml
+<ShiftPatternConstraint>
+  <Id>AVOID_FRI_EVENING_EVENING</Id>
+  <Weight>-90</Weight>
+  <WeekDayStart>5</WeekDayStart>
+  <Pattern>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### PREFER_FRI_NIGHT_NIGHT_NIGHT
+
+```xml
+<ShiftPatternConstraint>
+  <Id>PREFER_FRI_NIGHT_NIGHT_NIGHT</Id>
+  <Weight>90</Weight>
+  <WeekDayStart>5</WeekDayStart>
+  <Pattern>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### PREFER_FRI_NIGHT_NIGHT_NIGHT2
+
+```xml
+<ShiftPatternConstraint>
+  <Id>PREFER_FRI_NIGHT_NIGHT_NIGHT2</Id>
+  <Weight>90</Weight>
+  <WeekDayStart>6</WeekDayStart>
+  <Pattern>
+    <ShiftType>NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV</ShiftType>
+    <ShiftType>NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV</ShiftType>
+    <ShiftType>NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### PREFER_NIGHT_NIGHT
+
+```xml
+<ShiftPatternConstraint>
+  <Id>PREFER_NIGHT_NIGHT</Id>
+  <Weight>90</Weight>
+  <Pattern>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### PREFER_SAT_NIGHT_NIGHT_NIGHT
+
+```xml
+<ShiftPatternConstraint>
+  <Id>PREFER_SAT_NIGHT_NIGHT_NIGHT</Id>
+  <Weight>90</Weight>
+  <WeekDayStart>7</WeekDayStart>
+  <Pattern>
+    <ShiftType>NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV</ShiftType>
+    <ShiftType>NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV</ShiftType>
+    <ShiftType>NIGHT_W_PREV#NIGHT_WD_PREV#NIGHT_D_PREV</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### PREFER_SAT_NIGHT_NIGHT_NIGHT2
+
+```xml
+<ShiftPatternConstraint>
+  <Id>PREFER_SAT_NIGHT_NIGHT_NIGHT2</Id>
+  <Weight>90</Weight>
+  <WeekDayStart>6</WeekDayStart>
+  <Pattern>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### max_continous_dayoff#3
+
+```xml
+<ShiftPatternConstraint>
+  <Id>max_continous_dayoff#3</Id>
+  <Weight>-90</Weight>
+  <Pattern>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+    <ShiftType>DAYOFF</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### max_continous_dutycall_shifts#7
+
+```xml
+<ShiftPatternConstraint>
+  <Id>max_continous_dutycall_shifts#7</Id>
+  <Weight>-100</Weight>
+  <Pattern>
+    <ShiftType>ON_CALL</ShiftType>
+    <ShiftType>ON_CALL</ShiftType>
+    <ShiftType>ON_CALL</ShiftType>
+    <ShiftType>ON_CALL</ShiftType>
+    <ShiftType>ON_CALL</ShiftType>
+    <ShiftType>ON_CALL</ShiftType>
+    <ShiftType>ON_CALL</ShiftType>
+    <ShiftType>ON_CALL</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### max_continous_evenings#3
+
+```xml
+<ShiftPatternConstraint>
+  <Id>max_continous_evenings#3</Id>
+  <Weight>-100</Weight>
+  <Pattern>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### max_continous_nights#3
+
+```xml
+<ShiftPatternConstraint>
+  <Id>max_continous_nights#3</Id>
+  <Weight>-100</Weight>
+  <Pattern>
+    <ShiftType>
+      NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+**JSON equivalent (patternConstraints):** Undesired pattern of 4 consecutive days of night shifts (max 3 in a row). Define one pattern with 4 pattern days, each allowing night shift types; use importance STRICT to make it hard.
+
+```json
+{
+  "id": "max_continous_nights#3",
+  "importance": "STRICT",
+  "isDesired": false,
+  "patterns": [
+    {
+      "patternDays": [
+        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } },
+        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } },
+        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } },
+        { "shifts": { "labels": ["NIGHT_W", "NIGHT_WD", "NIGHT_D"] } }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### max_continous_onduty_shifts#1
+
+```xml
+<ShiftPatternConstraint>
+  <Id>max_continous_onduty_shifts#1</Id>
+  <Weight>-100</Weight>
+  <Pattern>
+    <ShiftType>ON_DUTY</ShiftType>
+    <ShiftType>ON_DUTY</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### max_continous_shifts#5
+
+```xml
+<ShiftPatternConstraint>
+  <Id>max_continous_shifts#5</Id>
+  <Weight>-100</Weight>
+  <Pattern>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+    <ShiftType>WORK#ON_DUTY</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### min_continous_evenings#1
+
+```xml
+<ShiftPatternConstraint>
+  <Id>min_continous_evenings#1</Id>
+  <Weight>-100</Weight>
+  <Pattern>
+    <ShiftType>!EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+    <ShiftType>!EVENING_W#EVENING_WD#EVENING_D</ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+### min_continous_nights#1
+
+```xml
+<ShiftPatternConstraint>
+  <Id>min_continous_nights#1</Id>
+  <Weight>-100</Weight>
+  <Pattern>
+    <ShiftType>
+      !NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+    <ShiftType>
+      !NIGHT_W_PREV#NIGHT_W_NEXT#NIGHT_W#NIGHT_WD_PREV#NIGHT_WD_NEXT#NIGHT_WD#NIGHT_D_PREV#NIGHT_D_NEXT#NIGHT_D
+    </ShiftType>
+  </Pattern>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftPatternConstraint>
+```
+
+---
+
+## ShiftUtilizationConstraint ⇒ EmployeeUtilizationConstraint
+
+Use **employeeUtilizationConstraints** for targets (min/ideal/max hours or shifts per period). Pair with **fairnessConstraints** to distribute utilization fairly across employees.
+
+### FAIR_WORKDAYS
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>FAIR_WORKDAYS</Id>
+  <Weight>10</Weight>
+  <Fairness>99</Fairness>
+  <RateAdjustFairness>true</RateAdjustFairness>
+  <MaxOccurrence>0</MaxOccurrence>
+  <Shifts>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraint + fairnessConstraint):** Fair distribution of work days (WORK/ON_DUTY) over employees. Define one utilization constraint per employee (or per group) with the same period and work types; then a fairness constraint over those constraint ids so the solver balances the number of work days.
+
+```json
+{
+  "employeeUtilizationConstraints": [
+    {
+      "id": "FAIR_WORKDAYS_1",
+      "targets": {
+        "idealShifts": 15
+      },
+      "filters": {
+        "employees": { "ids": ["1"] },
+        "work": { "workloadCategories": ["WORK", "ON_DUTY"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    },
+    {
+      "id": "FAIR_WORKDAYS_2",
+      "targets": {
+        "idealShifts": 15
+      },
+      "filters": {
+        "employees": { "ids": ["2"] },
+        "work": { "workloadCategories": ["WORK", "ON_DUTY"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    }
+  ],
+  "fairnessConstraints": [
+    {
+      "id": "FAIR_WORKDAYS",
+      "importance": "VERY_HIGH",
+      "constraintIds": ["FAIR_WORKDAYS_1", "FAIR_WORKDAYS_2"]
+    }
+  ]
+}
+```
+
+---
+
+### FAIR_MORNINGS
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>FAIR_MORNINGS</Id>
+  <Weight>0</Weight>
+  <Fairness>90</Fairness>
+  <RateAdjustFairness>true</RateAdjustFairness>
+  <MaxOccurrence>0</MaxOccurrence>
+  <Shifts>
+    <Type>MORNING_W</Type>
+    <Type>MORNING_WD</Type>
+    <Type>MORNING_D</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraint + fairnessConstraint):** Fair distribution of morning shifts.
+
+```json
+{
+  "employeeUtilizationConstraints": [
+    {
+      "id": "FAIR_MORNINGS_1",
+      "targets": {
+        "idealShifts": 5
+      },
+      "filters": {
+        "employees": { "ids": ["1"] },
+        "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    },
+    {
+      "id": "FAIR_MORNINGS_2",
+      "targets": {
+        "idealShifts": 5
+      },
+      "filters": {
+        "employees": { "ids": ["2"] },
+        "shifts": { "labels": ["MORNING_W", "MORNING_WD", "MORNING_D"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    }
+  ],
+  "fairnessConstraints": [
+    {
+      "id": "FAIR_MORNINGS",
+      "importance": "HIGH",
+      "constraintIds": ["FAIR_MORNINGS_1", "FAIR_MORNINGS_2"]
+    }
+  ]
+}
+```
+
+---
+
+### FAIR_EVENINGS
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>FAIR_EVENINGS</Id>
+  <Weight>0</Weight>
+  <Fairness>90</Fairness>
+  <RateAdjustFairness>true</RateAdjustFairness>
+  <MaxOccurrence>0</MaxOccurrence>
+  <Shifts>
+    <Type>EVENING_W</Type>
+    <Type>EVENING_WD</Type>
+    <Type>EVENING_D</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraint + fairnessConstraint):** Fair distribution of evening shifts; one utilization constraint per employee and a fairness constraint over their ids.
+
+```json
+{
+  "employeeUtilizationConstraints": [
+    {
+      "id": "FAIR_EVENINGS_1",
+      "targets": {
+        "idealShifts": 8
+      },
+      "filters": {
+        "employees": { "ids": ["1"] },
+        "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    },
+    {
+      "id": "FAIR_EVENINGS_2",
+      "targets": {
+        "idealShifts": 8
+      },
+      "filters": {
+        "employees": { "ids": ["2"] },
+        "shifts": { "labels": ["EVENING_W", "EVENING_WD", "EVENING_D"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    }
+  ],
+  "fairnessConstraints": [
+    {
+      "id": "FAIR_EVENINGS",
+      "importance": "HIGH",
+      "constraintIds": ["FAIR_EVENINGS_1", "FAIR_EVENINGS_2"]
+    }
+  ]
+}
+```
+
+---
+
+### FAIR_NIGHTS
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>FAIR_NIGHTS</Id>
+  <Weight>0</Weight>
+  <Fairness>90</Fairness>
+  <RateAdjustFairness>true</RateAdjustFairness>
+  <MaxOccurrence>0</MaxOccurrence>
+  <Shifts>
+    <Type>NIGHT_W_PREV</Type>
+    <Type>NIGHT_W_NEXT</Type>
+    <Type>NIGHT_W</Type>
+    <Type>EVENING_W_NEXT</Type>
+    <Type>NIGHT_WD_PREV</Type>
+    <Type>NIGHT_WD_NEXT</Type>
+    <Type>NIGHT_WD</Type>
+    <Type>EVENING_WD_NEXT</Type>
+    <Type>NIGHT_D_PREV</Type>
+    <Type>NIGHT_D_NEXT</Type>
+    <Type>NIGHT_D</Type>
+    <Type>EVENING_D_NEXT</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraint + fairnessConstraint):** Fair distribution of night shifts.
+
+```json
+{
+  "employeeUtilizationConstraints": [
+    {
+      "id": "FAIR_NIGHTS_1",
+      "targets": {
+        "idealShifts": 4
+      },
+      "filters": {
+        "employees": { "ids": ["1"] },
+        "shifts": {
+          "labels": [
+            "NIGHT_W_PREV",
+            "NIGHT_W_NEXT",
+            "NIGHT_W",
+            "EVENING_W_NEXT",
+            "NIGHT_WD_PREV",
+            "NIGHT_WD_NEXT",
+            "NIGHT_WD",
+            "EVENING_WD_NEXT",
+            "NIGHT_D_PREV",
+            "NIGHT_D_NEXT",
+            "NIGHT_D",
+            "EVENING_D_NEXT"
+          ]
+        }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    },
+    {
+      "id": "FAIR_NIGHTS_2",
+      "targets": {
+        "idealShifts": 4
+      },
+      "filters": {
+        "employees": { "ids": ["2"] },
+        "shifts": {
+          "labels": [
+            "NIGHT_W_PREV",
+            "NIGHT_W_NEXT",
+            "NIGHT_W",
+            "EVENING_W_NEXT",
+            "NIGHT_WD_PREV",
+            "NIGHT_WD_NEXT",
+            "NIGHT_WD",
+            "EVENING_WD_NEXT",
+            "NIGHT_D_PREV",
+            "NIGHT_D_NEXT",
+            "NIGHT_D",
+            "EVENING_D_NEXT"
+          ]
+        }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    }
+  ],
+  "fairnessConstraints": [
+    {
+      "id": "FAIR_NIGHTS",
+      "importance": "HIGH",
+      "constraintIds": ["FAIR_NIGHTS_1", "FAIR_NIGHTS_2"]
+    }
+  ]
+}
+```
+
+---
+
+### FAIR_DUTYCALL
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>FAIR_DUTYCALL</Id>
+  <Weight>0</Weight>
+  <Fairness>99</Fairness>
+  <RateAdjustFairness>true</RateAdjustFairness>
+  <MaxOccurrence>0</MaxOccurrence>
+  <Shifts>
+    <Type>ON_CALL</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraint + fairnessConstraint):** Fair distribution of on-call shifts.
+
+```json
+{
+  "employeeUtilizationConstraints": [
+    {
+      "id": "FAIR_DUTYCALL_1",
+      "targets": {
+        "idealShifts": 2
+      },
+      "filters": {
+        "employees": { "ids": ["1"] },
+        "shifts": { "labels": ["workloadCategory:ON_CALL"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    },
+    {
+      "id": "FAIR_DUTYCALL_2",
+      "targets": {
+        "idealShifts": 2
+      },
+      "filters": {
+        "employees": { "ids": ["2"] },
+        "shifts": { "labels": ["workloadCategory:ON_CALL"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    }
+  ],
+  "fairnessConstraints": [
+    {
+      "id": "FAIR_DUTYCALL",
+      "importance": "HIGH",
+      "constraintIds": ["FAIR_DUTYCALL_1", "FAIR_DUTYCALL_2"]
+    }
+  ]
+}
+```
+
+---
+
+### FAIR_ONDUTY
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>FAIR_ONDUTY</Id>
+  <Weight>0</Weight>
+  <Fairness>99</Fairness>
+  <RateAdjustFairness>true</RateAdjustFairness>
+  <MaxOccurrence>0</MaxOccurrence>
+  <Shifts>
+    <Type>ON_DUTY</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraint + fairnessConstraint):** Fair distribution of on-duty shifts.
+
+```json
+{
+  "employeeUtilizationConstraints": [
+    {
+      "id": "FAIR_ONDUTY_1",
+      "targets": {
+        "idealShifts": 3
+      },
+      "filters": {
+        "employees": { "ids": ["1"] },
+        "work": { "workloadCategories": ["ON_DUTY"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    },
+    {
+      "id": "FAIR_ONDUTY_2",
+      "targets": {
+        "idealShifts": 3
+      },
+      "filters": {
+        "employees": { "ids": ["2"] },
+        "work": { "workloadCategories": ["ON_DUTY"] }
+      },
+      "periods": {
+        "recurrentDefinition": { "daysPerPeriod": 7 }
+      }
+    }
+  ],
+  "fairnessConstraints": [
+    {
+      "id": "FAIR_ONDUTY",
+      "importance": "HIGH",
+      "constraintIds": ["FAIR_ONDUTY_1", "FAIR_ONDUTY_2"]
+    }
+  ]
+}
+```
+
+---
+
+### max_dutycall_shifts#3#
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_dutycall_shifts#3#</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>3</MaxOccurrence>
+  <Shifts>
+    <Type>ON_CALL</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Max 3 on-call shifts per period per employee.
+
+```json
+{
+  "id": "max_dutycall_shifts#3#",
+  "importance": "STRICT",
+  "targets": {
+    "maxShifts": 3
+  },
+  "filters": {
+    "shifts": { "labels": ["workloadCategory:ON_CALL"] }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+### max_evenings#8#
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_evenings#8#</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>8</MaxOccurrence>
+  <Shifts>
+    <Type>EVENING_W</Type>
+    <Type>EVENING_W_NEXT</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Max 8 evening shifts per period per employee.
+
+```json
+{
+  "id": "max_evenings#8#",
+  "importance": "STRICT",
+  "targets": {
+    "maxShifts": 8
+  },
+  "filters": {
+    "shifts": { "labels": ["EVENING_W", "EVENING_W_NEXT"] }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+### max_nights#5#
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_nights#5#</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>5</MaxOccurrence>
+  <Shifts>
+    <Type>NIGHT_W_NEXT</Type>
+    <Type>NIGHT_WD_NEXT</Type>
+    <Type>NIGHT_W</Type>
+    <Type>NIGHT_W_PREV</Type>
+    <Type>NIGHT_WD_PREV</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Max 5 night shifts per period per employee.
+
+```json
+{
+  "id": "max_nights#5#",
+  "importance": "STRICT",
+  "targets": {
+    "maxShifts": 5
+  },
+  "filters": {
+    "shifts": {
+      "labels": [
+        "NIGHT_W_NEXT",
+        "NIGHT_WD_NEXT",
+        "NIGHT_W",
+        "NIGHT_W_PREV",
+        "NIGHT_WD_PREV"
+      ]
+    }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+### max_onduty_shifts#3#0
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_onduty_shifts#3#0</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>3</MaxOccurrence>
+  <Shifts>
+    <Type>ON_DUTY</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Max 3 on-duty shifts per period per employee.
+
+```json
+{
+  "id": "max_onduty_shifts#3#0",
+  "importance": "STRICT",
+  "targets": {
+    "maxShifts": 3
+  },
+  "filters": {
+    "work": { "workloadCategories": ["ON_DUTY"] }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+### max_shift_length#10
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_shift_length#10</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>0</MaxOccurrence>
+  <MinDuration>601</MinDuration>
+  <Shifts>
+    <Type>WORK</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>4</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Cap total hours from long (e.g. ≥10h) WORK shifts per week. Define shifts with appropriate labels and use maxHours per period; shift max duration is typically set in shift definitions.
+
+```json
+{
+  "id": "max_shift_length#10",
+  "importance": "STRICT",
+  "targets": {
+    "maxHours": 80
+  },
+  "filters": {
+    "work": { "workloadCategories": ["WORK"] }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+### max_shift_length#7
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_shift_length#7</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>0</MaxOccurrence>
+  <MinDuration>421</MinDuration>
+  <Shifts>
+    <Type>WORK</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Cap total hours from WORK shifts per period (e.g. row 2); combine with shift definitions for a 7h max length.
+
+```json
+{
+  "id": "max_shift_length#7",
+  "importance": "STRICT",
+  "targets": {
+    "maxHours": 56
+  },
+  "filters": {
+    "employees": { "ids": ["2"] },
+    "work": { "workloadCategories": ["WORK"] }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+### max_undesirable_shifts#4#1
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_undesirable_shifts#4#1</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>4</MaxOccurrence>
+  <MinOccurrence>1</MinOccurrence>
+  <Shifts>
+    <Name>UNDESIRABLE</Name>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Between 1 and 4 shifts with label UNDESIRABLE per period per employee.
+
+```json
+{
+  "id": "max_undesirable_shifts#4#1",
+  "importance": "STRICT",
+  "targets": {
+    "minShifts": 1,
+    "maxShifts": 4
+  },
+  "filters": {
+    "shifts": { "labels": ["UNDESIRABLE"] }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+### max_workdays#23#10
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>max_workdays#23#10</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>23</MaxOccurrence>
+  <MinOccurrence>10</MinOccurrence>
+  <Shifts>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Min 10 and max 23 shifts (WORK or ON_DUTY) per planning period per employee.
+
+```json
+{
+  "id": "max_workdays#23#10",
+  "importance": "STRICT",
+  "targets": {
+    "minShifts": 10,
+    "maxShifts": 23
+  },
+  "filters": {
+    "work": { "workloadCategories": ["WORK", "ON_DUTY"] }
+  }
+}
+```
+
+---
+
+### min_shift_length#4
+
+```xml
+<ShiftUtilizationConstraint>
+  <Id>min_shift_length#4</Id>
+  <Weight>100</Weight>
+  <MaxOccurrence>0</MaxOccurrence>
+  <MaxDuration>239</MaxDuration>
+  <Shifts>
+    <Type>WORK</Type>
+  </Shifts>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+    <RowNbr>4</RowNbr>
+  </ScheduleRows>
+</ShiftUtilizationConstraint>
+```
+
+**JSON equivalent (employeeUtilizationConstraints):** Minimum shift length is typically enforced in shift definitions. To encourage a minimum share of longer shifts per period, use targets with filters and overlapRules.
+
+```json
+{
+  "id": "min_shift_length#4",
+  "importance": "MEDIUM",
+  "targets": {
+    "minHours": 32
+  },
+  "filters": {
+    "work": { "workloadCategories": ["WORK"] }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  }
+}
+```
+
+---
+
+## WeekendDistributionConstraint ⇒ PeriodDistributionConstraint
+
+### FAIR_WEEKENDS
+
+```xml
+<WeekendDistributionConstraint>
+  <Id>FAIR_WEEKENDS</Id>
+  <Weight>0</Weight>
+  <Fairness>99</Fairness>
+  <Percentage>100.00</Percentage>
+  <Types>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Types>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</WeekendDistributionConstraint>
+```
+
+**JSON equivalent (periodDistributionConstraint + fairnessConstraint):** Define a period label "WEEKENDS" in configuration; one period-distribution constraint (e.g. maxWorkedPeriods 0 for “avoid”) per employee or shared, then a fairness constraint over those ids.
+
+```json
+{
+  "periodDistributionConstraints": [
+    {
+      "id": "AVOID_WEEKENDS",
+      "importance": "NONE",
+      "filters": {
+        "employees": { "ids": ["1", "2"] },
+        "work": { "workloadCategories": ["WORK", "ON_DUTY"] }
+      },
+      "maxWorkedPeriods": 0,
+      "periods": {
+        "labels": ["WEEKENDS"]
+      }
+    }
+  ],
+  "fairnessConstraints": [
+    {
+      "id": "FAIR_WEEKENDS",
+      "importance": "VERY_HIGH",
+      "constraintIds": ["AVOID_WEEKENDS"]
+    }
+  ],
+  "configuration": {
+    "periodLabels": [
+      {
+        "label": "WEEKENDS",
+        "periods": {
+          "recurrentDefinition": {
+            "daysPerPeriod": 2,
+            "daysBetweenStarts": 7,
+            "startDay": { "date": "2024-12-21" }
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+_Starts on a Saturday, repeat every 7 days._
+
+---
+
+### max_weekends#2#1
+
+```xml
+<WeekendDistributionConstraint>
+  <Id>max_weekends#2#1</Id>
+  <Weight>100</Weight>
+  <Percentage>50.00</Percentage>
+  <FreeNeighbours>1</FreeNeighbours>
+  <Types>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Types>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</WeekendDistributionConstraint>
+```
+
+**JSON equivalent (periodDistributionConstraint):** Max 2 worked weekends; at least 1 free weekend before and after each worked weekend. Define a "WEEKENDS" label in configuration.periodLabels.
+
+```json
+{
+  "id": "max_weekends#2#1",
+  "importance": "STRICT",
+  "maxWorkedPeriods": 2,
+  "minSurroundingFreePeriods": 1,
+  "filters": {
+    "work": { "workloadCategories": ["WORK", "ON_DUTY"] }
+  },
+  "periods": {
+    "labels": ["WEEKENDS"]
+  }
+}
+```
+
+---
+
+### min_weekends#2#
+
+```xml
+<WeekendDistributionConstraint>
+  <Id>min_weekends#2#</Id>
+  <Weight>100</Weight>
+  <Percentage>50.00</Percentage>
+  <Types>
+    <Type>WORK</Type>
+    <Type>ON_DUTY</Type>
+  </Types>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+  </ScheduleRows>
+</WeekendDistributionConstraint>
+```
+
+**JSON equivalent (periodDistributionConstraint):** Target at least 2 weekends worked per employee (soft target).
+
+```json
+{
+  "id": "min_weekends#2#",
+  "minWorkedPeriods": 2,
+  "filters": {
+    "work": { "workloadCategories": ["WORK", "ON_DUTY"] }
+  },
+  "periods": {
+    "labels": ["WEEKENDS"]
+  }
+}
+```
+
+---
+
+## WeeklyRestConstraint ⇒ periodicRestConstraints
+
+### WEEKLYRESTHOUR_45
+
+```xml
+<WeeklyRestConstraint>
+  <Id>WEEKLYRESTHOUR_45</Id>
+  <Weight>50</Weight>
+  <RestHours>45</RestHours>
+  <ScheduleRows>
+    <RowNbr>1</RowNbr>
+    <RowNbr>2</RowNbr>
+  </ScheduleRows>
+</WeeklyRestConstraint>
+```
+
+**JSON equivalent (periodicRestConstraint):** At least 45 hours continuous rest per week.
+
+```json
+{
+  "id": "WEEKLYRESTHOUR_45",
+  "importance": "MEDIUM",
+  "targets": {
+    "continuousRest": { "minHours": 45 }
+  },
+  "periods": {
+    "recurrentDefinition": { "daysPerPeriod": 7 }
+  },
+  "filters": {
+    "employees": { "ids": ["1", "2"] }
+  }
+}
+```
+
+---
+
+## WeeklyRestRules ⇒ periodicRestConstraints
+
+```xml
+<WeeklyRestRule>
+  <Id>013N002M4001</Id>
+  <NbrOfDays>7</NbrOfDays>
+  <MinRestHours>36</MinRestHours>
+  <DayStart>3</DayStart>
+  <TimeStart>14:00</TimeStart>
+</WeeklyRestRule>
+```
+
+**JSON equivalent (periodicRestConstraint):** At least 36 hours continuous rest in every 7-day period. DayStart=3 (Wednesday) and TimeStart=14:00 can be used to align the period (e.g. Wednesday 14:00 to next Wednesday 14:00) via `periods.recurrentDefinition` with `startDay` and `startTime` if your API supports it.
+
+```json
+{
+  "id": "013N002M4001",
+  "importance": "STRICT",
+  "targets": {
+    "continuousRest": { "minHours": 36 }
+  },
+  "periods": {
+    "recurrentDefinition": {
+      "daysPerPeriod": 7,
+      "startTime": "14:00"
+    }
+  }
+}
+```
