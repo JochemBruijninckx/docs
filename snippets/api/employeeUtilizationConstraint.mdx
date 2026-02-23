@@ -109,17 +109,6 @@
         If a cap is provided, the average number of bonus hours per period will be capped at this value. The employee can be eligible for more bonus hours, but they will not be counted beyond this cap.
       </ResponseField>
     </Expandable>
-    <ResponseField name="defaultTime" type="object">
-      Settings to determine if and how default time rules affect the constraint.
-    </ResponseField>
-    <Expandable title="defaultTime – properties">
-      <ResponseField name="includeDefaultHours" type="boolean">
-        Whether or not default hours should be included in the calculation of an employee's total hours worked for the constraint. Default: true.
-      </ResponseField>
-      <ResponseField name="minOverlapHours" type="number">
-        The minimum number of hours that this constraint should overlap with a day where a default time rule is active. If the overlap is below this amount, the hours from the default time rule will not be counted for this constraint.
-      </ResponseField>
-    </Expandable>
     <ResponseField name="overlapRules" type="object">
       Specifies overlap thresholds that a shift must meet with the constraint's periods in order for it to be counted as relevant for the constraint.
     </ResponseField>

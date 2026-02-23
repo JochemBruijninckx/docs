@@ -893,12 +893,12 @@ components:
           $ref: "#/components/schemas/durationInterval"
           description: If specified, the shift must have a gap (between any two shift
             intervals) that falls inside this range.
-        workTypeIds:
+        workloadCategories:
           type: array
           items:
             type: string
-          description: If specified, the shift must have at least one of the work types
-            specified in this list.
+          description: If specified, the shift must have at least one of the workload
+            categories specified in this list.
           uniqueItems: true
     periodLabelRule:
       type: object
@@ -1345,12 +1345,12 @@ components:
           description: The minimum number of consecutive entities that an employee should
             ideally work. This cannot be set as a strict limit and will be
             treated as a target instead.
-          minimum: 1
+          minimum: 0
         max:
           type: integer
           description: The maximum number of consecutive entities that an employee can
             work. Currently only supports importance STRICT.
-          minimum: 1
+          minimum: 0
     rotationConstraintTargets:
       type: object
       required:
@@ -1791,24 +1791,6 @@ components:
                 can be eligible for more bonus hours, but they will not be
                 counted beyond this cap.
               minimum: 0
-        defaultTime:
-          description: Settings to determine if and how default time rules affect the
-            constraint.
-          type: object
-          properties:
-            includeDefaultHours:
-              type: boolean
-              description: Whether or not default hours should be included in the calculation
-                of an employee's total hours worked for the constraint.
-              default: true
-            minOverlapHours:
-              type: number
-              description: >-
-                The minimum number of hours that this constraint should overlap
-                with a day where a default time rule is active.
-
-                If the overlap is below this amount, the hours from the default
-                time rule will not be counted for this constraint.
         overlapRules:
           description: >-
             Specify when a scheduled shift should count towards the targets of
@@ -2170,6 +2152,52 @@ components:
                 uniqueItems: true
                 items:
                   type: integer
+    fairnessConstraint:
+      type: object
+      required:
+        - id
+        - constraintIds
+      properties:
+        id:
+          $ref: "#/components/schemas/constraintId"
+        importance:
+          description: The importance of adhering to this fairness constraint.
+          $ref: "#/components/schemas/importance"
+        constraintIds:
+          type: array
+          description: List of constraint ids for which the corresponding (in)conveniences
+            should be distributed fairly. May only contain constraints of the
+            same type.
+          items:
+            type: string
+          uniqueItems: true
+        constraintFactors:
+          type: array
+          description: Technical property. Contact dev team for information on how to use
+            this.
+          items:
+            type: object
+            properties:
+              constraintId:
+                type: string
+                description: The id of the constraint for which this factor should be applied.
+              factor:
+                type: number
+                description: The factor to apply to the (in)conveniences of the specified
+                  constraint when calculating fairness.
+                minimum: 0
+                maximum: 2
+        applyConstraintImportanceScaling:
+          type: boolean
+          description: If true, more importance is given to (in)conveniences for
+            constraints with a higher importance.
+          default: true
+        applyWorkloadScaling:
+          type: boolean
+          description: If true, the measured (in)conveniences are scaled proportionally to
+            each employee's workload, ensuring fairness accounts for differences
+            in hours worked.
+          default: false
     prioritizationConstraint:
       type: object
       description: >-
@@ -3526,39 +3554,11 @@ components:
               items:
                 $ref: "#/components/schemas/rotationConstraint"
             fairnessConstraints:
-              type: array
               description: Constraints that improve distribution of (in)conveniences from
                 other constraints over employees.
+              type: array
               items:
-                type: object
-                required:
-                  - id
-                  - constraintIds
-                properties:
-                  id:
-                    $ref: "#/components/schemas/constraintId"
-                  importance:
-                    description: The importance of adhering to this fairness constraint.
-                    $ref: "#/components/schemas/importance"
-                  constraintIds:
-                    type: array
-                    description: List of constraint ids for which the corresponding (in)conveniences
-                      should be distributed fairly. May only contain constraints
-                      of the same type.
-                    items:
-                      type: string
-                    uniqueItems: true
-                  applyConstraintImportanceScaling:
-                    type: boolean
-                    description: If true, more importance is given to (in)conveniences for
-                      constraints with a higher importance.
-                    default: true
-                  applyWorkloadScaling:
-                    type: boolean
-                    description: If true, the measured (in)conveniences are scaled proportionally to
-                      each employee's workload, ensuring fairness accounts for
-                      differences in hours worked.
-                    default: false
+                $ref: "#/components/schemas/fairnessConstraint"
         configuration:
           $ref: "#/components/schemas/configuration"
         extensions:
@@ -4126,12 +4126,12 @@ components:
               $ref: "#/components/schemas/durationInterval"
               description: If specified, the shift must have a gap (between any two shift
                 intervals) that falls inside this range.
-            workTypeIds:
+            workloadCategories:
               type: array
               items:
                 type: string
-              description: If specified, the shift must have at least one of the work types
-                specified in this list.
+              description: If specified, the shift must have at least one of the workload
+                categories specified in this list.
               uniqueItems: true
         configuration:
           type: object
@@ -4835,24 +4835,6 @@ components:
                     can be eligible for more bonus hours, but they will not be
                     counted beyond this cap.
                   minimum: 0
-            defaultTime:
-              description: Settings to determine if and how default time rules affect the
-                constraint.
-              type: object
-              properties:
-                includeDefaultHours:
-                  type: boolean
-                  description: Whether or not default hours should be included in the calculation
-                    of an employee's total hours worked for the constraint.
-                  default: true
-                minOverlapHours:
-                  type: number
-                  description: >-
-                    The minimum number of hours that this constraint should
-                    overlap with a day where a default time rule is active.
-
-                    If the overlap is below this amount, the hours from the
-                    default time rule will not be counted for this constraint.
             overlapRules:
               description: >-
                 Specify when a scheduled shift should count towards the targets
@@ -5193,12 +5175,12 @@ components:
               description: The minimum number of consecutive entities that an employee should
                 ideally work. This cannot be set as a strict limit and will be
                 treated as a target instead.
-              minimum: 1
+              minimum: 0
             max:
               type: integer
               description: The maximum number of consecutive entities that an employee can
                 work. Currently only supports importance STRICT.
-              minimum: 1
+              minimum: 0
         rotationConstraint:
           type: object
           required:
@@ -5322,6 +5304,52 @@ components:
               $ref: "#/components/schemas/overlapRules"
             periods:
               $ref: "#/components/schemas/periods"
+        fairnessConstraint:
+          type: object
+          required:
+            - id
+            - constraintIds
+          properties:
+            id:
+              $ref: "#/components/schemas/constraintId"
+            importance:
+              description: The importance of adhering to this fairness constraint.
+              $ref: "#/components/schemas/importance"
+            constraintIds:
+              type: array
+              description: List of constraint ids for which the corresponding (in)conveniences
+                should be distributed fairly. May only contain constraints of
+                the same type.
+              items:
+                type: string
+              uniqueItems: true
+            constraintFactors:
+              type: array
+              description: Technical property. Contact dev team for information on how to use
+                this.
+              items:
+                type: object
+                properties:
+                  constraintId:
+                    type: string
+                    description: The id of the constraint for which this factor should be applied.
+                  factor:
+                    type: number
+                    description: The factor to apply to the (in)conveniences of the specified
+                      constraint when calculating fairness.
+                    minimum: 0
+                    maximum: 2
+            applyConstraintImportanceScaling:
+              type: boolean
+              description: If true, more importance is given to (in)conveniences for
+                constraints with a higher importance.
+              default: true
+            applyWorkloadScaling:
+              type: boolean
+              description: If true, the measured (in)conveniences are scaled proportionally to
+                each employee's workload, ensuring fairness accounts for
+                differences in hours worked.
+              default: false
         prioritizationConstraint:
           type: object
           description: >-
