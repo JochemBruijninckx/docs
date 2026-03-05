@@ -19,7 +19,7 @@
     </ResponseField>
     <Expandable title="shiftDemands – item structure">
       <ResponseField name="shiftId" type="string" required>
-        Id of the shift for which there is demand.
+        Unique identifier for the shift.
       </ResponseField>
       <ResponseField name="min" type="integer">
         Minimum number of employees needed to cover the demand. The solver will try to cover the demand with at least this number of employees. If not specified, will be equal to ideal.
@@ -49,7 +49,7 @@
           </ResponseField>
         </Expandable>
         <ResponseField name="min" type="integer">
-          The minimum number of employees on the demand matching this attribute requirement.
+          Minimum number of required employees that match the requirement.
         </ResponseField>
       </Expandable>
       <ResponseField name="priority" type="number">
@@ -61,7 +61,7 @@
     </ResponseField>
     <Expandable title="timeDemands – item structure">
       <ResponseField name="timeSlotId" type="string" required>
-        Id of the time slot for which there is demand.
+        Unique identifier for this time slot.
       </ResponseField>
       <ResponseField name="min" type="integer">
         Minimum number of employees needed to cover the demand. The solver will try to cover the demand with at least this number of employees. If not specified, will be equal to ideal.

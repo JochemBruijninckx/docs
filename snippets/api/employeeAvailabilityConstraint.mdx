@@ -168,5 +168,13 @@
         Provide labels to re-use periods that were defined in the configuration.
       </ResponseField>
     </Expandable>
+    <ResponseField name="options" type="object">
+      
+    </ResponseField>
+    <Expandable title="options – properties">
+      <ResponseField name="periodHandling" type="string (enum: PARTIAL | COMPLETE)">
+        Used to indicate whether partial fulfillment per period is acceptable (PARTIAL) or not (COMPLETE). This setting can only be used for undesired constraints. Default: "PARTIAL".
+      </ResponseField>
+    </Expandable>
   </Expandable>
 </ResponseField>
